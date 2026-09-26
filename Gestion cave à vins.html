@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ma Cave à Vin - POC</title>
+    <!-- Inclusion de Tesseract.js via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #722F37; /* Rouge vin */
+            --secondary-color: #f8f9fa;
+            --text-color: #333;
+            --border-color: #ddd;
+            --success-color: #28a745;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        /* Dashboard KPI */
+        .dashboard {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .kpi-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+            max-width: 250px;
+        }
+
+        .kpi-card h3 {
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .kpi-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-top: 10px;
+        }
+
+        /* Boutons d'action */
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #5a252c;
+        }
+
+        button.secondary {
+            background-color: #6c757d;
+        }
+
+        button.secondary:hover {
+            background-color: #5a6268;
+        }
+
+        /* Section Scanner */
+        #scanner-section {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        #camera-stream {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 8px;
+            background-color: #000;
+            display: block;
+            margin: 0 auto 15px auto;
+        }
+
+        #ocr-loader {
+            display: none;
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        canvas {
+            display: none;
+        }
+
+        /* Formulaire */
+        #form-section {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group select {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .form-actions {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        /* Inventaire */
+        .inventory {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #f1f1f1;
+            font-weight: bold;
+        }
+
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .qty-btn {
+            padding: 5px 10px;
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .badge.rouge { background-color: #722F37; }
+        .badge.blanc { background-color: #F3E5AB; color: #333; }
+        .badge.rose { background-color: #FFC0CB; color: #333; }
+        .badge.effervescent { background-color: #FFD700; color: #333; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🍷 Ma Cave à Vin</h1>
+    </header>
+
+    <div class="dashboard">
+        <div class="kpi-card">
+            <h3>Total Bouteilles</h3>
+            <div class="value" id="kpi-total">0</div>
+        </div>
+        <div class="kpi-card">
+            <h3>Références</h3>
+            <div class="value" id="kpi-refs">0</div>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button onclick="openScanner()">📷 Scanner une étiquette</button>
+        <button onclick="openForm()" class="secondary">✍️ Ajout Manuel</button>
+    </div>
+
+    <!-- Section Scanner (Caméra) -->
+    <div id="scanner-section">
+        <h2>Scanner l'étiquette</h2>
+        <p style="margin-bottom: 15px; color: #666;">Placez l'étiquette bien au centre et évitez les reflets.</p>
+        <video id="camera-stream" autoplay playsinline></video>
+        <canvas id="canvas"></canvas>
+        <div>
+            <button onclick="captureAndRecognize()">📸 Capturer & Analyser</button>
+            <button onclick="closeScanner()" class="secondary">Annuler</button>
+        </div>
+        <div id="ocr-loader">Analyse de l'étiquette en cours... Veuillez patienter.</div>
+    </div>
+
+    <!-- Formulaire d'ajout / modification -->
+    <div id="form-section">
+        <h2 id="form-title">Ajouter un vin</h2>
+        <form id="wine-form" onsubmit="saveWine(event)">
+            <input type="hidden" id="wine-id">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="domaine">Domaine / Château (Texte Brut OCR)</label>
+                    <input type="text" id="domaine" required>
+                </div>
+                <div class="form-group">
+                    <label for="region">Appellation / Région</label>
+                    <input type="text" id="region">
+                </div>
+                <div class="form-group">
+                    <label for="millesime">Millésime</label>
+                    <input type="number" id="millesime" min="1900" max="2100">
+                </div>
+                <div class="form-group">
+                    <label for="couleur">Couleur</label>
+                    <select id="couleur" required>
+                        <option value="Rouge">Rouge</option>
+                        <option value="Blanc">Blanc</option>
+                        <option value="Rosé">Rosé</option>
+                        <option value="Effervescent">Effervescent</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="quantite">Quantité ajoutée</label>
+                    <input type="number" id="quantite" min="1" value="1" required>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" onclick="closeForm()" class="secondary">Annuler</button>
+                <button type="submit">💾 Enregistrer</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Inventaire -->
+    <div class="inventory">
+        <h2>Inventaire de la cave</h2>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Domaine</th>
+                        <th>Région</th>
+                        <th>Millésime</th>
+                        <th>Couleur</th>
+                        <th>Stock</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="inventory-body">
+                    <!-- Généré par JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. CONFIGURATION ET DONNÉES ---
+        const STORAGE_KEY = 'ryzek_cave_a_vin_data';
+        let wineInventory = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        let stream = null;
+
+        // Dictionnaires pour l'intelligence de parsing OCR
+        const REGIONS_DICT = ["bordeaux", "bourgogne", "rhone", "loire", "alsace", "champagne", "languedoc", "provence", "beaujolais", "chablis", "margaux", "pauillac", "saint-emilion", "pomerol", "sancerre", "cotes du rhone"];
+        const COLORS_DICT = {
+            "rouge": "Rouge",
+            "blanc": "Blanc",
+            "rosé": "Rosé",
+            "rose": "Rosé",
+            "champagne": "Effervescent",
+            "brut": "Effervescent"
+        };
+
+        // --- 2. GESTION DE LA CAMÉRA ET OCR ---
+        async function openScanner() {
+            document.getElementById('scanner-section').style.display = 'block';
+            document.getElementById('form-section').style.display = 'none';
+            const video = document.getElementById('camera-stream');
+
+            try {
+                // Demande la caméra arrière par défaut
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "environment" } 
+                });
+                video.srcObject = stream;
+            } catch (err) {
+                alert("Erreur d'accès à la caméra : " + err.message + ". Assurez-vous d'être sur localhost ou HTTPS.");
+            }
+        }
+
+        function closeScanner() {
+            document.getElementById('scanner-section').style.display = 'none';
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+        }
+
+        async function captureAndRecognize() {
+            const video = document.getElementById('camera-stream');
+            const canvas = document.getElementById('canvas');
+            const loader = document.getElementById('ocr-loader');
+            
+            // Ajuster le canvas à la taille de la vidéo
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // Dessiner l'image courante de la vidéo sur le canvas
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Récupérer l'image en base64
+            const imageDataUrl = canvas.toDataURL('image/jpeg');
+            
+            loader.style.display = 'block';
+
+            try {
+                // Lancement de Tesseract.js
+                const result = await Tesseract.recognize(
+                    imageDataUrl,
+                    'fra', // Dictionnaire français
+                    { logger: m => console.log(m) } // Log de progression dans la console
+                );
+
+                const textExtrait = result.data.text;
+                console.log("Texte brut extrait : ", textExtrait);
+                
+                parseOCRText(textExtrait);
+                
+            } catch (error) {
+                alert("Erreur lors de l'analyse OCR : " + error.message);
+            } finally {
+                loader.style.display = 'none';
+                closeScanner();
+            }
+        }
+
+        // --- 3. INTELLIGENCE DE PARSING (Extraction des données) ---
+        function parseOCRText(text) {
+            const textLower = text.toLowerCase();
+            let prefilledData = {
+                domaine: text.replace(/\n/g, ' ').substring(0, 50).trim(), // Prend le début brut en guise de nom
+                region: '',
+                millesime: '',
+                couleur: 'Rouge' // Défaut
+            };
+
+            // 1. Recherche du millésime (Regex : 4 chiffres entre 1950 et 2030)
+            const millesimeMatch = text.match(/\b(19[5-9]\d|20[0-2]\d)\b/);
+            if (millesimeMatch) {
+                prefilledData.millesime = millesimeMatch[0];
+            }
+
+            // 2. Recherche de la région
+            for (const region of REGIONS_DICT) {
+                if (textLower.includes(region)) {
+                    prefilledData.region = region.charAt(0).toUpperCase() + region.slice(1);
+                    break;
+                }
+            }
+
+            // 3. Recherche de la couleur
+            for (const [key, value] of Object.entries(COLORS_DICT)) {
+                if (textLower.includes(key)) {
+                    prefilledData.couleur = value;
+                    break;
+                }
+            }
+
+            // Ouvre le formulaire avec les données pré-remplies
+            openForm(prefilledData);
+        }
+
+        // --- 4. GESTION DU FORMULAIRE ET CRUD ---
+        function openForm(data = null) {
+            closeScanner();
+            document.getElementById('form-section').style.display = 'block';
+            document.getElementById('form-title').innerText = data && data.id ? "Modifier un vin" : "Ajouter un vin";
+            
+            // Reset du formulaire
+            document.getElementById('wine-form').reset();
+            document.getElementById('wine-id').value = '';
+
+            if (data) {
+                if(data.id) document.getElementById('wine-id').value = data.id;
+                if(data.domaine) document.getElementById('domaine').value = data.domaine;
+                if(data.region) document.getElementById('region').value = data.region;
+                if(data.millesime) document.getElementById('millesime').value = data.millesime;
+                if(data.couleur) document.getElementById('couleur').value = data.couleur;
+                if(data.quantite) document.getElementById('quantite').value = data.quantite;
+            }
+        }
+
+        function closeForm() {
+            document.getElementById('form-section').style.display = 'none';
+        }
+
+        function saveWine(event) {
+            event.preventDefault();
+            
+            const id = document.getElementById('wine-id').value;
+            const newWine = {
+                id: id ? id : Date.now().toString(),
+                domaine: document.getElementById('domaine').value,
+                region: document.getElementById('region').value,
+                millesime: document.getElementById('millesime').value,
+                couleur: document.getElementById('couleur').value,
+                quantite: parseInt(document.getElementById('quantite').value, 10)
+            };
+
+            if (id) {
+                // Mise à jour
+                const index = wineInventory.findIndex(w => w.id === id);
+                if (index !== -1) wineInventory[index] = newWine;
+            } else {
+                // Ajout
+                wineInventory.push(newWine);
+            }
+
+            saveToLocalStorage();
+            closeForm();
+            renderDashboard();
+        }
+
+        function updateStock(id, change) {
+            const wine = wineInventory.find(w => w.id === id);
+            if (wine) {
+                wine.quantite += change;
+                if (wine.quantite <= 0) {
+                    if(confirm("La quantité est à 0. Voulez-vous supprimer cette référence de l'inventaire ?")) {
+                        deleteWine(id);
+                        return;
+                    } else {
+                        wine.quantite = 0;
+                    }
+                }
+                saveToLocalStorage();
+                renderDashboard();
+            }
+        }
+
+        function deleteWine(id) {
+            wineInventory = wineInventory.filter(w => w.id !== id);
+            saveToLocalStorage();
+            renderDashboard();
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
+        }
+
+        // --- 5. AFFICHAGE (Rendu UI) ---
+        function renderDashboard() {
+            // KPI
+            const totalBottles = wineInventory.reduce((sum, wine) => sum + wine.quantite, 0);
+            document.getElementById('kpi-total').innerText = totalBottles;
+            document.getElementById('kpi-refs').innerText = wineInventory.length;
+
+            // Tableau Inventaire
+            const tbody = document.getElementById('inventory-body');
+            tbody.innerHTML = '';
+
+            wineInventory.forEach(wine => {
+                const tr = document.createElement('tr');
+                
+                // Classe CSS pour le badge de couleur
+                const colorClass = wine.couleur.toLowerCase().replace('é', 'e');
+
+                tr.innerHTML = `
+                    <td><strong>${wine.domaine}</strong></td>
+                    <td>${wine.region || '-'}</td>
+                    <td>${wine.millesime || 'NV'}</td>
+                    <td><span class="badge ${colorClass}">${wine.couleur}</span></td>
+                    <td>
+                        <div class="qty-controls">
+                            <button type="button" class="qty-btn secondary" onclick="updateStock('${wine.id}', -1)">-</button>
+                            <strong>${wine.quantite}</strong>
+                            <button type="button" class="qty-btn" onclick="updateStock('${wine.id}', 1)">+</button>
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="secondary" onclick='openForm(${JSON.stringify(wine).replace(/'/g, "&#39;")})'>✏️</button>
+                        <button type="button" class="delete-btn" onclick="if(confirm('Supprimer cette référence ?')) deleteWine('${wine.id}')">🗑️</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Initialisation au chargement de la page
+        document.addEventListener('DOMContentLoaded', renderDashboard);
+
+    </script>
+</body>
+</html>
