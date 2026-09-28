@@ -3,566 +3,327 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ma Cave à Vin - POC</title>
-    <!-- Inclusion de Tesseract.js via CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <title>Visualiseur de Cave - Data Driven UI</title>
     <style>
         :root {
-            --primary-color: #722F37; /* Rouge vin */
-            --secondary-color: #f8f9fa;
-            --text-color: #333;
-            --border-color: #ddd;
-            --success-color: #28a745;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #333;
+            --border: #e1e4e8;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
-        body {
-            background-color: var(--secondary-color);
-            color: var(--text-color);
-            padding: 20px;
+        body { background-color: var(--bg-color); color: var(--text-main); padding: 20px; }
+        h1 { text-align: center; color: #722F37; margin-bottom: 30px; }
+
+        .cave-container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
             max-width: 1200px;
             margin: 0 auto;
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        h1 {
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
-
-        /* Dashboard KPI */
-        .dashboard {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-
-        .kpi-card {
-            background: white;
+        .groupe-cave {
+            background: var(--card-bg);
             padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .groupe-cave h2 {
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: #444;
+        }
+
+        /* Disposition des étages et blocs */
+        .conteneur-blocs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        /* Spécifique pour empiler les étages du garage visuellement */
+        .groupe-garage .conteneur-blocs {
+            flex-direction: column-reverse; /* Pour avoir l'étage 1 en bas */
+        }
+        .etage-complet {
+            display: flex;
+            gap: 15px;
+            background: #fafafa;
+            padding: 10px;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            text-align: center;
+            border: 1px solid #eee;
+        }
+
+        .bloc {
             flex: 1;
             min-width: 150px;
-            max-width: 250px;
-        }
-
-        .kpi-card h3 {
-            font-size: 14px;
-            color: #666;
-            text-transform: uppercase;
-        }
-
-        .kpi-card .value {
-            font-size: 32px;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-top: 10px;
-        }
-
-        /* Boutons d'action */
-        .actions {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
-
-        button, .btn-primary {
-            display: inline-block;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 12px 24px;
+            background: #fff;
+            border: 1px solid var(--border);
             border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            text-align: center;
-            text-decoration: none;
-            transition: background-color 0.3s;
-        }
-
-        button:hover, .btn-primary:hover {
-            background-color: #5a252c;
-        }
-
-        button.secondary {
-            background-color: #6c757d;
-        }
-
-        button.secondary:hover {
-            background-color: #5a6268;
-        }
-
-        /* Section Loader OCR */
-        #ocr-loader-section {
-            display: none;
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        
-        #ocr-loader-section h2 {
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
-
-        /* Formulaire */
-        #form-section {
-            display: none;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        @media (max-width: 600px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group label {
-            margin-bottom: 5px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .form-group input, .form-group select {
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 16px;
-        }
-
-        .form-actions {
-            margin-top: 20px;
-            text-align: right;
-        }
-
-        /* Inventaire */
-        .inventory {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        th, td {
             padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
         }
 
-        th {
-            background-color: #f1f1f1;
-            font-weight: bold;
+        .bloc h3 {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #888;
+            margin-bottom: 10px;
+            text-align: center;
         }
 
-        .qty-controls {
+        /* Les grilles (précis) vs Flex (vrac) */
+        .grille-vins.grille {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            justify-items: center;
+        }
+
+        .grille-vins.vrac {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        /* Les emplacements physiques */
+        .case-grille, .case-vrac-vide {
+            width: 35px;
+            height: 35px;
+            border: 2px dashed #ccc;
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            font-size: 10px;
+            color: #aaa;
+            cursor: pointer;
+            transition: background 0.2s;
         }
 
-        .qty-btn {
-            padding: 5px 10px;
-            font-size: 18px;
-            line-height: 1;
+        .case-grille:hover, .case-vrac-vide:hover {
+            background: #e9ecef;
+            border-color: #999;
         }
 
-        .delete-btn {
-            background-color: #dc3545;
-            padding: 5px 10px;
+        /* Les bouteilles */
+        .pastille {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            cursor: pointer;
+            border: 2px solid #fff;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 14px;
         }
 
-        .delete-btn:hover {
-            background-color: #c82333;
+        .pastille:hover {
+            transform: scale(1.15);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            z-index: 10;
         }
 
-        .badge {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-            color: white;
-        }
-        
-        .badge.rouge { background-color: #722F37; }
-        .badge.blanc { background-color: #F3E5AB; color: #333; }
-        .badge.rose { background-color: #FFC0CB; color: #333; }
-        .badge.effervescent { background-color: #FFD700; color: #333; }
+        /* Couleurs des vins */
+        .rouge { background: linear-gradient(135deg, #722F37, #4a1c22); }
+        .blanc { background: linear-gradient(135deg, #F3E5AB, #d1c179); }
+        .rose { background: linear-gradient(135deg, #FFC0CB, #d195a0); }
+
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>🍷 Ma Cave à Vin</h1>
-    </header>
-
-    <div class="dashboard">
-        <div class="kpi-card">
-            <h3>Total Bouteilles</h3>
-            <div class="value" id="kpi-total">0</div>
-        </div>
-        <div class="kpi-card">
-            <h3>Références</h3>
-            <div class="value" id="kpi-refs">0</div>
-        </div>
-    </div>
-
-    <!-- Actions principales avec appel de l'appareil photo natif -->
-    <div class="actions">
-        <!-- Input caché qui déclenche l'appareil photo du smartphone -->
-        <input type="file" id="camera-input" accept="image/*" capture="environment" style="display: none;" onchange="processImage(event)">
-        
-        <button class="btn-primary" onclick="document.getElementById('camera-input').click()">📷 Photographier l'étiquette</button>
-        <button onclick="openForm()" class="secondary">✍️ Ajout Manuel</button>
-    </div>
-
-    <!-- Section Loader pendant l'analyse OCR -->
-    <div id="ocr-loader-section">
-        <h2>⏳ Analyse en cours...</h2>
-        <p style="color: #666;">Le moteur déchiffre l'étiquette, merci de patienter.</p>
-    </div>
-
-    <!-- Formulaire d'ajout / modification -->
-    <div id="form-section">
-        <h2 id="form-title">Ajouter un vin</h2>
-        <form id="wine-form" onsubmit="saveWine(event)">
-            <input type="hidden" id="wine-id">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="domaine">Domaine / Château (Texte Nettoyé)</label>
-                    <input type="text" id="domaine" required>
-                </div>
-                <div class="form-group">
-                    <label for="region">Appellation / Région</label>
-                    <input type="text" id="region">
-                </div>
-                <div class="form-group">
-                    <label for="millesime">Millésime</label>
-                    <input type="number" id="millesime" min="1900" max="2100">
-                </div>
-                <div class="form-group">
-                    <label for="couleur">Couleur</label>
-                    <select id="couleur" required>
-                        <option value="Rouge">Rouge</option>
-                        <option value="Blanc">Blanc</option>
-                        <option value="Rosé">Rosé</option>
-                        <option value="Effervescent">Effervescent</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="quantite">Quantité ajoutée</label>
-                    <input type="number" id="quantite" min="1" value="1" required>
-                </div>
-            </div>
-            <div class="form-actions">
-                <button type="button" onclick="closeForm()" class="secondary">Annuler</button>
-                <button type="submit">💾 Enregistrer</button>
-            </div>
-        </form>
-    </div>
-
-    <!-- Inventaire -->
-    <div class="inventory">
-        <h2>Inventaire de la cave</h2>
-        <div style="overflow-x: auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Domaine</th>
-                        <th>Région</th>
-                        <th>Millésime</th>
-                        <th>Couleur</th>
-                        <th>Stock</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="inventory-body">
-                    <!-- Généré par JS -->
-                </tbody>
-            </table>
-        </div>
+    <h1>🗺️ Topologie de la Cave (Visualiseur)</h1>
+    <div id="cave-visuelle" class="cave-container">
+        <!-- Le moteur JS dessinera tout ici -->
     </div>
 
     <script>
-        // --- 1. CONFIGURATION ET DONNÉES ---
-        const STORAGE_KEY = 'ryzek_cave_a_vin_data';
-        let wineInventory = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        // ==========================================
+        // 1. LE PARAMÉTRAGE UNIVERSEL (La Topologie)
+        // ==========================================
+        const topologie = [
+            // Espace Sous l'escalier (Mixte)
+            { id: "esc_casier", nom: "Casier Précis", type: "grille", capacite: 12, groupe: "Sous l'escalier" },
+            { id: "esc_vrac", nom: "Caisse en Vrac", type: "vrac", capacite: 24, groupe: "Sous l'escalier" } // Capacité visuelle max pour dessiner les ronds vides
+        ];
 
-        // Dictionnaires pour l'intelligence de parsing OCR
-        const REGIONS_DICT = ["bordeaux", "bourgogne", "rhone", "loire", "alsace", "champagne", "languedoc", "provence", "beaujolais", "chablis", "margaux", "pauillac", "saint-emilion", "pomerol", "sancerre", "cotes du rhone", "chateauneuf"];
-        const COLORS_DICT = {
-            "rouge": "Rouge",
-            "blanc": "Blanc",
-            "rosé": "Rosé",
-            "rose": "Rosé",
-            "champagne": "Effervescent",
-            "brut": "Effervescent"
-        };
+        // Génération automatique des 10 étages du Garage (100 bouteilles) via JS pour garder le pivot propre
+        for (let i = 1; i <= 10; i++) {
+            topologie.push({ id: `g_e${i}_g`, nom: `Étage ${i} - Gauche`, type: "vrac", capacite: 5, groupe: "Garage", etage: i });
+            topologie.push({ id: `g_e${i}_d`, nom: `Étage ${i} - Droite`, type: "vrac", capacite: 5, groupe: "Garage", etage: i });
+        }
 
-        // --- 2. GESTION DE LA CAMÉRA NATIVE ET OCR ---
-        function processImage(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        // ==========================================
+        // 2. LE NOUVEAU PIVOT DE DONNÉES (L'Inventaire)
+        // ==========================================
+        // Le champ quantité disparait au profit du tableau "emplacements"
+        let inventaire = [
+            { 
+                id: "w1", domaine: "Château Margaux", millesime: 2015, couleur: "Rouge", 
+                // 3 bouteilles en vrac sur le même demi-étage du garage
+                emplacements: ["g_e4_g", "g_e4_g", "g_e4_g"] 
+            },
+            { 
+                id: "w2", domaine: "Les Pierres Plates", millesime: 2024, couleur: "Blanc", 
+                // 2 bouteilles au garage, 1 dans le casier précis position 4
+                emplacements: ["g_e1_d", "g_e1_d", "esc_casier_pos_4"] 
+            },
+            { 
+                id: "w3", domaine: "Minervois Domaine XYZ", millesime: 2021, couleur: "Rosé", 
+                // 1 bouteille tout en haut du garage, 2 dans le vrac escalier, 1 en position précise 12
+                emplacements: ["g_e10_d", "esc_vrac", "esc_vrac", "esc_casier_pos_12"] 
+            }
+        ];
 
-            // Afficher le loader
-            document.getElementById('ocr-loader-section').style.display = 'block';
-            document.getElementById('form-section').style.display = 'none';
+        // ==========================================
+        // 3. LE MOTEUR DE RENDU (Data-Driven UI)
+        // ==========================================
+        function renderCave() {
+            const container = document.getElementById('cave-visuelle');
+            container.innerHTML = '';
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    // Création d'un canvas pour redimensionner l'image (optimisation des performances)
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
+            // A. Mapper les bouteilles de l'inventaire vers leurs identifiants physiques
+            const mapEmplacements = {};
+            inventaire.forEach(vin => {
+                vin.emplacements.forEach((empStr, indexDansTableau) => {
+                    let baseId = empStr;
+                    let positionExacte = null;
                     
-                    // On limite la taille max à 1200px pour que l'OCR soit rapide mais reste précis
-                    const MAX_WIDTH = 1200;
-                    const MAX_HEIGHT = 1200;
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > height) {
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
-                    } else {
-                        if (height > MAX_HEIGHT) {
-                            width *= MAX_HEIGHT / height;
-                            height = MAX_HEIGHT;
-                        }
+                    // Détection des positions précises (format: ID_pos_NUMERO)
+                    if (empStr.includes('_pos_')) {
+                        const parts = empStr.split('_pos_');
+                        baseId = parts[0];
+                        positionExacte = parseInt(parts[1], 10);
                     }
 
-                    canvas.width = width;
-                    canvas.height = height;
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    // Conversion du canvas en image compréhensible par Tesseract
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-
-                    // Lancement de Tesseract
-                    Tesseract.recognize(
-                        dataUrl,
-                        'fra',
-                        { logger: m => console.log(m) }
-                    ).then(({ data: { text } }) => {
-                        console.log("Texte brut retourné par Tesseract :", text);
-                        document.getElementById('ocr-loader-section').style.display = 'none';
-                        document.getElementById('camera-input').value = ''; // Réinitialisation de l'input
-                        parseOCRText(text);
-                    }).catch(err => {
-                        console.error(err);
-                        alert("Erreur lors de l'analyse OCR.");
-                        document.getElementById('ocr-loader-section').style.display = 'none';
-                        document.getElementById('camera-input').value = '';
+                    if (!mapEmplacements[baseId]) mapEmplacements[baseId] = [];
+                    mapEmplacements[baseId].push({ 
+                        vin: vin, 
+                        empIndex: indexDansTableau, // Pour savoir quelle occurrence supprimer 
+                        exactPos: positionExacte 
                     });
-                }
-                img.src = e.target.result;
-            }
-            reader.readAsDataURL(file);
-        }
-
-        // --- 3. INTELLIGENCE DE PARSING (Extraction et Nettoyage des données) ---
-        function parseOCRText(text) {
-            const textLower = text.toLowerCase();
-            
-            // SANITIZATION (Nettoyage) : On supprime les caractères bizarres renvoyés par l'OCR
-            // On ne garde que les lettres, les chiffres, les espaces et la ponctuation basique
-            let cleanText = text.replace(/[^a-zA-ZÀ-ÿ0-9\s\.,&'\-]/g, ' '); 
-            // On supprime les espaces multiples consécutifs
-            cleanText = cleanText.replace(/\s+/g, ' ').trim();
-            
-            let prefilledData = {
-                domaine: cleanText.substring(0, 50), // On garde les 50 premiers caractères nettoyés pour le domaine
-                region: '',
-                millesime: '',
-                couleur: 'Rouge' // Défaut
-            };
-
-            // 1. Recherche du millésime (Regex : 4 chiffres entre 1950 et 2030)
-            const millesimeMatch = text.match(/\b(19[5-9]\d|20[0-2]\d)\b/);
-            if (millesimeMatch) {
-                prefilledData.millesime = millesimeMatch[0];
-            }
-
-            // 2. Recherche de la région
-            for (const region of REGIONS_DICT) {
-                if (textLower.includes(region)) {
-                    prefilledData.region = region.charAt(0).toUpperCase() + region.slice(1);
-                    break;
-                }
-            }
-
-            // 3. Recherche de la couleur
-            for (const [key, value] of Object.entries(COLORS_DICT)) {
-                if (textLower.includes(key)) {
-                    prefilledData.couleur = value;
-                    break;
-                }
-            }
-
-            // Ouvre le formulaire avec les données pré-remplies et nettoyées
-            openForm(prefilledData);
-        }
-
-        // --- 4. GESTION DU FORMULAIRE ET CRUD ---
-        function openForm(data = null) {
-            document.getElementById('form-section').style.display = 'block';
-            document.getElementById('form-title').innerText = data && data.id ? "Modifier un vin" : "Ajouter un vin";
-            
-            // Reset du formulaire
-            document.getElementById('wine-form').reset();
-            document.getElementById('wine-id').value = '';
-
-            if (data) {
-                if(data.id) document.getElementById('wine-id').value = data.id;
-                if(data.domaine) document.getElementById('domaine').value = data.domaine;
-                if(data.region) document.getElementById('region').value = data.region;
-                if(data.millesime) document.getElementById('millesime').value = data.millesime;
-                if(data.couleur) document.getElementById('couleur').value = data.couleur;
-                if(data.quantite) document.getElementById('quantite').value = data.quantite;
-            }
-        }
-
-        function closeForm() {
-            document.getElementById('form-section').style.display = 'none';
-        }
-
-        function saveWine(event) {
-            event.preventDefault();
-            
-            const id = document.getElementById('wine-id').value;
-            const newWine = {
-                id: id ? id : Date.now().toString(),
-                domaine: document.getElementById('domaine').value,
-                region: document.getElementById('region').value,
-                millesime: document.getElementById('millesime').value,
-                couleur: document.getElementById('couleur').value,
-                quantite: parseInt(document.getElementById('quantite').value, 10)
-            };
-
-            if (id) {
-                // Mise à jour
-                const index = wineInventory.findIndex(w => w.id === id);
-                if (index !== -1) wineInventory[index] = newWine;
-            } else {
-                // Ajout
-                wineInventory.push(newWine);
-            }
-
-            saveToLocalStorage();
-            closeForm();
-            renderDashboard();
-        }
-
-        function updateStock(id, change) {
-            const wine = wineInventory.find(w => w.id === id);
-            if (wine) {
-                wine.quantite += change;
-                if (wine.quantite <= 0) {
-                    if(confirm("La quantité est à 0. Voulez-vous supprimer cette référence de l'inventaire ?")) {
-                        deleteWine(id);
-                        return;
-                    } else {
-                        wine.quantite = 0;
-                    }
-                }
-                saveToLocalStorage();
-                renderDashboard();
-            }
-        }
-
-        function deleteWine(id) {
-            wineInventory = wineInventory.filter(w => w.id !== id);
-            saveToLocalStorage();
-            renderDashboard();
-        }
-
-        function saveToLocalStorage() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
-        }
-
-        // --- 5. AFFICHAGE (Rendu UI) ---
-        function renderDashboard() {
-            // KPI
-            const totalBottles = wineInventory.reduce((sum, wine) => sum + wine.quantite, 0);
-            document.getElementById('kpi-total').innerText = totalBottles;
-            document.getElementById('kpi-refs').innerText = wineInventory.length;
-
-            // Tableau Inventaire
-            const tbody = document.getElementById('inventory-body');
-            tbody.innerHTML = '';
-
-            wineInventory.forEach(wine => {
-                const tr = document.createElement('tr');
-                
-                // Classe CSS pour le badge de couleur
-                const colorClass = wine.couleur.toLowerCase().replace('é', 'e');
-
-                tr.innerHTML = `
-                    <td><strong>${wine.domaine}</strong></td>
-                    <td>${wine.region || '-'}</td>
-                    <td>${wine.millesime || 'NV'}</td>
-                    <td><span class="badge ${colorClass}">${wine.couleur}</span></td>
-                    <td>
-                        <div class="qty-controls">
-                            <button type="button" class="qty-btn secondary" onclick="updateStock('${wine.id}', -1)">-</button>
-                            <strong>${wine.quantite}</strong>
-                            <button type="button" class="qty-btn" onclick="updateStock('${wine.id}', 1)">+</button>
-                        </div>
-                    </td>
-                    <td>
-                        <button type="button" class="secondary" onclick='openForm(${JSON.stringify(wine).replace(/'/g, "&#39;")})'>✏️</button>
-                        <button type="button" class="delete-btn" onclick="if(confirm('Supprimer cette référence ?')) deleteWine('${wine.id}')">🗑️</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+                });
             });
+
+            // B. Grouper la topologie par lieu physique
+            const groupes = { "Garage": [], "Sous l'escalier": [] };
+            topologie.forEach(bloc => groupes[bloc.groupe].push(bloc));
+
+            // C. Génération du HTML
+            for (const [nomGroupe, blocs] of Object.entries(groupes)) {
+                const section = document.createElement('div');
+                section.className = `groupe-cave groupe-${nomGroupe.toLowerCase().replace(/[' ]/g, '')}`;
+                section.innerHTML = `<h2>${nomGroupe}</h2>`;
+                
+                const conteneurBlocs = document.createElement('div');
+                conteneurBlocs.className = 'conteneur-blocs';
+
+                // Logique spéciale pour regrouper visuellement la Gauche et la Droite du Garage
+                if (nomGroupe === "Garage") {
+                    const etages = {};
+                    blocs.forEach(b => {
+                        if(!etages[b.etage]) etages[b.etage] = [];
+                        etages[b.etage].push(b);
+                    });
+                    
+                    Object.values(etages).forEach(paireBlocs => {
+                        const divEtage = document.createElement('div');
+                        divEtage.className = 'etage-complet';
+                        paireBlocs.forEach(bloc => divEtage.appendChild(creerHTMLBloc(bloc, mapEmplacements[bloc.id])));
+                        conteneurBlocs.appendChild(divEtage);
+                    });
+                } else {
+                    // Rendu standard (Escalier)
+                    blocs.forEach(bloc => conteneurBlocs.appendChild(creerHTMLBloc(bloc, mapEmplacements[bloc.id])));
+                }
+                
+                section.appendChild(conteneurBlocs);
+                container.appendChild(section);
+            }
         }
 
-        // Initialisation au chargement de la page
-        document.addEventListener('DOMContentLoaded', renderDashboard);
+        // Fonction annexe : Dessiner un bloc individuel (Casier ou Zone Vrac)
+        function creerHTMLBloc(bloc, bouteillesPresentes = []) {
+            const divBloc = document.createElement('div');
+            divBloc.className = `bloc bloc-${bloc.type}`;
+            divBloc.innerHTML = `<h3>${bloc.nom}</h3>`;
+            
+            const grilleVins = document.createElement('div');
+            grilleVins.className = `grille-vins ${bloc.type}`;
+
+            if (bloc.type === 'grille') {
+                // Rendu des cases strictes (1 à N)
+                for (let i = 1; i <= bloc.capacite; i++) {
+                    const caseDiv = document.createElement('div');
+                    caseDiv.className = 'case-grille';
+                    
+                    const btl = bouteillesPresentes.find(b => b.exactPos === i);
+                    if (btl) {
+                        caseDiv.appendChild(creerPastilleBouteille(btl, bloc.id, i));
+                    } else {
+                        caseDiv.innerHTML = i; // Affiche le numéro si vide
+                        caseDiv.title = "Emplacement libre";
+                        caseDiv.onclick = () => simulerAjout(`${bloc.id}_pos_${i}`);
+                    }
+                    grilleVins.appendChild(caseDiv);
+                }
+            } else if (bloc.type === 'vrac') {
+                // Rendu fluide (Flex)
+                bouteillesPresentes.forEach(btl => grilleVins.appendChild(creerPastilleBouteille(btl, bloc.id)));
+                
+                // Calcul des emplacements vides pour le rendu visuel
+                const placesLibres = bloc.capacite ? bloc.capacite - bouteillesPresentes.length : 1;
+                for(let i = 0; i < placesLibres; i++) {
+                    const slotVide = document.createElement('div');
+                    slotVide.className = 'case-vrac-vide';
+                    slotVide.title = "Ajouter ici";
+                    slotVide.onclick = () => simulerAjout(bloc.id);
+                    grilleVins.appendChild(slotVide);
+                }
+            }
+            
+            divBloc.appendChild(grilleVins);
+            return divBloc;
+        }
+
+        // Fonction annexe : Fabriquer la pastille cliquable
+        function creerPastilleBouteille(btl, blocId, position = null) {
+            const pastille = document.createElement('div');
+            const colorClass = btl.vin.couleur.toLowerCase().replace('é', 'e');
+            
+            pastille.className = `pastille ${colorClass}`;
+            pastille.title = `${btl.vin.domaine} - ${btl.vin.millesime}\nClic pour boire/retirer`;
+            
+            // Interaction de SORTIE (Boire la bouteille)
+            pastille.onclick = (e) => {
+                e.stopPropagation(); // Évite de déclencher le clic de la case en dessous
+                const locPrevue = position ? `la position ${position} du casier` : `ce casier`;
+                if(confirm(`Déboucher / Retirer 1 bouteille de :\n${btl.vin.domaine} (${btl.vin.millesime})\nDepuis ${locPrevue} ?`)) {
+                    // On retire cette occurrence précise du tableau
+                    btl.vin.emplacements.splice(btl.empIndex, 1);
+                    // On redessine tout
+                    renderCave();
+                }
+            };
+            return pastille;
+        }
+
+        // Fonction annexe : Simulation de clic sur case vide
+        function simulerAjout(emplacementStr) {
+            alert(`[Simulation d'Entrée] \n\nL'application ouvrira le formulaire OCR/Manuel avec le champ de localisation déjà verrouillé sur la valeur :\n"${emplacementStr}"`);
+        }
+
+        // Lancement au chargement
+        document.addEventListener('DOMContentLoaded', renderCave);
 
     </script>
 </body>
