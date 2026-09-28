@@ -3,87 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ma Cave à Vin - Complète</title>
-    <!-- Inclusion de Tesseract.js via CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <title>Ma Cave à Vin - Sortie</title>
     <style>
         :root {
             --primary-color: #722F37;
-            --secondary-color: #f8f9fa;
-            --text-color: #333;
-            --border-color: #ddd;
-            --success-color: #28a745;
+            --primary-light: #90454d;
+            --bg-color: #f4f6f8;
             --card-bg: #ffffff;
+            --text-main: #2d3436;
+            --text-muted: #636e72;
+            --border-color: #dfe6e9;
+            --nav-bg: #ffffff;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
-        body { background-color: var(--secondary-color); color: var(--text-color); padding: 20px; max-width: 1200px; margin: 0 auto; }
-        header { text-align: center; margin-bottom: 30px; }
-        h1 { color: var(--primary-color); margin-bottom: 10px; }
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            /* Marge en bas pour ne pas cacher de contenu sous la barre de navigation fixe */
+            padding-bottom: 80px; 
+        }
 
-        /* Dashboard KPI */
-        .dashboard { display: flex; gap: 20px; justify-content: center; margin-bottom: 30px; flex-wrap: wrap; }
-        .kpi-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; flex: 1; min-width: 150px; max-width: 250px; }
-        .kpi-card h3 { font-size: 14px; color: #666; text-transform: uppercase; }
-        .kpi-card .value { font-size: 32px; font-weight: bold; color: var(--primary-color); margin-top: 10px; }
+        header { background: var(--primary-color); color: white; padding: 15px 20px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        header h1 { font-size: 20px; font-weight: 600; margin: 0; }
 
-        /* Boutons d'action */
-        .actions { display: flex; gap: 15px; justify-content: center; margin-bottom: 30px; }
-        button, .btn-primary { display: inline-block; background-color: var(--primary-color); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; text-align: center; text-decoration: none; transition: background-color 0.3s; }
-        button:hover, .btn-primary:hover { background-color: #5a252c; }
-        button.secondary { background-color: #6c757d; }
-        button.secondary:hover { background-color: #5a6268; }
+        /* --- SYSTÈME D'ONGLETS (SPA) --- */
+        .tab-content { display: none; padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Loader OCR */
-        #ocr-loader-section { display: none; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; text-align: center; }
-        #ocr-loader-section h2 { color: var(--primary-color); margin-bottom: 10px; }
+        /* --- BARRE DE NAVIGATION BASSE --- */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: var(--nav-bg);
+            display: flex; justify-content: space-around;
+            padding: 10px 5px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 1000;
+            border-top: 1px solid var(--border-color);
+        }
+        .nav-item {
+            background: none; border: none; color: var(--text-muted);
+            font-size: 12px; font-weight: 600;
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            padding: 8px 15px; border-radius: 8px;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .nav-item.active { color: var(--primary-color); background: rgba(114, 47, 55, 0.1); }
+        .nav-icon { font-size: 20px; }
 
-        /* Formulaire */
-        #form-section { display: none; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
-        .form-group { display: flex; flex-direction: column; }
-        .form-group.full-width { grid-column: 1 / -1; }
-        .form-group label { margin-bottom: 5px; font-weight: bold; font-size: 14px; }
-        .form-group input, .form-group select, .form-group textarea { padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 16px; }
-        .form-actions { margin-top: 20px; text-align: right; }
-        .info-emplacement { background: #e9ecef; padding: 10px; border-radius: 4px; font-size: 14px; color: #555; text-align: center; font-weight: bold; margin-bottom: 15px; }
-
-        /* Visuel Cave (Data Driven UI) */
-        .cave-container { display: flex; flex-direction: column; gap: 40px; margin-bottom: 40px; }
-        .groupe-cave { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .groupe-cave h2 { border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; color: #444; text-align: left; }
-        .conteneur-blocs { display: flex; flex-wrap: wrap; gap: 15px; }
-        .groupe-garage .conteneur-blocs { flex-direction: column-reverse; }
-        .etage-complet { display: flex; gap: 15px; background: #fafafa; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
-        .bloc { flex: 1; min-width: 150px; background: #fff; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; }
-        .bloc h3 { font-size: 12px; text-transform: uppercase; color: #888; margin-bottom: 10px; text-align: center; }
-        .grille-vins.grille { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; justify-items: center; }
-        .grille-vins.vrac { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        /* --- FILTRES TACTILES (CHIPS) --- */
+        .filter-section { margin-bottom: 25px; }
+        .filter-group { margin-bottom: 15px; }
+        .filter-title { font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; padding-left: 5px; }
+        .chips-container {
+            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px;
+            /* Masquer la barre de défilement tout en gardant le scroll */
+            scrollbar-width: none; 
+        }
+        .chips-container::-webkit-scrollbar { display: none; }
         
-        .case-grille, .case-vrac-vide { width: 35px; height: 35px; border: 2px dashed #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #aaa; cursor: pointer; transition: background 0.2s; }
-        .case-grille:hover, .case-vrac-vide:hover { background: #e9ecef; border-color: #999; }
-        .pastille { width: 35px; height: 35px; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3); cursor: pointer; border: 2px solid #fff; transition: transform 0.2s, box-shadow 0.2s; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-        .pastille:hover { transform: scale(1.15); box-shadow: 0 4px 8px rgba(0,0,0,0.4); z-index: 10; }
-        
-        .rouge { background: linear-gradient(135deg, #722F37, #4a1c22); }
-        .blanc { background: linear-gradient(135deg, #F3E5AB, #d1c179); color: #333; }
-        .rose { background: linear-gradient(135deg, #FFC0CB, #d195a0); color: #333; }
-        .effervescent { background: linear-gradient(135deg, #FFD700, #c4a600); color: #333; }
+        .chip {
+            background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-muted);
+            padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 500;
+            white-space: nowrap; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .chip.active { background: var(--primary-color); color: white; border-color: var(--primary-color); box-shadow: 0 4px 6px rgba(114, 47, 55, 0.2); }
 
-        /* Inventaire Tableau */
-        .inventory { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
-        th { background-color: #f1f1f1; font-weight: bold; }
-        .delete-btn { background-color: #dc3545; padding: 5px 10px; font-size: 14px; }
-        .delete-btn:hover { background-color: #c82333; }
-        .badge { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; color: white; }
-        .badge.rouge { background-color: #722F37; }
-        .badge.blanc { background-color: #F3E5AB; color: #333; }
-        .badge.rose { background-color: #FFC0CB; color: #333; }
-        .badge.effervescent { background-color: #FFD700; color: #333; }
+        /* --- GRILLE DE RÉSULTATS (VINS) --- */
+        .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .results-count { font-weight: bold; color: var(--primary-color); }
+        
+        .wine-grid {
+            display: grid;
+            grid-template-columns: 1fr; /* 1 colonne sur petit écran */
+            gap: 15px;
+        }
+        /* Z Fold ouvert = 2 colonnes ou plus */
+        @media (min-width: 600px) { .wine-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 900px) { .wine-grid { grid-template-columns: repeat(3, 1fr); } }
+
+        .wine-card {
+            background: var(--card-bg); border-radius: 12px; padding: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid var(--border-color);
+            display: flex; flex-direction: column; justify-content: space-between; gap: 15px;
+        }
+        .wine-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .wine-title { font-size: 16px; font-weight: bold; color: var(--text-main); margin-bottom: 4px; line-height: 1.2; }
+        .wine-region { font-size: 13px; color: var(--text-muted); }
+        
+        .wine-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+        .tag { font-size: 11px; padding: 3px 8px; border-radius: 4px; background: #f1f2f6; color: #576574; font-weight: 600; }
+        
+        .wine-stock { font-size: 13px; color: var(--text-main); display: flex; align-items: center; gap: 5px; }
+        .stock-badge { background: var(--primary-color); color: white; padding: 2px 6px; border-radius: 10px; font-weight: bold; font-size: 12px; }
+        
+        .btn-deboucher {
+            width: 100%; background: var(--primary-light); color: white; border: none;
+            padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .btn-deboucher:hover { background: var(--primary-color); }
+
+        /* Placeholders pour les autres onglets */
+        .placeholder-content { text-align: center; padding: 50px 20px; color: var(--text-muted); }
+        .placeholder-content h2 { color: var(--primary-color); margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -92,478 +117,227 @@
         <h1>🍷 Ma Cave à Vin</h1>
     </header>
 
-    <div class="dashboard">
-        <div class="kpi-card">
-            <h3>Total Bouteilles</h3>
-            <div class="value" id="kpi-total">0</div>
-        </div>
-        <div class="kpi-card">
-            <h3>Références Différentes</h3>
-            <div class="value" id="kpi-refs">0</div>
-        </div>
-    </div>
-
-    <!-- Actions principales -->
-    <div class="actions">
-        <input type="file" id="camera-input" accept="image/*" capture="environment" style="display: none;" onchange="processImage(event)">
-        <button class="btn-primary" onclick="triggerCamera('esc_vrac')">📷 OCR Rapide (Vrac)</button>
-        <button onclick="openForm(null, 'esc_vrac')" class="secondary">✍️ Ajout Manuel Rapide</button>
-    </div>
-
-    <div id="ocr-loader-section">
-        <h2>⏳ Analyse en cours...</h2>
-        <p style="color: #666;">Conversion et déchiffrage de l'étiquette en cours.</p>
-    </div>
-
-    <!-- Formulaire d'ajout / modification -->
-    <div id="form-section">
-        <h2 id="form-title">Ajouter un vin</h2>
-        <div id="info-loc" class="info-emplacement">Emplacement cible : En Vrac</div>
-        
-        <form id="wine-form" onsubmit="saveWine(event)">
-            <input type="hidden" id="wine-id">
-            <input type="hidden" id="emplacement_cible" value="esc_vrac">
+    <main>
+        <!-- ONGLET 1 : DÉBOUCHER (Workflow de Sortie) -->
+        <section id="tab-deboucher" class="tab-content active">
             
-            <div class="form-grid">
-                <div class="form-group full-width">
-                    <label for="raw-text">Texte brut détecté par l'OCR</label>
-                    <textarea id="raw-text" rows="2" readonly style="font-size: 13px; color: #666; background: #f8f9fa;"></textarea>
+            <!-- Les Filtres -->
+            <div class="filter-section">
+                <div class="filter-group">
+                    <div class="filter-title">La Robe</div>
+                    <div class="chips-container" id="filter-robe">
+                        <div class="chip" onclick="toggleFilter('couleur', 'Rouge', this)">🔴 Rouge</div>
+                        <div class="chip" onclick="toggleFilter('couleur', 'Blanc', this)">⚪ Blanc</div>
+                        <div class="chip" onclick="toggleFilter('couleur', 'Rosé', this)">🌸 Rosé</div>
+                        <div class="chip" onclick="toggleFilter('couleur', 'Effervescent', this)">🍾 Bulles</div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="domaine">Domaine / Nom</label>
-                    <input type="text" id="domaine" required>
+
+                <div class="filter-group">
+                    <div class="filter-title">L'Envergure</div>
+                    <div class="chips-container" id="filter-envergure">
+                        <div class="chip" onclick="toggleFilter('envergure', 'Détente', this)">📅 Détente (Semaine)</div>
+                        <div class="chip" onclick="toggleFilter('envergure', 'Dégustation', this)">✨ Dégustation (W-E)</div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="region">Appellation / Région</label>
-                    <input type="text" id="region">
-                </div>
-                <div class="form-group">
-                    <label for="millesime">Millésime</label>
-                    <input type="number" id="millesime" min="1900" max="2100">
-                </div>
-                <div class="form-group">
-                    <label for="couleur">Couleur</label>
-                    <select id="couleur" required>
-                        <option value="Rouge">Rouge</option>
-                        <option value="Blanc">Blanc</option>
-                        <option value="Rosé">Rosé</option>
-                        <option value="Effervescent">Effervescent</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="quantite">Quantité (pastilles à générer)</label>
-                    <input type="number" id="quantite" min="1" value="1" required>
+
+                <div class="filter-group">
+                    <div class="filter-title">Le Profil</div>
+                    <div class="chips-container" id="filter-profil">
+                        <div class="chip" onclick="toggleFilter('profil', 'Fruité/Vif', this)">🍇 Léger / Vif</div>
+                        <div class="chip" onclick="toggleFilter('profil', 'Puissant/Rond', this)">🥩 Puissant / Rond</div>
+                    </div>
                 </div>
             </div>
-            <div class="form-actions">
-                <button type="button" onclick="closeForm()" class="secondary">Annuler</button>
-                <button type="submit">💾 Enregistrer</button>
+
+            <!-- Les Résultats -->
+            <div class="results-header">
+                <h3>Vins disponibles</h3>
+                <span class="results-count" id="results-count">0 réf.</span>
             </div>
-        </form>
-    </div>
+            
+            <div class="wine-grid" id="wine-results">
+                <!-- Généré par JavaScript -->
+            </div>
 
-    <!-- Moteur de Rendu Visuel -->
-    <div id="cave-visuelle" class="cave-container"></div>
+        </section>
 
-    <!-- Inventaire Tableau -->
-    <div class="inventory">
-        <h2>Détail de l'inventaire</h2>
-        <div style="overflow-x: auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Domaine</th>
-                        <th>Région</th>
-                        <th>Millésime</th>
-                        <th>Couleur</th>
-                        <th>Stock Total</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="inventory-body"></tbody>
-            </table>
-        </div>
-    </div>
+        <!-- ONGLET 2 : RANGER (Prochaine étape) -->
+        <section id="tab-ranger" class="tab-content">
+            <div class="placeholder-content">
+                <h2>📥 Zone d'Entrée</h2>
+                <p>C'est ici que nous intégrerons la saisie prédictive, le scanner OCR et l'affectation visuelle au garage ou sous l'escalier dans la prochaine version.</p>
+            </div>
+        </section>
+
+        <!-- ONGLET 3 : MA CAVE (Ancien tableau de bord) -->
+        <section id="tab-macave" class="tab-content">
+            <div class="placeholder-content">
+                <h2>📊 Gestion globale</h2>
+                <p>Retrouvez ici la valorisation, les statistiques et le tableau complet de votre inventaire.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Navigation Basse -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('deboucher', this)">
+            <span class="nav-icon">🍷</span>
+            <span>Déboucher</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('ranger', this)">
+            <span class="nav-icon">📥</span>
+            <span>Ranger</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('macave', this)">
+            <span class="nav-icon">📊</span>
+            <span>Ma Cave</span>
+        </button>
+    </nav>
 
     <script>
         // ==========================================
-        // 1. CONFIGURATION & MIGRATION DES DONNÉES
+        // 1. DONNÉES ET INITIALISATION
         // ==========================================
         const STORAGE_KEY = 'ryzek_cave_a_vin_data';
         let wineInventory = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-        // MIGRATION : Convertir l'ancien format (quantite) vers le nouveau (emplacements[])
-        wineInventory = wineInventory.map(wine => {
-            if (wine.quantite !== undefined && !wine.emplacements) {
-                wine.emplacements = Array(wine.quantite).fill('esc_vrac');
-                delete wine.quantite;
-            }
-            if(!wine.emplacements) wine.emplacements = [];
-            return wine;
-        });
-
-        // Dictionnaires
-        const REGIONS_DICT = ["bordeaux", "bourgogne", "rhone", "loire", "alsace", "champagne", "languedoc", "provence", "beaujolais", "chablis", "margaux", "pauillac", "saint-emilion", "pomerol", "sancerre", "cotes du rhone", "chateauneuf", "roussillon", "cotes du roussillon", "minervois", "corbieres"];
-        const COLORS_DICT = { "rouge": "Rouge", "blanc": "Blanc", "rosé": "Rosé", "rose": "Rosé", "champagne": "Effervescent", "brut": "Effervescent" };
-
-        // Topologie Physiques (JSON Config)
-        const topologie = [
-            { id: "esc_casier", nom: "Casier Précis", type: "grille", capacite: 12, groupe: "Sous l'escalier" },
-            { id: "esc_vrac", nom: "Caisse en Vrac", type: "vrac", capacite: 24, groupe: "Sous l'escalier" }
-        ];
-        // 10 étages du garage générés
-        for (let i = 1; i <= 10; i++) {
-            topologie.push({ id: `g_e${i}_g`, nom: `Étage ${i} - G`, type: "vrac", capacite: 5, groupe: "Garage", etage: i });
-            topologie.push({ id: `g_e${i}_d`, nom: `Étage ${i} - D`, type: "vrac", capacite: 5, groupe: "Garage", etage: i });
-        }
-
-        // ==========================================
-        // 2. OCR & CAMÉRA
-        // ==========================================
-        let emplacementPourOCR = "esc_vrac";
-
-        function triggerCamera(cibleId) {
-            emplacementPourOCR = cibleId;
-            document.getElementById('camera-input').click();
-        }
-
-        function processImage(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            document.getElementById('ocr-loader-section').style.display = 'block';
-            document.getElementById('form-section').style.display = 'none';
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    
-                    const MAX_WIDTH = 1000;
-                    const MAX_HEIGHT = 1000;
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > height) {
-                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-                    } else {
-                        if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    // Binarisation N/B
-                    const imageData = ctx.getImageData(0, 0, width, height);
-                    const data = imageData.data;
-                    for (let i = 0; i < data.length; i += 4) {
-                        let brightness = (data[i] * 0.299) + (data[i + 1] * 0.587) + (data[i + 2] * 0.114);
-                        let color = brightness > 120 ? 255 : 0; 
-                        data[i] = color; data[i + 1] = color; data[i + 2] = color;
-                    }
-                    ctx.putImageData(imageData, 0, 0);
-
-                    const dataUrl = canvas.toDataURL('image/jpeg', 1.0);
-
-                    Tesseract.recognize(dataUrl, 'fra', { logger: m => console.log(m) })
-                    .then(({ data: { text } }) => {
-                        document.getElementById('ocr-loader-section').style.display = 'none';
-                        document.getElementById('camera-input').value = ''; 
-                        parseOCRText(text, emplacementPourOCR);
-                    }).catch(err => {
-                        alert("Erreur OCR.");
-                        document.getElementById('ocr-loader-section').style.display = 'none';
-                        document.getElementById('camera-input').value = '';
-                    });
-                }
-                img.src = e.target.result;
-            }
-            reader.readAsDataURL(file);
-        }
-
-        function parseOCRText(text, cibleId) {
-            const textLower = text.toLowerCase();
-            let bestDomaine = "";
-            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 3);
-            
-            for (let line of lines) {
-                let cleanLine = line.replace(/[^a-zA-ZÀ-ÿ0-9\s\.,&'\-]/g, ' ').replace(/\s+/g, ' ').trim();
-                const excludeWords = ["produce", "france", "medaille", "argent", "or", "bronze", "concours", "vin", "bouteille", "domaine", "chateau", "vol", "ml", "cl", "propriete", "mis en bouteille"];
-                let isJunk = false;
-                for (let word of excludeWords) { if (cleanLine.toLowerCase().includes(word)) { isJunk = true; break; } }
-                if (!isJunk && cleanLine.length > 4 && cleanLine.length < 40) { bestDomaine = cleanLine; break; }
-            }
-            if (!bestDomaine && lines.length > 0) bestDomaine = lines[0].replace(/[^a-zA-ZÀ-ÿ0-9\s\.,&'\-]/g, ' ').substring(0, 50);
-
-            let prefilledData = { domaine: bestDomaine, region: '', millesime: '', couleur: 'Rouge', rawText: text };
-
-            const millesimeMatch = text.match(/\b(19[5-9]\d|20[0-2]\d)\b/);
-            if (millesimeMatch) prefilledData.millesime = millesimeMatch[0];
-
-            for (const region of REGIONS_DICT) {
-                if (textLower.includes(region)) { prefilledData.region = region.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); break; }
-            }
-
-            for (const [key, value] of Object.entries(COLORS_DICT)) {
-                if (textLower.includes(key)) { prefilledData.couleur = value; break; }
-            }
-
-            openForm(prefilledData, cibleId);
-        }
-
-        // ==========================================
-        // 3. FORMULAIRE & SAUVEGARDE
-        // ==========================================
-        function openForm(data = null, cibleId = "esc_vrac") {
-            document.getElementById('form-section').style.display = 'block';
-            document.getElementById('form-title').innerText = data && data.id ? "Modifier un vin" : "Ajouter un vin";
-            document.getElementById('info-loc').innerText = `Emplacement cible : ${cibleId.replace(/_/g, ' ').toUpperCase()}`;
-            document.getElementById('emplacement_cible').value = cibleId;
-            
-            document.getElementById('wine-form').reset();
-            document.getElementById('wine-id').value = '';
-            document.getElementById('raw-text').value = ''; 
-
-            if (data) {
-                if(data.id) document.getElementById('wine-id').value = data.id;
-                if(data.domaine) document.getElementById('domaine').value = data.domaine;
-                if(data.region) document.getElementById('region').value = data.region;
-                if(data.millesime) document.getElementById('millesime').value = data.millesime;
-                if(data.couleur) document.getElementById('couleur').value = data.couleur;
-                if(data.rawText) document.getElementById('raw-text').value = data.rawText.replace(/\n/g, '  |  ');
-                // Si c'est une modif, on force la quantité visuelle à la taille du tableau
-                if(data.emplacements) document.getElementById('quantite').value = data.emplacements.length;
-            }
-            // Scroll fluide vers le formulaire
-            document.getElementById('form-section').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function closeForm() {
-            document.getElementById('form-section').style.display = 'none';
-        }
-
-        function saveWine(event) {
-            event.preventDefault();
-            
-            const id = document.getElementById('wine-id').value;
-            const targetLoc = document.getElementById('emplacement_cible').value;
-            const qtySaisie = parseInt(document.getElementById('quantite').value, 10);
-            
-            const domaine = document.getElementById('domaine').value;
-            const region = document.getElementById('region').value;
-            const millesime = document.getElementById('millesime').value;
-            const couleur = document.getElementById('couleur').value;
-
-            if (id) {
-                // Modification d'un vin existant
-                const index = wineInventory.findIndex(w => w.id === id);
-                if (index !== -1) {
-                    wineInventory[index].domaine = domaine;
-                    wineInventory[index].region = region;
-                    wineInventory[index].millesime = millesime;
-                    wineInventory[index].couleur = couleur;
-                    
-                    // Ajustement brutale de la quantité globale si changée manuellement via le formulaire
-                    let currentQty = wineInventory[index].emplacements.length;
-                    if(qtySaisie > currentQty) {
-                        for(let i=0; i < (qtySaisie - currentQty); i++) wineInventory[index].emplacements.push(targetLoc);
-                    } else if (qtySaisie < currentQty) {
-                        wineInventory[index].emplacements = wineInventory[index].emplacements.slice(0, qtySaisie);
-                    }
-                }
-            } else {
-                // Création d'un nouveau vin
-                const newEmplacements = Array(qtySaisie).fill(targetLoc);
-                const newWine = {
-                    id: Date.now().toString(),
-                    domaine: domaine,
-                    region: region,
-                    millesime: millesime,
-                    couleur: couleur,
-                    emplacements: newEmplacements
-                };
-                wineInventory.push(newWine);
-            }
-
-            sauvegarderEtRafraichir();
-            closeForm();
-        }
-
-        function retirerDuStock(idVin, indexEmplacement) {
-            const wineIndex = wineInventory.findIndex(w => w.id === idVin);
-            if (wineIndex !== -1) {
-                // Retire 1 occurrence du tableau
-                wineInventory[wineIndex].emplacements.splice(indexEmplacement, 1);
-                
-                // Si la bouteille n'est plus nulle part, on propose de la supprimer de la base
-                if (wineInventory[wineIndex].emplacements.length === 0) {
-                    if(confirm(`Il n'y a plus aucune bouteille de "${wineInventory[wineIndex].domaine}" en stock.\nVoulez-vous supprimer définitivement cette référence de l'historique ?`)) {
-                        wineInventory.splice(wineIndex, 1);
-                    }
-                }
-                sauvegarderEtRafraichir();
-            }
-        }
-
-        function deleteWine(id) {
-            wineInventory = wineInventory.filter(w => w.id !== id);
-            sauvegarderEtRafraichir();
-        }
-
-        function sauvegarderEtRafraichir() {
+        // Jeu de données fictif pour tester si la cave est vide (Injecte les nouveaux tags)
+        if (wineInventory.length === 0) {
+            wineInventory = [
+                { id: "1", domaine: "Château Haut-Marbuzet", region: "Saint-Estèphe", millesime: 2018, couleur: "Rouge", envergure: "Dégustation", profil: "Puissant/Rond", emplacements: ["garage_e4_g", "garage_e4_g"] },
+                { id: "2", domaine: "Les Pierres Plates", region: "Côtes du Roussillon", millesime: 2024, couleur: "Blanc", envergure: "Détente", profil: "Fruité/Vif", emplacements: ["esc_casier_pos_2"] },
+                { id: "3", domaine: "Domaine de la Romanée-Conti", region: "Bourgogne", millesime: 2015, couleur: "Rouge", envergure: "Dégustation", profil: "Fruité/Vif", emplacements: ["esc_casier_pos_1"] },
+                { id: "4", domaine: "Petit Pic Saint-Loup", region: "Languedoc", millesime: 2022, couleur: "Rouge", envergure: "Détente", profil: "Puissant/Rond", emplacements: ["garage_e1_d", "garage_e1_d", "garage_e1_d"] },
+                { id: "5", domaine: "Rosé de Provence", region: "Bandol", millesime: 2023, couleur: "Rosé", envergure: "Détente", profil: "Fruité/Vif", emplacements: ["esc_vrac"] }
+            ];
             localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
-            renderInterface();
         }
 
         // ==========================================
-        // 4. MOTEUR DE RENDU VISUEL ET TABLEAU
+        // 2. NAVIGATION (SPA)
         // ==========================================
-        function renderInterface() {
-            // A. Calculs KPI
-            const totalBottles = wineInventory.reduce((sum, wine) => sum + wine.emplacements.length, 0);
-            document.getElementById('kpi-total').innerText = totalBottles;
-            document.getElementById('kpi-refs').innerText = wineInventory.length;
+        function switchTab(tabId, btnElement) {
+            // Masquer tous les contenus
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            // Afficher le bon contenu
+            document.getElementById(`tab-${tabId}`).classList.add('active');
 
-            // B. Rendu du Tableau Inventaire
-            const tbody = document.getElementById('inventory-body');
-            tbody.innerHTML = '';
-            
-            wineInventory.forEach(wine => {
-                const tr = document.createElement('tr');
-                const colorClass = wine.couleur.toLowerCase().replace('é', 'e');
-                const qteTotale = wine.emplacements.length;
+            // Mettre à jour l'état visuel des boutons de navigation
+            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+        }
 
-                tr.innerHTML = `
-                    <td><strong>${wine.domaine}</strong></td>
-                    <td>${wine.region || '-'}</td>
-                    <td>${wine.millesime || 'NV'}</td>
-                    <td><span class="badge ${colorClass}">${wine.couleur}</span></td>
-                    <td><strong>${qteTotale}</strong></td>
-                    <td>
-                        <button type="button" class="secondary" onclick='openForm(${JSON.stringify(wine).replace(/'/g, "&#39;")}, "esc_vrac")'>✏️ Editer</button>
-                        <button type="button" class="delete-btn" onclick="if(confirm('Supprimer définitivement la référence ?')) deleteWine('${wine.id}')">🗑️</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
+        // ==========================================
+        // 3. MOTEUR DE RECHERCHE ET FILTRES
+        // ==========================================
+        // État actif des filtres
+        let activeFilters = {
+            couleur: null,
+            envergure: null,
+            profil: null
+        };
 
-            // C. Rendu Visuel de la Cave
-            const container = document.getElementById('cave-visuelle');
+        function toggleFilter(category, value, element) {
+            // Si on clique sur un chip déjà actif, on le désactive
+            if (activeFilters[category] === value) {
+                activeFilters[category] = null;
+                element.classList.remove('active');
+            } else {
+                // Désactiver les autres chips de la même catégorie visuellement
+                element.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+                // Activer le nouveau
+                activeFilters[category] = value;
+                element.classList.add('active');
+            }
+            renderDeboucher();
+        }
+
+        function renderDeboucher() {
+            const container = document.getElementById('wine-results');
             container.innerHTML = '';
 
-            const mapEmplacements = {};
-            wineInventory.forEach(vin => {
-                vin.emplacements.forEach((empStr, indexDansTableau) => {
-                    let baseId = empStr;
-                    let positionExacte = null;
-                    if (empStr.includes('_pos_')) {
-                        const parts = empStr.split('_pos_');
-                        baseId = parts[0];
-                        positionExacte = parseInt(parts[1], 10);
-                    }
-                    if (!mapEmplacements[baseId]) mapEmplacements[baseId] = [];
-                    mapEmplacements[baseId].push({ vin: vin, empIndex: indexDansTableau, exactPos: positionExacte });
-                });
+            // Filtrage des données
+            const filteredWines = wineInventory.filter(wine => {
+                // S'il n'y a plus de stock, on ne l'affiche pas dans l'onglet "Déboucher"
+                if (!wine.emplacements || wine.emplacements.length === 0) return false;
+
+                let match = true;
+                if (activeFilters.couleur && wine.couleur !== activeFilters.couleur) match = false;
+                if (activeFilters.envergure && wine.envergure !== activeFilters.envergure) match = false;
+                if (activeFilters.profil && wine.profil !== activeFilters.profil) match = false;
+                return match;
             });
 
-            const groupes = { "Garage": [], "Sous l'escalier": [] };
-            topologie.forEach(bloc => groupes[bloc.groupe].push(bloc));
+            // Mise à jour du compteur
+            document.getElementById('results-count').innerText = `${filteredWines.length} réf.`;
 
-            for (const [nomGroupe, blocs] of Object.entries(groupes)) {
-                const section = document.createElement('div');
-                section.className = `groupe-cave groupe-${nomGroupe.toLowerCase().replace(/[' ]/g, '')}`;
-                section.innerHTML = `<h2>📍 ${nomGroupe}</h2>`;
-                
-                const conteneurBlocs = document.createElement('div');
-                conteneurBlocs.className = 'conteneur-blocs';
-
-                if (nomGroupe === "Garage") {
-                    const etages = {};
-                    blocs.forEach(b => { if(!etages[b.etage]) etages[b.etage] = []; etages[b.etage].push(b); });
-                    Object.values(etages).forEach(paireBlocs => {
-                        const divEtage = document.createElement('div');
-                        divEtage.className = 'etage-complet';
-                        paireBlocs.forEach(bloc => divEtage.appendChild(creerHTMLBloc(bloc, mapEmplacements[bloc.id])));
-                        conteneurBlocs.appendChild(divEtage);
-                    });
-                } else {
-                    blocs.forEach(bloc => conteneurBlocs.appendChild(creerHTMLBloc(bloc, mapEmplacements[bloc.id])));
-                }
-                
-                section.appendChild(conteneurBlocs);
-                container.appendChild(section);
+            // Affichage des cartes
+            if (filteredWines.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding: 30px; color:#999; grid-column: 1/-1;">Aucun vin ne correspond à cette recherche.</div>`;
+                return;
             }
+
+            filteredWines.forEach(wine => {
+                const stock = wine.emplacements.length;
+                // Formater l'emplacement pour qu'il soit lisible (ex: "garage_e4_g" -> "garage e4 g")
+                const locPrevue = wine.emplacements[0].replace(/_/g, ' ').toUpperCase();
+
+                const card = document.createElement('div');
+                card.className = 'wine-card';
+                card.innerHTML = `
+                    <div>
+                        <div class="wine-header">
+                            <div>
+                                <div class="wine-title">${wine.domaine} <span style="font-weight:normal; color:#666;">${wine.millesime || ''}</span></div>
+                                <div class="wine-region">${wine.region || '-'}</div>
+                            </div>
+                            <div class="stock-badge">${stock} en stock</div>
+                        </div>
+                        <div class="wine-tags">
+                            <span class="tag">Couleur : ${wine.couleur}</span>
+                            ${wine.envergure ? `<span class="tag">🍷 ${wine.envergure}</span>` : ''}
+                            ${wine.profil ? `<span class="tag">👅 ${wine.profil}</span>` : ''}
+                        </div>
+                        <div class="wine-stock" style="margin-top:10px;">
+                            📍 Prendre 1 bouteille : <strong>${locPrevue}</strong>
+                        </div>
+                    </div>
+                    <button class="btn-deboucher" onclick="deboucherVin('${wine.id}')">🍾 Retirer du stock</button>
+                `;
+                container.appendChild(card);
+            });
         }
 
-        function creerHTMLBloc(bloc, bouteillesPresentes = []) {
-            const divBloc = document.createElement('div');
-            divBloc.className = `bloc bloc-${bloc.type}`;
-            divBloc.innerHTML = `<h3>${bloc.nom}</h3>`;
-            
-            const grilleVins = document.createElement('div');
-            grilleVins.className = `grille-vins ${bloc.type}`;
-
-            if (bloc.type === 'grille') {
-                for (let i = 1; i <= bloc.capacite; i++) {
-                    const caseDiv = document.createElement('div');
-                    caseDiv.className = 'case-grille';
-                    const btl = bouteillesPresentes.find(b => b.exactPos === i);
+        // ==========================================
+        // 4. ACTION : DÉBOUCHER
+        // ==========================================
+        function deboucherVin(idVin) {
+            const wineIndex = wineInventory.findIndex(w => w.id === idVin);
+            if (wineIndex !== -1) {
+                const wine = wineInventory[wineIndex];
+                if(confirm(`Êtes-vous sûr de vouloir déboucher une bouteille de :\n${wine.domaine} (${wine.millesime}) ?`)) {
+                    // On retire la première bouteille trouvée de ce lot
+                    wine.emplacements.pop(); 
                     
-                    if (btl) {
-                        caseDiv.appendChild(creerPastilleBouteille(btl));
-                    } else {
-                        caseDiv.innerHTML = i;
-                        caseDiv.title = "Emplacement libre - Clic pour ajouter";
-                        caseDiv.onclick = () => actionSlotVide(`${bloc.id}_pos_${i}`);
+                    // Sauvegarde
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
+                    
+                    // Rafraichir l'affichage
+                    renderDeboucher();
+                    
+                    // Si on vient de vider le stock de ce vin, message sympa
+                    if(wine.emplacements.length === 0) {
+                        alert("Santé ! 🥂 C'était votre dernière bouteille de cette référence.");
                     }
-                    grilleVins.appendChild(caseDiv);
-                }
-            } else if (bloc.type === 'vrac') {
-                bouteillesPresentes.forEach(btl => grilleVins.appendChild(creerPastilleBouteille(btl)));
-                const placesLibres = bloc.capacite ? Math.max(1, bloc.capacite - bouteillesPresentes.length) : 1;
-                for(let i = 0; i < placesLibres; i++) {
-                    const slotVide = document.createElement('div');
-                    slotVide.className = 'case-vrac-vide';
-                    slotVide.innerHTML = "+";
-                    slotVide.title = "Ajouter ici";
-                    slotVide.onclick = () => actionSlotVide(bloc.id);
-                    grilleVins.appendChild(slotVide);
                 }
             }
-            
-            divBloc.appendChild(grilleVins);
-            return divBloc;
         }
 
-        function actionSlotVide(cibleId) {
-            if(confirm(`Voulez-vous utiliser l'appareil photo pour ajouter une bouteille ici ?\n(Annuler pour saisir manuellement)`)){
-                triggerCamera(cibleId);
-            } else {
-                openForm(null, cibleId);
-            }
-        }
-
-        function creerPastilleBouteille(btl) {
-            const pastille = document.createElement('div');
-            const colorClass = btl.vin.couleur.toLowerCase().replace('é', 'e');
-            
-            pastille.className = `pastille ${colorClass}`;
-            pastille.title = `${btl.vin.domaine} - ${btl.vin.millesime}\nClic pour retirer du stock`;
-            
-            pastille.onclick = (e) => {
-                e.stopPropagation(); 
-                if(confirm(`🍷 DÉBOUCHER / RETIRER :\n${btl.vin.domaine} (${btl.vin.millesime})\nConfirmer la sortie ?`)) {
-                    retirerDuStock(btl.vin.id, btl.empIndex);
-                }
-            };
-            return pastille;
-        }
-
-        // Lancement au chargement
-        document.addEventListener('DOMContentLoaded', renderInterface);
+        // Initialisation au lancement
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDeboucher();
+        });
 
     </script>
 </body>
