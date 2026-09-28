@@ -81,7 +81,8 @@
             margin-bottom: 30px;
         }
 
-        button {
+        button, .btn-primary {
+            display: inline-block;
             background-color: var(--primary-color);
             color: white;
             border: none;
@@ -90,10 +91,12 @@
             cursor: pointer;
             font-size: 16px;
             font-weight: bold;
+            text-align: center;
+            text-decoration: none;
             transition: background-color 0.3s;
         }
 
-        button:hover {
+        button:hover, .btn-primary:hover {
             background-color: #5a252c;
         }
 
@@ -105,35 +108,20 @@
             background-color: #5a6268;
         }
 
-        /* Section Scanner */
-        #scanner-section {
+        /* Section Loader OCR */
+        #ocr-loader-section {
             display: none;
             background: white;
-            padding: 20px;
+            padding: 30px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             margin-bottom: 30px;
             text-align: center;
         }
-
-        #camera-stream {
-            width: 100%;
-            max-width: 500px;
-            border-radius: 8px;
-            background-color: #000;
-            display: block;
-            margin: 0 auto 15px auto;
-        }
-
-        #ocr-loader {
-            display: none;
+        
+        #ocr-loader-section h2 {
             color: var(--primary-color);
-            font-weight: bold;
-            margin-top: 15px;
-        }
-
-        canvas {
-            display: none;
+            margin-bottom: 10px;
         }
 
         /* Formulaire */
@@ -259,22 +247,19 @@
         </div>
     </div>
 
+    <!-- Actions principales avec appel de l'appareil photo natif -->
     <div class="actions">
-        <button onclick="openScanner()">📷 Scanner une étiquette</button>
+        <!-- Input caché qui déclenche l'appareil photo du smartphone -->
+        <input type="file" id="camera-input" accept="image/*" capture="environment" style="display: none;" onchange="processImage(event)">
+        
+        <button class="btn-primary" onclick="document.getElementById('camera-input').click()">📷 Photographier l'étiquette</button>
         <button onclick="openForm()" class="secondary">✍️ Ajout Manuel</button>
     </div>
 
-    <!-- Section Scanner (Caméra) -->
-    <div id="scanner-section">
-        <h2>Scanner l'étiquette</h2>
-        <p style="margin-bottom: 15px; color: #666;">Placez l'étiquette bien au centre et évitez les reflets.</p>
-        <video id="camera-stream" autoplay playsinline></video>
-        <canvas id="canvas"></canvas>
-        <div>
-            <button onclick="captureAndRecognize()">📸 Capturer & Analyser</button>
-            <button onclick="closeScanner()" class="secondary">Annuler</button>
-        </div>
-        <div id="ocr-loader">Analyse de l'étiquette en cours... Veuillez patienter.</div>
+    <!-- Section Loader pendant l'analyse OCR -->
+    <div id="ocr-loader-section">
+        <h2>⏳ Analyse en cours...</h2>
+        <p style="color: #666;">Le moteur déchiffre l'étiquette, merci de patienter.</p>
     </div>
 
     <!-- Formulaire d'ajout / modification -->
@@ -284,7 +269,7 @@
             <input type="hidden" id="wine-id">
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="domaine">Domaine / Château (Texte Brut OCR)</label>
+                    <label for="domaine">Domaine / Château (Texte Nettoyé)</label>
                     <input type="text" id="domaine" required>
                 </div>
                 <div class="form-group">
@@ -342,10 +327,9 @@
         // --- 1. CONFIGURATION ET DONNÉES ---
         const STORAGE_KEY = 'ryzek_cave_a_vin_data';
         let wineInventory = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-        let stream = null;
 
         // Dictionnaires pour l'intelligence de parsing OCR
-        const REGIONS_DICT = ["bordeaux", "bourgogne", "rhone", "loire", "alsace", "champagne", "languedoc", "provence", "beaujolais", "chablis", "margaux", "pauillac", "saint-emilion", "pomerol", "sancerre", "cotes du rhone"];
+        const REGIONS_DICT = ["bordeaux", "bourgogne", "rhone", "loire", "alsace", "champagne", "languedoc", "provence", "beaujolais", "chablis", "margaux", "pauillac", "saint-emilion", "pomerol", "sancerre", "cotes du rhone", "chateauneuf"];
         const COLORS_DICT = {
             "rouge": "Rouge",
             "blanc": "Blanc",
@@ -355,75 +339,82 @@
             "brut": "Effervescent"
         };
 
-        // --- 2. GESTION DE LA CAMÉRA ET OCR ---
-        async function openScanner() {
-            document.getElementById('scanner-section').style.display = 'block';
+        // --- 2. GESTION DE LA CAMÉRA NATIVE ET OCR ---
+        function processImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Afficher le loader
+            document.getElementById('ocr-loader-section').style.display = 'block';
             document.getElementById('form-section').style.display = 'none';
-            const video = document.getElementById('camera-stream');
 
-            try {
-                // Demande la caméra arrière par défaut
-                stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "environment" } 
-                });
-                video.srcObject = stream;
-            } catch (err) {
-                alert("Erreur d'accès à la caméra : " + err.message + ". Assurez-vous d'être sur localhost ou HTTPS.");
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    // Création d'un canvas pour redimensionner l'image (optimisation des performances)
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // On limite la taille max à 1200px pour que l'OCR soit rapide mais reste précis
+                    const MAX_WIDTH = 1200;
+                    const MAX_HEIGHT = 1200;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Conversion du canvas en image compréhensible par Tesseract
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+
+                    // Lancement de Tesseract
+                    Tesseract.recognize(
+                        dataUrl,
+                        'fra',
+                        { logger: m => console.log(m) }
+                    ).then(({ data: { text } }) => {
+                        console.log("Texte brut retourné par Tesseract :", text);
+                        document.getElementById('ocr-loader-section').style.display = 'none';
+                        document.getElementById('camera-input').value = ''; // Réinitialisation de l'input
+                        parseOCRText(text);
+                    }).catch(err => {
+                        console.error(err);
+                        alert("Erreur lors de l'analyse OCR.");
+                        document.getElementById('ocr-loader-section').style.display = 'none';
+                        document.getElementById('camera-input').value = '';
+                    });
+                }
+                img.src = e.target.result;
             }
+            reader.readAsDataURL(file);
         }
 
-        function closeScanner() {
-            document.getElementById('scanner-section').style.display = 'none';
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-                stream = null;
-            }
-        }
-
-        async function captureAndRecognize() {
-            const video = document.getElementById('camera-stream');
-            const canvas = document.getElementById('canvas');
-            const loader = document.getElementById('ocr-loader');
-            
-            // Ajuster le canvas à la taille de la vidéo
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            
-            // Dessiner l'image courante de la vidéo sur le canvas
-            const context = canvas.getContext('2d');
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            
-            // Récupérer l'image en base64
-            const imageDataUrl = canvas.toDataURL('image/jpeg');
-            
-            loader.style.display = 'block';
-
-            try {
-                // Lancement de Tesseract.js
-                const result = await Tesseract.recognize(
-                    imageDataUrl,
-                    'fra', // Dictionnaire français
-                    { logger: m => console.log(m) } // Log de progression dans la console
-                );
-
-                const textExtrait = result.data.text;
-                console.log("Texte brut extrait : ", textExtrait);
-                
-                parseOCRText(textExtrait);
-                
-            } catch (error) {
-                alert("Erreur lors de l'analyse OCR : " + error.message);
-            } finally {
-                loader.style.display = 'none';
-                closeScanner();
-            }
-        }
-
-        // --- 3. INTELLIGENCE DE PARSING (Extraction des données) ---
+        // --- 3. INTELLIGENCE DE PARSING (Extraction et Nettoyage des données) ---
         function parseOCRText(text) {
             const textLower = text.toLowerCase();
+            
+            // SANITIZATION (Nettoyage) : On supprime les caractères bizarres renvoyés par l'OCR
+            // On ne garde que les lettres, les chiffres, les espaces et la ponctuation basique
+            let cleanText = text.replace(/[^a-zA-ZÀ-ÿ0-9\s\.,&'\-]/g, ' '); 
+            // On supprime les espaces multiples consécutifs
+            cleanText = cleanText.replace(/\s+/g, ' ').trim();
+            
             let prefilledData = {
-                domaine: text.replace(/\n/g, ' ').substring(0, 50).trim(), // Prend le début brut en guise de nom
+                domaine: cleanText.substring(0, 50), // On garde les 50 premiers caractères nettoyés pour le domaine
                 region: '',
                 millesime: '',
                 couleur: 'Rouge' // Défaut
@@ -451,13 +442,12 @@
                 }
             }
 
-            // Ouvre le formulaire avec les données pré-remplies
+            // Ouvre le formulaire avec les données pré-remplies et nettoyées
             openForm(prefilledData);
         }
 
         // --- 4. GESTION DU FORMULAIRE ET CRUD ---
         function openForm(data = null) {
-            closeScanner();
             document.getElementById('form-section').style.display = 'block';
             document.getElementById('form-title').innerText = data && data.id ? "Modifier un vin" : "Ajouter un vin";
             
