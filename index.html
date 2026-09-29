@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ma Cave à Vin - Assistant Intelligent</title>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <title>Ma Cave à Vin - Saisie & Sécurité globale</title>
     <style>
         :root {
             --primary-color: #722F37;
@@ -23,8 +22,30 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 80px; }
-        header { background: var(--primary-color); color: white; padding: 15px 20px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        
+        /* HEADER AVEC ACTIONS GLOBALES */
+        header { 
+            background: var(--primary-color); 
+            color: white; 
+            padding: 15px 20px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
         header h1 { font-size: 20px; font-weight: 600; margin: 0; }
+        .header-actions { display: flex; gap: 15px; }
+        .header-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 18px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .header-btn:hover { background: rgba(255, 255, 255, 0.3); }
 
         .tab-content { display: none; padding: 20px; max-width: 1200px; margin: 0 auto; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
@@ -36,7 +57,6 @@
         .nav-icon { font-size: 20px; }
 
         .btn-primary { background-color: var(--primary-color); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-secondary { background-color: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .btn-danger { background-color: var(--danger-color); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
 
         /* ALERTES & CARROUSEL SOMMELIER */
@@ -59,7 +79,6 @@
 
         .wine-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
         @media (min-width: 600px) { .wine-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (min-width: 900px) { .wine-grid { grid-template-columns: repeat(3, 1fr); } }
         .wine-card { background: var(--card-bg); border-radius: 12px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; gap: 12px; }
         .wine-header { display: flex; justify-content: space-between; align-items: flex-start; }
         .wine-title { font-size: 16px; font-weight: bold; color: var(--text-main); margin-bottom: 4px; line-height: 1.2; }
@@ -69,11 +88,8 @@
         .tag { font-size: 11px; padding: 3px 8px; border-radius: 4px; background: #f1f2f6; color: #576574; font-weight: 600; }
         .wine-stock { font-size: 13px; color: var(--text-main); margin-top:10px; padding-top: 10px; border-top: 1px dashed var(--border-color); }
         .btn-deboucher { width: 100%; background: var(--primary-light); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; transition: background 0.2s; margin-top: 5px; }
-        .btn-deboucher:hover { background: var(--primary-color); }
-
+        
         /* ARRIVAGES (Formulaire & Cave) */
-        .scan-box { background: var(--card-bg); border: 2px dashed var(--primary-light); border-radius: 12px; padding: 25px; text-align: center; margin-bottom: 20px; cursor: pointer; transition: background 0.2s; }
-        .scan-box:hover { background: #fdf5f6; }
         #form-section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 30px; border-left: 4px solid var(--primary-color); }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
@@ -101,14 +117,22 @@
         .blanc { background: linear-gradient(135deg, #F3E5AB, #d1c179); }
         .rose { background: linear-gradient(135deg, #FFC0CB, #d195a0); }
         .effervescent { background: linear-gradient(135deg, #FFD700, #c4a600); }
-        
-        #ocr-loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 2000; align-items: center; justify-content: center; flex-direction: column; }
+
+        /* ADMINISTRATION (KPI) */
+        .dashboard { display: flex; gap: 15px; justify-content: center; margin-bottom: 25px; flex-wrap: wrap; }
+        .kpi-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; flex: 1; min-width: 140px; }
+        .kpi-card h3 { font-size: 12px; color: #666; text-transform: uppercase; }
+        .kpi-card .value { font-size: 28px; font-weight: bold; color: var(--primary-color); margin-top: 5px; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>🍷 Ma Cave à Vin</h1>
+        <h1>🍷 Ma Cave</h1>
+        <div class="header-actions">
+            <button class="header-btn" onclick="exporterJSON()" title="Sauvegarder">💾</button>
+            <button class="header-btn" onclick="document.getElementById('import-file').click()" title="Restaurer">📂</button>
+        </div>
     </header>
 
     <main>
@@ -121,10 +145,6 @@
                 <span id="alerte-texte">🚨 X bouteilles à boire d'urgence</span>
                 <button class="btn-danger" onclick="toggleFilter('apogee', 'urgence', null)">Voir</button>
             </div>
-
-            <button class="btn-primary" onclick="triggerScanSortie()" style="margin-bottom: 20px;">
-                📷 Scanner une bouteille pour la sortir
-            </button>
 
             <div class="section-title">💡 Le Sommelier vous suggère :</div>
             <div class="carousel" id="sommelier-carousel">
@@ -161,22 +181,16 @@
         </section>
 
         <!-- ========================================== -->
-        <!-- ONGLET 2 : ARRIVAGES (Workflow d'Entrée)   -->
+        <!-- ONGLET 2 : ARRIVAGES (Saisie Manuelle Ciblée)-->
         <!-- ========================================== -->
         <section id="tab-arrivages" class="tab-content">
             
-            <div class="scan-box" onclick="triggerScanEntree()">
-                <div style="font-size: 30px; margin-bottom: 10px;">📷</div>
-                <h3 style="color: var(--primary-color);">Scanner la nouvelle bouteille</h3>
-                <p style="font-size: 12px; color: var(--text-muted); margin-top: 5px;">Remplissage automatique du formulaire</p>
-            </div>
-
             <div id="form-section">
-                <h3 id="form-title" style="margin-bottom: 15px; color: var(--primary-color);">Définir les caractéristiques</h3>
+                <h3 id="form-title" style="margin-bottom: 15px; color: var(--primary-color);">✍️ Renseigner la nouvelle bouteille</h3>
                 <form id="wine-form">
                     <div class="form-grid">
                         <div class="form-group full-width">
-                            <label>Domaine / Nom</label>
+                            <label>Domaine / Nom du Vin</label>
                             <input type="text" id="domaine" required placeholder="Ex: Château Margaux">
                         </div>
                         <div class="form-group">
@@ -224,10 +238,22 @@
         </section>
 
         <!-- ========================================== -->
-        <!-- ONGLET 3 : MA CAVE (Administration)        -->
+        <!-- ONGLET 3 : MA CAVE (Administration)         -->
         <!-- ========================================== -->
         <section id="tab-macave" class="tab-content">
-            <h2 style="color: var(--primary-color); margin-bottom: 20px;">Données Globales</h2>
+            
+            <div class="dashboard">
+                <div class="kpi-card">
+                    <h3>Bouteilles en Cave</h3>
+                    <div class="value" id="kpi-total">0</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Références Uniques</h3>
+                    <div class="value" id="kpi-refs">0</div>
+                </div>
+            </div>
+
+            <h2 style="color: var(--primary-color); margin-bottom: 20px;">Détail de l'inventaire</h2>
             <div id="inventory-list"></div>
         </section>
     </main>
@@ -245,14 +271,8 @@
         </button>
     </nav>
 
-    <!-- Éléments cachés -->
-    <input type="file" id="camera-input-entree" accept="image/*" capture="environment" style="display: none;" onchange="processImage(event, 'entree')">
-    <input type="file" id="camera-input-sortie" accept="image/*" capture="environment" style="display: none;" onchange="processImage(event, 'sortie')">
-    
-    <div id="ocr-loader">
-        <h2 style="color: var(--primary-color); margin-bottom: 10px;">📷 Analyse en cours...</h2>
-        <p>Lecture de l'étiquette par l'intelligence artificielle</p>
-    </div>
+    <!-- Input d'import global caché -->
+    <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importerJSON(event)">
 
     <script>
         // ==========================================
@@ -262,9 +282,6 @@
         let wineInventory = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
         const CURRENT_YEAR = 2026;
 
-        const REGIONS_DICT = ["bordeaux", "bourgogne", "rhone", "loire", "alsace", "champagne", "languedoc", "provence", "beaujolais", "chablis", "margaux", "pauillac", "saint-emilion", "pomerol"];
-        const COLORS_DICT = { "rouge": "Rouge", "blanc": "Blanc", "rosé": "Rosé", "rose": "Rosé", "champagne": "Effervescent" };
-
         const topologie = [
             { id: "esc_casier", nom: "Casier Précis", type: "grille", capacite: 12, groupe: "Sous l'escalier" },
             { id: "esc_vrac", nom: "Caisse en Vrac", type: "vrac", capacite: 24, groupe: "Sous l'escalier" }
@@ -272,16 +289,6 @@
         for (let i = 1; i <= 10; i++) {
             topologie.push({ id: `g_e${i}_g`, nom: `Étage ${i} - G`, type: "vrac", capacite: 5, groupe: "Garage", etage: i });
             topologie.push({ id: `g_e${i}_d`, nom: `Étage ${i} - D`, type: "vrac", capacite: 5, groupe: "Garage", etage: i });
-        }
-
-        // Jeu d'essai si cave vide
-        if (wineInventory.length === 0) {
-            wineInventory = [
-                { id: "1", domaine: "Château Latour", region: "Pauillac", millesime: 2014, couleur: "Rouge", envergure: "Dégustation", profil: "Puissant/Rond", emplacements: ["garage_e4_g"] }, // Apogée
-                { id: "2", domaine: "Rosé Piscine", region: "Sud Ouest", millesime: 2023, couleur: "Rosé", envergure: "Détente", profil: "Fruité/Vif", emplacements: ["esc_vrac", "esc_vrac"] }, // Urgence
-                { id: "3", domaine: "Petit Chablis", region: "Bourgogne", millesime: 2025, couleur: "Blanc", envergure: "Détente", profil: "Fruité/Vif", emplacements: ["esc_casier_pos_2", "esc_casier_pos_3", "esc_casier_pos_4"] } // Jeune, max stock
-            ];
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
         }
 
         // ==========================================
@@ -315,7 +322,55 @@
         }
 
         // ==========================================
-        // 3. NAVIGATION (SPA)
+        // 3. GESTION DES FICHIERS JSON (Export/Import Globaux)
+        // ==========================================
+        function exporterJSON() {
+            if (wineInventory.length === 0) {
+                alert("Votre cave est vide, rien à exporter !");
+                return;
+            }
+            const dataStr = JSON.stringify(wineInventory, null, 2);
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ma_cave_ryzek_${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importerJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (!Array.isArray(importedData)) throw new Error("Format invalide.");
+                    
+                    if(confirm(`Êtes-vous sûr de vouloir écraser votre cave actuelle par ce fichier ? (${importedData.length} références trouvées)`)) {
+                        wineInventory = importedData;
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
+                        alert("Restauration réussie !");
+                        // Recharge la vue active
+                        document.querySelectorAll('.nav-item').forEach(btn => {
+                            if(btn.classList.contains('active')) btn.click();
+                        });
+                    }
+                } catch (error) {
+                    alert("Erreur lors de la lecture du fichier JSON. Assurez-vous qu'il s'agit du bon fichier.");
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; 
+        }
+
+        // ==========================================
+        // 4. NAVIGATION (SPA)
         // ==========================================
         function switchTab(tabId, btnElement) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -329,7 +384,7 @@
         }
 
         // ==========================================
-        // 4. ONGLET : DÉBOUCHER & SOMMELIER
+        // 5. ONGLET : DÉBOUCHER & SOMMELIER
         // ==========================================
         let activeFilters = { couleur: null, envergure: null, profil: null, apogee: null };
 
@@ -352,26 +407,20 @@
             let countUrgence = 0;
             const winesWithMaturity = wineInventory.map(w => ({ ...w, maturite: calculerMaturite(w) })).filter(w => w.emplacements && w.emplacements.length > 0);
 
-            // Carrousel Sommelier
             const carousel = document.getElementById('sommelier-carousel');
             carousel.innerHTML = '';
             
-            // Suggestion 1 : À boire
             const suggUrgence = winesWithMaturity.find(w => w.maturite.statut === 'urgence');
             if(suggUrgence) carousel.appendChild(createSuggestionCard("A boire ce soir", suggUrgence));
             
-            // Suggestion 2 : Top Apogée (Rouge Dégustation de pref)
             const suggApogee = winesWithMaturity.find(w => w.maturite.statut === 'apogee' && w.envergure === 'Dégustation');
             if(suggApogee) carousel.appendChild(createSuggestionCard("Trésor à maturité", suggApogee));
             
-            // Suggestion 3 : Max Stock
             const suggStock = [...winesWithMaturity].sort((a,b) => b.emplacements.length - a.emplacements.length)[0];
             if(suggStock && suggStock.emplacements.length > 3) carousel.appendChild(createSuggestionCard("Faites de la place", suggStock));
 
-            // Filtres
             const filteredWines = winesWithMaturity.filter(wine => {
                 if (wine.maturite.statut === 'urgence') countUrgence++;
-                
                 let match = true;
                 if (activeFilters.couleur && wine.couleur !== activeFilters.couleur) match = false;
                 if (activeFilters.envergure && wine.envergure !== activeFilters.envergure) match = false;
@@ -380,7 +429,6 @@
                 return match;
             });
 
-            // Alerte
             const alerteDiv = document.getElementById('alerte-apogee');
             if (countUrgence > 0 && activeFilters.apogee !== 'urgence') {
                 document.getElementById('alerte-texte').innerText = `🚨 ${countUrgence} vin(s) à boire d'urgence !`;
@@ -392,7 +440,6 @@
             filteredWines.forEach(wine => {
                 const stock = wine.emplacements.length;
                 const locs = [...new Set(wine.emplacements.map(loc => loc.replace(/_/g, ' ').toUpperCase()))].join(', ');
-
                 const card = document.createElement('div');
                 card.className = 'wine-card';
                 card.innerHTML = `
@@ -442,9 +489,8 @@
         }
 
         // ==========================================
-        // 5. ONGLET : ARRIVAGES (Form + Placement)
+        // 6. ONGLET : ARRIVAGES (Saisie Manuelle)
         // ==========================================
-        // Activer la carte visuelle dès qu'on tape dans le formulaire
         document.getElementById('wine-form').addEventListener('input', () => {
             document.getElementById('cave-visuelle-ranger').classList.add('active-placement');
             document.getElementById('titre-placement').style.opacity = '1';
@@ -452,7 +498,10 @@
 
         function actionSlotVide(cibleId) {
             const domaine = document.getElementById('domaine').value;
-            if (!domaine) { alert("Veuillez d'abord remplir le formulaire (ou scanner une étiquette) avant de choisir l'emplacement."); return; }
+            if (!domaine) { 
+                alert("Veuillez d'abord renseigner le nom du domaine avant de choisir l'emplacement sur la grille."); 
+                return; 
+            }
             
             const qty = parseInt(document.getElementById('quantite').value, 10) || 1;
             const newWine = {
@@ -466,7 +515,7 @@
             wineInventory.push(newWine);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
             
-            alert(`✅ ${qty} bouteille(s) ajoutée(s) avec succès !`);
+            alert(`✅ ${qty} bouteille(s) de ${domaine} ajoutée(s) avec succès !`);
             document.getElementById('wine-form').reset();
             document.getElementById('cave-visuelle-ranger').classList.remove('active-placement');
             document.getElementById('titre-placement').style.opacity = '0.5';
@@ -554,85 +603,12 @@
         }
 
         // ==========================================
-        // 6. OCR (Entrée & Sortie Inversée)
-        // ==========================================
-        function triggerScanEntree() { document.getElementById('camera-input-entree').click(); }
-        function triggerScanSortie() { document.getElementById('camera-input-sortie').click(); }
-
-        function processImage(event, mode) {
-            const file = event.target.files[0];
-            if (!file) return;
-            document.getElementById('ocr-loader').style.display = 'flex';
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    let w = img.width, h = img.height;
-                    if (w > 1000 || h > 1000) { if (w > h) { h *= 1000/w; w = 1000; } else { w *= 1000/h; h = 1000; } }
-                    canvas.width = w; canvas.height = h;
-                    ctx.drawImage(img, 0, 0, w, h);
-
-                    // Binarisation N/B
-                    const imgData = ctx.getImageData(0, 0, w, h);
-                    const data = imgData.data;
-                    for (let i = 0; i < data.length; i += 4) {
-                        let c = ((data[i]*0.299 + data[i+1]*0.587 + data[i+2]*0.114) > 120) ? 255 : 0;
-                        data[i] = data[i+1] = data[i+2] = c;
-                    }
-                    ctx.putImageData(imgData, 0, 0);
-
-                    Tesseract.recognize(canvas.toDataURL('image/jpeg', 1.0), 'fra')
-                    .then(({ data: { text } }) => {
-                        document.getElementById('ocr-loader').style.display = 'none';
-                        document.getElementById(`camera-input-${mode}`).value = ''; 
-                        if(mode === 'entree') parseOCREntree(text);
-                        else parseOCRSortie(text);
-                    }).catch(err => {
-                        document.getElementById('ocr-loader').style.display = 'none';
-                        alert("Erreur de lecture de l'étiquette.");
-                    });
-                }
-                img.src = e.target.result;
-            }
-            reader.readAsDataURL(file);
-        }
-
-        function parseOCREntree(text) {
-            const lines = text.split('\n').map(l => l.trim().replace(/[^a-zA-ZÀ-ÿ0-9\s]/g, '')).filter(l => l.length > 4);
-            if(lines.length > 0) document.getElementById('domaine').value = lines[0].substring(0, 40);
-            
-            const milMatch = text.match(/\b(19[5-9]\d|20[0-2]\d)\b/);
-            if (milMatch) document.getElementById('millesime').value = milMatch[0];
-
-            for (const r of REGIONS_DICT) if (text.toLowerCase().includes(r)) { document.getElementById('region').value = r.charAt(0).toUpperCase() + r.slice(1); break; }
-            
-            document.getElementById('cave-visuelle-ranger').classList.add('active-placement');
-            document.getElementById('titre-placement').style.opacity = '1';
-        }
-
-        function parseOCRSortie(text) {
-            // Recherche d'une correspondance dans l'inventaire
-            const textLow = text.toLowerCase();
-            let bestMatch = null;
-            wineInventory.forEach(w => {
-                if(textLow.includes(w.domaine.toLowerCase()) || (w.millesime && textLow.includes(w.millesime.toString()))) {
-                    bestMatch = w;
-                }
-            });
-            if(bestMatch) {
-                deboucherVin(bestMatch.id);
-            } else {
-                alert("Impossible de retrouver ce vin dans votre stock actuel.");
-            }
-        }
-
-        // ==========================================
         // 7. ONGLET : MA CAVE
         // ==========================================
         function renderMaCave() {
+            document.getElementById('kpi-total').innerText = wineInventory.reduce((sum, w) => sum + w.emplacements.length, 0);
+            document.getElementById('kpi-refs').innerText = wineInventory.length;
+
             const list = document.getElementById('inventory-list');
             list.innerHTML = '';
             wineInventory.forEach(wine => {
