@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ma Cave à Vin - V1</title>
-    <!-- Tesseract.js -->
+    <title>Ma Cave à Vin - Assistant Intelligent</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         :root {
@@ -18,126 +17,92 @@
             --nav-bg: #ffffff;
             --success-color: #28a745;
             --danger-color: #d63031;
+            --warning-color: #f39c12;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
-        body { 
-            background-color: var(--bg-color); 
-            color: var(--text-main); 
-            padding-bottom: 80px; /* Espace pour la bottom-nav */
-        }
-
+        body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 80px; }
         header { background: var(--primary-color); color: white; padding: 15px 20px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         header h1 { font-size: 20px; font-weight: 600; margin: 0; }
 
-        /* --- SYSTÈME D'ONGLETS --- */
         .tab-content { display: none; padding: 20px; max-width: 1200px; margin: 0 auto; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- NAVIGATION BASSE --- */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: var(--nav-bg);
-            display: flex; justify-content: space-around;
-            padding: 10px 5px; box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-            z-index: 1000; border-top: 1px solid var(--border-color);
-        }
-        .nav-item {
-            background: none; border: none; color: var(--text-muted);
-            font-size: 12px; font-weight: 600;
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
-            padding: 8px 15px; border-radius: 8px; cursor: pointer; transition: all 0.2s;
-        }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--nav-bg); display: flex; justify-content: space-around; padding: 10px 5px; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000; border-top: 1px solid var(--border-color); }
+        .nav-item { background: none; border: none; color: var(--text-muted); font-size: 12px; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 8px 15px; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
         .nav-item.active { color: var(--primary-color); background: rgba(114, 47, 55, 0.1); }
         .nav-icon { font-size: 20px; }
 
-        /* --- BOUTONS STANDARDS --- */
-        .btn-primary { background-color: var(--primary-color); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-primary { background-color: var(--primary-color); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-secondary { background-color: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .btn-danger { background-color: var(--danger-color); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
 
-        /* ========================================= */
-        /* CSS ONGLET : DÉBOUCHER                    */
-        /* ========================================= */
-        .filter-section { margin-bottom: 25px; }
-        .filter-group { margin-bottom: 15px; }
-        .filter-title { font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; padding-left: 5px; }
-        .chips-container { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        /* ALERTES & CARROUSEL SOMMELIER */
+        .alert-banner { background: #ffeaa7; border-left: 5px solid var(--warning-color); padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; align-items: center; justify-content: space-between; font-weight: bold; color: #d35400; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .section-title { font-size: 16px; color: var(--primary-color); margin-bottom: 12px; font-weight: bold; }
+        
+        .carousel { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 25px; scrollbar-width: none; }
+        .carousel::-webkit-scrollbar { display: none; }
+        .suggestion-card { min-width: 260px; background: linear-gradient(135deg, #fff, #f8f9fa); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.04); flex-shrink: 0; }
+        .suggestion-motive { font-size: 11px; text-transform: uppercase; color: var(--primary-light); font-weight: bold; margin-bottom: 5px; }
+        
+        /* FILTRES & GRILLE DE VINS */
+        .filter-section { margin-bottom: 25px; background: var(--card-bg); padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+        .filter-group { margin-bottom: 12px; }
+        .filter-title { font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; padding-left: 2px; }
+        .chips-container { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
         .chips-container::-webkit-scrollbar { display: none; }
-        .chip {
-            background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-muted);
-            padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 500;
-            white-space: nowrap; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-        }
-        .chip.active { background: var(--primary-color); color: white; border-color: var(--primary-color); box-shadow: 0 4px 6px rgba(114, 47, 55, 0.2); }
-        .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .results-count { font-weight: bold; color: var(--primary-color); }
+        .chip { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-muted); padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
+        .chip.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+
         .wine-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
         @media (min-width: 600px) { .wine-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (min-width: 900px) { .wine-grid { grid-template-columns: repeat(3, 1fr); } }
-        .wine-card { background: var(--card-bg); border-radius: 12px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; gap: 15px; }
+        .wine-card { background: var(--card-bg); border-radius: 12px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; gap: 12px; }
         .wine-header { display: flex; justify-content: space-between; align-items: flex-start; }
         .wine-title { font-size: 16px; font-weight: bold; color: var(--text-main); margin-bottom: 4px; line-height: 1.2; }
         .wine-region { font-size: 13px; color: var(--text-muted); }
+        .maturity-icon { font-size: 18px; margin-left: 8px; }
         .wine-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
         .tag { font-size: 11px; padding: 3px 8px; border-radius: 4px; background: #f1f2f6; color: #576574; font-weight: 600; }
         .wine-stock { font-size: 13px; color: var(--text-main); margin-top:10px; padding-top: 10px; border-top: 1px dashed var(--border-color); }
-        .stock-badge { background: var(--primary-color); color: white; padding: 2px 6px; border-radius: 10px; font-weight: bold; font-size: 12px; }
-        .btn-deboucher { width: 100%; background: var(--primary-light); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; transition: background 0.2s; }
+        .btn-deboucher { width: 100%; background: var(--primary-light); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; transition: background 0.2s; margin-top: 5px; }
         .btn-deboucher:hover { background: var(--primary-color); }
 
-        /* ========================================= */
-        /* CSS ONGLET : RANGER (Visuel + Form)       */
-        /* ========================================= */
-        .instruction-banner { background: #e3f2fd; color: #0d47a1; padding: 15px; border-radius: 8px; text-align: center; font-weight: 500; margin-bottom: 20px; border: 1px solid #bbdefb; }
-        .cave-container { display: flex; flex-direction: column; gap: 30px; margin-bottom: 40px; }
-        .groupe-cave { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .groupe-cave h2 { border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; color: #444; font-size: 16px; }
-        .conteneur-blocs { display: flex; flex-wrap: wrap; gap: 15px; }
-        .groupe-garage .conteneur-blocs { flex-direction: column-reverse; }
-        .etage-complet { display: flex; gap: 15px; background: #fafafa; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
-        .bloc { flex: 1; min-width: 130px; background: #fff; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; }
-        .bloc h3 { font-size: 11px; text-transform: uppercase; color: #888; margin-bottom: 10px; text-align: center; }
-        
-        .grille-vins.grille { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; justify-items: center; }
-        .grille-vins.vrac { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
-        .case-grille, .case-vrac-vide { width: 32px; height: 32px; border: 2px dashed #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #aaa; cursor: pointer; transition: background 0.2s; }
-        .case-grille:hover, .case-vrac-vide:hover { background: #e9ecef; border-color: #999; }
-        .pastille { width: 32px; height: 32px; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; }
-        
-        /* Couleurs */
-        .rouge { background: linear-gradient(135deg, #722F37, #4a1c22); }
-        .blanc { background: linear-gradient(135deg, #F3E5AB, #d1c179); color: #333; }
-        .rose { background: linear-gradient(135deg, #FFC0CB, #d195a0); color: #333; }
-        .effervescent { background: linear-gradient(135deg, #FFD700, #c4a600); color: #333; }
-
-        /* Formulaire Overlay / Inline */
-        #ocr-loader-section { display: none; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; text-align: center; }
-        #form-section { display: none; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 30px; border: 2px solid var(--primary-color); }
+        /* ARRIVAGES (Formulaire & Cave) */
+        .scan-box { background: var(--card-bg); border: 2px dashed var(--primary-light); border-radius: 12px; padding: 25px; text-align: center; margin-bottom: 20px; cursor: pointer; transition: background 0.2s; }
+        .scan-box:hover { background: #fdf5f6; }
+        #form-section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 30px; border-left: 4px solid var(--primary-color); }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
         .form-group { display: flex; flex-direction: column; }
         .form-group.full-width { grid-column: 1 / -1; }
         .form-group label { margin-bottom: 5px; font-weight: bold; font-size: 13px; color: #444; }
-        .form-group input, .form-group select, .form-group textarea { padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; }
-        .info-emplacement { background: #e9ecef; padding: 8px; border-radius: 4px; font-size: 13px; color: #555; text-align: center; font-weight: bold; margin-bottom: 15px; }
-        .form-actions { display: flex; justify-content: flex-end; gap: 10px; }
-
-        /* ========================================= */
-        /* CSS ONGLET : MA CAVE (Administration)     */
-        /* ========================================= */
-        .dashboard { display: flex; gap: 15px; justify-content: center; margin-bottom: 25px; flex-wrap: wrap; }
-        .kpi-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; flex: 1; min-width: 140px; }
-        .kpi-card h3 { font-size: 12px; color: #666; text-transform: uppercase; }
-        .kpi-card .value { font-size: 28px; font-weight: bold; color: var(--primary-color); margin-top: 5px; }
-        .inventory-table-wrapper { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 14px; }
-        th { background-color: #f8f9fa; font-weight: 600; color: #555; }
-        .badge { padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; color: white; display: inline-block; text-align: center; min-width: 60px; }
-
+        .form-group input, .form-group select { padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; }
+        .cave-container { display: flex; flex-direction: column; gap: 30px; margin-bottom: 40px; opacity: 0.5; pointer-events: none; transition: opacity 0.3s; }
+        .cave-container.active-placement { opacity: 1; pointer-events: auto; }
+        
+        .groupe-cave { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .groupe-cave h2 { border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; color: #444; font-size: 15px; }
+        .conteneur-blocs { display: flex; flex-wrap: wrap; gap: 15px; }
+        .groupe-garage .conteneur-blocs { flex-direction: column-reverse; }
+        .etage-complet { display: flex; gap: 15px; background: #fafafa; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
+        .bloc { flex: 1; min-width: 130px; background: #fff; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; }
+        .bloc h3 { font-size: 11px; text-transform: uppercase; color: #888; margin-bottom: 10px; text-align: center; }
+        .grille-vins.grille { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; justify-items: center; }
+        .grille-vins.vrac { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+        .case-grille, .case-vrac-vide { width: 32px; height: 32px; border: 2px dashed #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #aaa; cursor: pointer; transition: background 0.2s; }
+        .case-grille:hover, .case-vrac-vide:hover { background: var(--primary-light); color: white; border-color: var(--primary-color); }
+        .pastille { width: 32px; height: 32px; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; }
+        
+        .rouge { background: linear-gradient(135deg, #722F37, #4a1c22); }
+        .blanc { background: linear-gradient(135deg, #F3E5AB, #d1c179); }
+        .rose { background: linear-gradient(135deg, #FFC0CB, #d195a0); }
+        .effervescent { background: linear-gradient(135deg, #FFD700, #c4a600); }
+        
+        #ocr-loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 2000; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
 <body>
@@ -151,6 +116,21 @@
         <!-- ONGLET 1 : DÉBOUCHER (Workflow de Sortie)  -->
         <!-- ========================================== -->
         <section id="tab-deboucher" class="tab-content active">
+            
+            <div id="alerte-apogee" class="alert-banner">
+                <span id="alerte-texte">🚨 X bouteilles à boire d'urgence</span>
+                <button class="btn-danger" onclick="toggleFilter('apogee', 'urgence', null)">Voir</button>
+            </div>
+
+            <button class="btn-primary" onclick="triggerScanSortie()" style="margin-bottom: 20px;">
+                📷 Scanner une bouteille pour la sortir
+            </button>
+
+            <div class="section-title">💡 Le Sommelier vous suggère :</div>
+            <div class="carousel" id="sommelier-carousel">
+                <!-- Généré par JS -->
+            </div>
+
             <div class="filter-section">
                 <div class="filter-group">
                     <div class="filter-title">La Robe</div>
@@ -177,47 +157,30 @@
                 </div>
             </div>
 
-            <div class="results-header">
-                <h3>Vins disponibles</h3>
-                <span class="results-count" id="results-count">0 réf.</span>
-            </div>
             <div class="wine-grid" id="wine-results"></div>
         </section>
 
         <!-- ========================================== -->
-        <!-- ONGLET 2 : RANGER (Workflow d'Entrée)      -->
+        <!-- ONGLET 2 : ARRIVAGES (Workflow d'Entrée)   -->
         <!-- ========================================== -->
-        <section id="tab-ranger" class="tab-content">
-            <div class="instruction-banner">
-                Sélectionnez un emplacement vide (boîte en pointillés) sur le plan pour y ranger une nouvelle bouteille.
-            </div>
-
-            <input type="file" id="camera-input" accept="image/*" capture="environment" style="display: none;" onchange="processImage(event)">
+        <section id="tab-arrivages" class="tab-content">
             
-            <div id="ocr-loader-section">
-                <h3 style="color: var(--primary-color);">⏳ Analyse OCR en cours...</h3>
-                <p style="font-size: 13px; color: #666;">Binarisation et lecture de l'étiquette.</p>
+            <div class="scan-box" onclick="triggerScanEntree()">
+                <div style="font-size: 30px; margin-bottom: 10px;">📷</div>
+                <h3 style="color: var(--primary-color);">Scanner la nouvelle bouteille</h3>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 5px;">Remplissage automatique du formulaire</p>
             </div>
 
             <div id="form-section">
-                <h3 id="form-title" style="margin-bottom: 10px; color: var(--primary-color);">Ajouter un vin</h3>
-                <div id="info-loc" class="info-emplacement">Emplacement cible : ...</div>
-                
-                <form id="wine-form" onsubmit="saveWine(event)">
-                    <input type="hidden" id="wine-id">
-                    <input type="hidden" id="emplacement_cible" value="">
-                    
+                <h3 id="form-title" style="margin-bottom: 15px; color: var(--primary-color);">Définir les caractéristiques</h3>
+                <form id="wine-form">
                     <div class="form-grid">
                         <div class="form-group full-width">
-                            <label>Texte brut détecté (si OCR)</label>
-                            <textarea id="raw-text" rows="2" readonly style="background: #f8f9fa;"></textarea>
-                        </div>
-                        <div class="form-group">
                             <label>Domaine / Nom</label>
-                            <input type="text" id="domaine" required>
+                            <input type="text" id="domaine" required placeholder="Ex: Château Margaux">
                         </div>
                         <div class="form-group">
-                            <label>Région / Appellation</label>
+                            <label>Région</label>
                             <input type="text" id="region">
                         </div>
                         <div class="form-group">
@@ -248,18 +211,15 @@
                             </select>
                         </div>
                         <div class="form-group full-width">
-                            <label>Quantité (Générera X pastilles ici)</label>
-                            <input type="number" id="quantite" min="1" value="1" required>
+                            <label>Combien de bouteilles à ranger ?</label>
+                            <input type="number" id="quantite" min="1" value="1" required style="font-size: 18px; font-weight: bold; text-align: center;">
                         </div>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn-secondary" onclick="closeForm()">Annuler</button>
-                        <button type="submit" class="btn-primary">💾 Enregistrer</button>
                     </div>
                 </form>
             </div>
 
-            <!-- Carte Visuelle pour Affectation -->
+            <div class="section-title" id="titre-placement" style="text-align: center; opacity: 0.5;">👇 Sélectionnez un emplacement libre ci-dessous 👇</div>
+            
             <div id="cave-visuelle-ranger" class="cave-container"></div>
         </section>
 
@@ -267,30 +227,8 @@
         <!-- ONGLET 3 : MA CAVE (Administration)        -->
         <!-- ========================================== -->
         <section id="tab-macave" class="tab-content">
-            <div class="dashboard">
-                <div class="kpi-card">
-                    <h3>Bouteilles en Cave</h3>
-                    <div class="value" id="kpi-total">0</div>
-                </div>
-                <div class="kpi-card">
-                    <h3>Références Uniques</h3>
-                    <div class="value" id="kpi-refs">0</div>
-                </div>
-            </div>
-
-            <div class="inventory-table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Vin</th>
-                            <th>Infos</th>
-                            <th>Stock</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="inventory-body"></tbody>
-                </table>
-            </div>
+            <h2 style="color: var(--primary-color); margin-bottom: 20px;">Données Globales</h2>
+            <div id="inventory-list"></div>
         </section>
     </main>
 
@@ -299,24 +237,33 @@
         <button class="nav-item active" onclick="switchTab('deboucher', this)">
             <span class="nav-icon">🍷</span><span>Déboucher</span>
         </button>
-        <button class="nav-item" onclick="switchTab('ranger', this)">
-            <span class="nav-icon">📥</span><span>Ranger</span>
+        <button class="nav-item" onclick="switchTab('arrivages', this)">
+            <span class="nav-icon">📥</span><span>Arrivages</span>
         </button>
         <button class="nav-item" onclick="switchTab('macave', this)">
             <span class="nav-icon">📊</span><span>Ma Cave</span>
         </button>
     </nav>
 
+    <!-- Éléments cachés -->
+    <input type="file" id="camera-input-entree" accept="image/*" capture="environment" style="display: none;" onchange="processImage(event, 'entree')">
+    <input type="file" id="camera-input-sortie" accept="image/*" capture="environment" style="display: none;" onchange="processImage(event, 'sortie')">
+    
+    <div id="ocr-loader">
+        <h2 style="color: var(--primary-color); margin-bottom: 10px;">📷 Analyse en cours...</h2>
+        <p>Lecture de l'étiquette par l'intelligence artificielle</p>
+    </div>
+
     <script>
         // ==========================================
-        // 1. DATA ET TOPOLOGIE (Base de données)
+        // 1. DATA ET TOPOLOGIE
         // ==========================================
         const STORAGE_KEY = 'ryzek_cave_a_vin_data';
         let wineInventory = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        const CURRENT_YEAR = 2026;
 
-        // Dictionnaires
-        const REGIONS_DICT = ["bordeaux", "bourgogne", "rhone", "loire", "alsace", "champagne", "languedoc", "provence", "beaujolais", "chablis", "margaux", "pauillac", "saint-emilion", "pomerol", "sancerre", "cotes du rhone", "chateauneuf", "roussillon", "cotes du roussillon", "minervois", "corbieres"];
-        const COLORS_DICT = { "rouge": "Rouge", "blanc": "Blanc", "rosé": "Rosé", "rose": "Rosé", "champagne": "Effervescent", "brut": "Effervescent" };
+        const REGIONS_DICT = ["bordeaux", "bourgogne", "rhone", "loire", "alsace", "champagne", "languedoc", "provence", "beaujolais", "chablis", "margaux", "pauillac", "saint-emilion", "pomerol"];
+        const COLORS_DICT = { "rouge": "Rouge", "blanc": "Blanc", "rosé": "Rosé", "rose": "Rosé", "champagne": "Effervescent" };
 
         const topologie = [
             { id: "esc_casier", nom: "Casier Précis", type: "grille", capacite: 12, groupe: "Sous l'escalier" },
@@ -327,8 +274,48 @@
             topologie.push({ id: `g_e${i}_d`, nom: `Étage ${i} - D`, type: "vrac", capacite: 5, groupe: "Garage", etage: i });
         }
 
+        // Jeu d'essai si cave vide
+        if (wineInventory.length === 0) {
+            wineInventory = [
+                { id: "1", domaine: "Château Latour", region: "Pauillac", millesime: 2014, couleur: "Rouge", envergure: "Dégustation", profil: "Puissant/Rond", emplacements: ["garage_e4_g"] }, // Apogée
+                { id: "2", domaine: "Rosé Piscine", region: "Sud Ouest", millesime: 2023, couleur: "Rosé", envergure: "Détente", profil: "Fruité/Vif", emplacements: ["esc_vrac", "esc_vrac"] }, // Urgence
+                { id: "3", domaine: "Petit Chablis", region: "Bourgogne", millesime: 2025, couleur: "Blanc", envergure: "Détente", profil: "Fruité/Vif", emplacements: ["esc_casier_pos_2", "esc_casier_pos_3", "esc_casier_pos_4"] } // Jeune, max stock
+            ];
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
+        }
+
         // ==========================================
-        // 2. GESTION DES ONGLETS (SPA)
+        // 2. MOTEUR D'APOGÉE (Règles 2026)
+        // ==========================================
+        function calculerMaturite(wine) {
+            if (!wine.millesime) return { statut: 'inconnu', icone: '' };
+            const age = CURRENT_YEAR - parseInt(wine.millesime, 10);
+            
+            if (wine.couleur === 'Rosé' || (wine.couleur === 'Blanc' && wine.profil === 'Fruité/Vif')) {
+                if (age > 2) return { statut: 'urgence', icone: '🔥' };
+                if (age >= 1) return { statut: 'apogee', icone: '✅' };
+                return { statut: 'jeune', icone: '⏳' };
+            }
+            if (wine.couleur === 'Rouge' && (wine.envergure === 'Détente' || wine.profil === 'Fruité/Vif')) {
+                if (age > 4) return { statut: 'urgence', icone: '🔥' };
+                if (age >= 2) return { statut: 'apogee', icone: '✅' };
+                return { statut: 'jeune', icone: '⏳' };
+            }
+            if (wine.couleur === 'Blanc' && wine.envergure === 'Dégustation') {
+                if (age > 8) return { statut: 'urgence', icone: '🔥' };
+                if (age >= 4) return { statut: 'apogee', icone: '✅' };
+                return { statut: 'jeune', icone: '⏳' };
+            }
+            if (wine.couleur === 'Rouge' && wine.envergure === 'Dégustation') {
+                if (age > 14) return { statut: 'urgence', icone: '🔥' };
+                if (age >= 8) return { statut: 'apogee', icone: '✅' };
+                return { statut: 'jeune', icone: '⏳' };
+            }
+            return { statut: 'inconnu', icone: '' };
+        }
+
+        // ==========================================
+        // 3. NAVIGATION (SPA)
         // ==========================================
         function switchTab(tabId, btnElement) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -336,25 +323,24 @@
             document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
             btnElement.classList.add('active');
             
-            closeForm(); // Sécurité
             if (tabId === 'deboucher') renderDeboucher();
-            if (tabId === 'ranger') renderCaveRanger();
+            if (tabId === 'arrivages') renderCaveArrivages();
             if (tabId === 'macave') renderMaCave();
         }
 
         // ==========================================
-        // 3. ONGLET : DÉBOUCHER (Sortie)
+        // 4. ONGLET : DÉBOUCHER & SOMMELIER
         // ==========================================
-        let activeFilters = { couleur: null, envergure: null, profil: null };
+        let activeFilters = { couleur: null, envergure: null, profil: null, apogee: null };
 
         function toggleFilter(category, value, element) {
             if (activeFilters[category] === value) {
                 activeFilters[category] = null;
-                element.classList.remove('active');
+                if(element) element.classList.remove('active');
             } else {
-                element.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+                if(element) element.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
                 activeFilters[category] = value;
-                element.classList.add('active');
+                if(element) element.classList.add('active');
             }
             renderDeboucher();
         }
@@ -363,26 +349,49 @@
             const container = document.getElementById('wine-results');
             container.innerHTML = '';
             
-            const filteredWines = wineInventory.filter(wine => {
-                if (!wine.emplacements || wine.emplacements.length === 0) return false;
+            let countUrgence = 0;
+            const winesWithMaturity = wineInventory.map(w => ({ ...w, maturite: calculerMaturite(w) })).filter(w => w.emplacements && w.emplacements.length > 0);
+
+            // Carrousel Sommelier
+            const carousel = document.getElementById('sommelier-carousel');
+            carousel.innerHTML = '';
+            
+            // Suggestion 1 : À boire
+            const suggUrgence = winesWithMaturity.find(w => w.maturite.statut === 'urgence');
+            if(suggUrgence) carousel.appendChild(createSuggestionCard("A boire ce soir", suggUrgence));
+            
+            // Suggestion 2 : Top Apogée (Rouge Dégustation de pref)
+            const suggApogee = winesWithMaturity.find(w => w.maturite.statut === 'apogee' && w.envergure === 'Dégustation');
+            if(suggApogee) carousel.appendChild(createSuggestionCard("Trésor à maturité", suggApogee));
+            
+            // Suggestion 3 : Max Stock
+            const suggStock = [...winesWithMaturity].sort((a,b) => b.emplacements.length - a.emplacements.length)[0];
+            if(suggStock && suggStock.emplacements.length > 3) carousel.appendChild(createSuggestionCard("Faites de la place", suggStock));
+
+            // Filtres
+            const filteredWines = winesWithMaturity.filter(wine => {
+                if (wine.maturite.statut === 'urgence') countUrgence++;
+                
                 let match = true;
                 if (activeFilters.couleur && wine.couleur !== activeFilters.couleur) match = false;
                 if (activeFilters.envergure && wine.envergure !== activeFilters.envergure) match = false;
                 if (activeFilters.profil && wine.profil !== activeFilters.profil) match = false;
+                if (activeFilters.apogee === 'urgence' && wine.maturite.statut !== 'urgence') match = false;
                 return match;
             });
 
-            document.getElementById('results-count').innerText = `${filteredWines.length} réf.`;
-
-            if (filteredWines.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding: 20px; color:#999; grid-column: 1/-1;">Aucun vin trouvé.</div>`;
-                return;
+            // Alerte
+            const alerteDiv = document.getElementById('alerte-apogee');
+            if (countUrgence > 0 && activeFilters.apogee !== 'urgence') {
+                document.getElementById('alerte-texte').innerText = `🚨 ${countUrgence} vin(s) à boire d'urgence !`;
+                alerteDiv.style.display = 'flex';
+            } else {
+                alerteDiv.style.display = 'none';
             }
 
             filteredWines.forEach(wine => {
                 const stock = wine.emplacements.length;
-                const locsUniques = [...new Set(wine.emplacements.map(loc => loc.replace(/_/g, ' ').toUpperCase()))];
-                const locPrevue = locsUniques.join(', ');
+                const locs = [...new Set(wine.emplacements.map(loc => loc.replace(/_/g, ' ').toUpperCase()))].join(', ');
 
                 const card = document.createElement('div');
                 card.className = 'wine-card';
@@ -390,184 +399,87 @@
                     <div>
                         <div class="wine-header">
                             <div>
-                                <div class="wine-title">${wine.domaine} <span style="font-weight:normal; color:#666;">${wine.millesime || ''}</span></div>
-                                <div class="wine-region">${wine.region || '-'}</div>
+                                <div class="wine-title">${wine.domaine} <span class="maturity-icon" title="${wine.maturite.statut}">${wine.maturite.icone}</span></div>
+                                <div class="wine-region" style="font-weight:bold; color:#555;">${wine.millesime || 'NV'} - ${wine.region || ''}</div>
                             </div>
-                            <div class="stock-badge">${stock}</div>
+                            <div style="background:var(--primary-color);color:white;padding:3px 8px;border-radius:12px;font-weight:bold;">${stock}</div>
                         </div>
                         <div class="wine-tags">
-                            <span class="tag">Couleur : ${wine.couleur}</span>
-                            <span class="tag">🍷 ${wine.envergure || 'N/A'}</span>
-                            <span class="tag">👅 ${wine.profil || 'N/A'}</span>
+                            <span class="tag">${wine.couleur}</span>
+                            <span class="tag">${wine.envergure || 'N/A'}</span>
+                            <span class="tag">${wine.profil || 'N/A'}</span>
                         </div>
-                        <div class="wine-stock">
-                            📍 Trouvable ici : <strong>${locPrevue}</strong>
-                        </div>
+                        <div class="wine-stock">📍 Emplacements : <strong>${locs}</strong></div>
                     </div>
-                    <button class="btn-deboucher" onclick="deboucherVin('${wine.id}')">🍾 Sortir 1 bouteille</button>
+                    <button class="btn-deboucher" onclick="deboucherVin('${wine.id}')">🍾 Déboucher 1 bouteille</button>
                 `;
                 container.appendChild(card);
             });
         }
 
+        function createSuggestionCard(motive, wine) {
+            const card = document.createElement('div');
+            card.className = 'suggestion-card';
+            card.innerHTML = `
+                <div class="suggestion-motive">${motive}</div>
+                <div style="font-weight:bold; font-size: 15px;">${wine.domaine}</div>
+                <div style="font-size:12px; color:#666; margin-bottom:10px;">${wine.millesime} - ${wine.couleur}</div>
+                <button class="btn-primary" style="padding:8px; font-size:12px;" onclick="deboucherVin('${wine.id}')">Sortir</button>
+            `;
+            return card;
+        }
+
         function deboucherVin(idVin) {
-            const wineIndex = wineInventory.findIndex(w => w.id === idVin);
-            if (wineIndex !== -1) {
-                const wine = wineInventory[wineIndex];
-                if(confirm(`Déboucher 1 bouteille de :\n${wine.domaine} ?`)) {
-                    wine.emplacements.pop(); // Retire la dernière physiquement ajoutée
-                    if(wine.emplacements.length === 0) {
-                        wineInventory.splice(wineIndex, 1);
-                        alert("C'était la dernière ! Référence supprimée.");
-                    }
-                    saveData();
+            const index = wineInventory.findIndex(w => w.id === idVin);
+            if (index !== -1) {
+                if(confirm(`Confirmer l'ouverture de :\n${wineInventory[index].domaine} ?`)) {
+                    wineInventory[index].emplacements.pop();
+                    if(wineInventory[index].emplacements.length === 0) wineInventory.splice(index, 1);
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
                     renderDeboucher();
                 }
             }
         }
 
         // ==========================================
-        // 4. ONGLET : RANGER (OCR + Form + Plan)
+        // 5. ONGLET : ARRIVAGES (Form + Placement)
         // ==========================================
-        let emplacementPourOCR = "";
+        // Activer la carte visuelle dès qu'on tape dans le formulaire
+        document.getElementById('wine-form').addEventListener('input', () => {
+            document.getElementById('cave-visuelle-ranger').classList.add('active-placement');
+            document.getElementById('titre-placement').style.opacity = '1';
+        });
 
         function actionSlotVide(cibleId) {
-            if(confirm(`Voulez-vous lancer le SCANNER (Appareil photo) pour remplir cet emplacement ?\n\nCliquez sur Annuler pour faire une SAISIE MANUELLE.`)){
-                emplacementPourOCR = cibleId;
-                document.getElementById('camera-input').click();
-            } else {
-                openForm(null, cibleId);
-            }
-        }
-
-        function processImage(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            document.getElementById('ocr-loader-section').style.display = 'block';
-            document.getElementById('form-section').style.display = 'none';
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    
-                    let width = img.width; let height = img.height;
-                    if (width > 1000 || height > 1000) {
-                        if (width > height) { height *= 1000 / width; width = 1000; } 
-                        else { width *= 1000 / height; height = 1000; }
-                    }
-                    canvas.width = width; canvas.height = height;
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    // Binarisation
-                    const imageData = ctx.getImageData(0, 0, width, height);
-                    const data = imageData.data;
-                    for (let i = 0; i < data.length; i += 4) {
-                        let b = (data[i] * 0.299) + (data[i+1] * 0.587) + (data[i+2] * 0.114);
-                        let c = b > 120 ? 255 : 0; 
-                        data[i] = c; data[i+1] = c; data[i+2] = c;
-                    }
-                    ctx.putImageData(imageData, 0, 0);
-
-                    Tesseract.recognize(canvas.toDataURL('image/jpeg', 1.0), 'fra')
-                    .then(({ data: { text } }) => {
-                        document.getElementById('ocr-loader-section').style.display = 'none';
-                        document.getElementById('camera-input').value = ''; 
-                        parseOCRText(text, emplacementPourOCR);
-                    }).catch(err => {
-                        document.getElementById('ocr-loader-section').style.display = 'none';
-                        document.getElementById('camera-input').value = '';
-                        alert("Échec de l'OCR. Ouverture du formulaire manuel.");
-                        openForm(null, emplacementPourOCR);
-                    });
-                }
-                img.src = e.target.result;
-            }
-            reader.readAsDataURL(file);
-        }
-
-        function parseOCRText(text, cibleId) {
-            const lines = text.split('\n').map(l => l.trim().replace(/[^a-zA-ZÀ-ÿ0-9\s\.,&'\-]/g, ' ').replace(/\s+/g, ' ')).filter(l => l.length > 4);
-            let domaine = lines.length > 0 ? lines[0] : "";
-            let prefilledData = { domaine: domaine.substring(0, 50), region: '', millesime: '', couleur: 'Rouge', rawText: text };
-
-            const milMatch = text.match(/\b(19[5-9]\d|20[0-2]\d)\b/);
-            if (milMatch) prefilledData.millesime = milMatch[0];
-
-            for (const r of REGIONS_DICT) if (text.toLowerCase().includes(r)) { prefilledData.region = r.charAt(0).toUpperCase() + r.slice(1); break; }
-            for (const [k, v] of Object.entries(COLORS_DICT)) if (text.toLowerCase().includes(k)) { prefilledData.couleur = v; break; }
-
-            openForm(prefilledData, cibleId);
-        }
-
-        function openForm(data, cibleId) {
-            document.getElementById('form-section').style.display = 'block';
-            document.getElementById('form-title').innerText = data && data.id ? "Modifier un vin" : "Ranger un vin";
-            document.getElementById('info-loc').innerText = `Cible : ${cibleId.replace(/_/g, ' ').toUpperCase()}`;
-            document.getElementById('emplacement_cible').value = cibleId;
-            document.getElementById('wine-form').reset();
-            document.getElementById('wine-id').value = '';
-            document.getElementById('raw-text').value = ''; 
-
-            if (data) {
-                if(data.id) document.getElementById('wine-id').value = data.id;
-                if(data.domaine) document.getElementById('domaine').value = data.domaine;
-                if(data.region) document.getElementById('region').value = data.region;
-                if(data.millesime) document.getElementById('millesime').value = data.millesime;
-                if(data.couleur) document.getElementById('couleur').value = data.couleur;
-                if(data.envergure) document.getElementById('envergure').value = data.envergure;
-                if(data.profil) document.getElementById('profil').value = data.profil;
-                if(data.rawText) document.getElementById('raw-text').value = data.rawText.replace(/\n/g, ' | ');
-                if(data.emplacements) document.getElementById('quantite').value = data.emplacements.length;
-            }
-            document.getElementById('form-section').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function closeForm() {
-            document.getElementById('form-section').style.display = 'none';
-        }
-
-        function saveWine(event) {
-            event.preventDefault();
-            const id = document.getElementById('wine-id').value;
-            const targetLoc = document.getElementById('emplacement_cible').value;
-            const qty = parseInt(document.getElementById('quantite').value, 10);
+            const domaine = document.getElementById('domaine').value;
+            if (!domaine) { alert("Veuillez d'abord remplir le formulaire (ou scanner une étiquette) avant de choisir l'emplacement."); return; }
             
-            const wData = {
-                domaine: document.getElementById('domaine').value,
-                region: document.getElementById('region').value,
-                millesime: document.getElementById('millesime').value,
-                couleur: document.getElementById('couleur').value,
-                envergure: document.getElementById('envergure').value,
-                profil: document.getElementById('profil').value
+            const qty = parseInt(document.getElementById('quantite').value, 10) || 1;
+            const newWine = {
+                id: Date.now().toString(),
+                domaine: domaine, region: document.getElementById('region').value,
+                millesime: document.getElementById('millesime').value, couleur: document.getElementById('couleur').value,
+                envergure: document.getElementById('envergure').value, profil: document.getElementById('profil').value,
+                emplacements: Array(qty).fill(cibleId)
             };
-
-            if (id) {
-                const i = wineInventory.findIndex(w => w.id === id);
-                if (i !== -1) {
-                    Object.assign(wineInventory[i], wData);
-                    // Juste modif des infos, on ne touche pas aux emplacements ici par simplicité
-                }
-            } else {
-                wData.id = Date.now().toString();
-                wData.emplacements = Array(qty).fill(targetLoc);
-                wineInventory.push(wData);
-            }
-            saveData();
-            closeForm();
-            renderCaveRanger();
+            
+            wineInventory.push(newWine);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
+            
+            alert(`✅ ${qty} bouteille(s) ajoutée(s) avec succès !`);
+            document.getElementById('wine-form').reset();
+            document.getElementById('cave-visuelle-ranger').classList.remove('active-placement');
+            document.getElementById('titre-placement').style.opacity = '0.5';
+            renderCaveArrivages();
         }
 
-        function renderCaveRanger() {
+        function renderCaveArrivages() {
             const container = document.getElementById('cave-visuelle-ranger');
             container.innerHTML = '';
 
             const mapEmplacements = {};
             wineInventory.forEach(vin => {
-                vin.emplacements.forEach((empStr, index) => {
+                vin.emplacements.forEach(empStr => {
                     let baseId = empStr.split('_pos_')[0];
                     let pos = empStr.includes('_pos_') ? parseInt(empStr.split('_pos_')[1], 10) : null;
                     if (!mapEmplacements[baseId]) mapEmplacements[baseId] = [];
@@ -591,18 +503,18 @@
                     Object.values(etages).forEach(paire => {
                         const divEtage = document.createElement('div');
                         divEtage.className = 'etage-complet';
-                        paire.forEach(b => divEtage.appendChild(creerHTMLBloc(b, mapEmplacements[b.id])));
+                        paire.forEach(b => divEtage.appendChild(creerHTMLBlocArr(b, mapEmplacements[b.id])));
                         conteneurBlocs.appendChild(divEtage);
                     });
                 } else {
-                    blocs.forEach(b => conteneurBlocs.appendChild(creerHTMLBloc(b, mapEmplacements[b.id])));
+                    blocs.forEach(b => conteneurBlocs.appendChild(creerHTMLBlocArr(b, mapEmplacements[b.id])));
                 }
                 section.appendChild(conteneurBlocs);
                 container.appendChild(section);
             }
         }
 
-        function creerHTMLBloc(bloc, bouteilles = []) {
+        function creerHTMLBlocArr(bloc, bouteilles = []) {
             const divBloc = document.createElement('div');
             divBloc.className = `bloc`;
             divBloc.innerHTML = `<h3>${bloc.nom}</h3>`;
@@ -615,7 +527,6 @@
                     const btl = bouteilles.find(b => b.exactPos === i);
                     if (btl) {
                         caseDiv.className = `pastille ${btl.vin.couleur.toLowerCase().replace('é','e')}`;
-                        caseDiv.title = btl.vin.domaine;
                     } else {
                         caseDiv.className = 'case-grille';
                         caseDiv.innerHTML = i;
@@ -627,7 +538,6 @@
                 bouteilles.forEach(btl => {
                     const p = document.createElement('div');
                     p.className = `pastille ${btl.vin.couleur.toLowerCase().replace('é','e')}`;
-                    p.title = btl.vin.domaine;
                     grille.appendChild(p);
                 });
                 const libres = bloc.capacite ? Math.max(1, bloc.capacite - bouteilles.length) : 1;
@@ -644,42 +554,102 @@
         }
 
         // ==========================================
-        // 5. ONGLET : MA CAVE (Tableau Admin)
+        // 6. OCR (Entrée & Sortie Inversée)
         // ==========================================
-        function renderMaCave() {
-            document.getElementById('kpi-total').innerText = wineInventory.reduce((sum, w) => sum + w.emplacements.length, 0);
-            document.getElementById('kpi-refs').innerText = wineInventory.length;
+        function triggerScanEntree() { document.getElementById('camera-input-entree').click(); }
+        function triggerScanSortie() { document.getElementById('camera-input-sortie').click(); }
 
-            const tbody = document.getElementById('inventory-body');
-            tbody.innerHTML = '';
+        function processImage(event, mode) {
+            const file = event.target.files[0];
+            if (!file) return;
+            document.getElementById('ocr-loader').style.display = 'flex';
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    let w = img.width, h = img.height;
+                    if (w > 1000 || h > 1000) { if (w > h) { h *= 1000/w; w = 1000; } else { w *= 1000/h; h = 1000; } }
+                    canvas.width = w; canvas.height = h;
+                    ctx.drawImage(img, 0, 0, w, h);
+
+                    // Binarisation N/B
+                    const imgData = ctx.getImageData(0, 0, w, h);
+                    const data = imgData.data;
+                    for (let i = 0; i < data.length; i += 4) {
+                        let c = ((data[i]*0.299 + data[i+1]*0.587 + data[i+2]*0.114) > 120) ? 255 : 0;
+                        data[i] = data[i+1] = data[i+2] = c;
+                    }
+                    ctx.putImageData(imgData, 0, 0);
+
+                    Tesseract.recognize(canvas.toDataURL('image/jpeg', 1.0), 'fra')
+                    .then(({ data: { text } }) => {
+                        document.getElementById('ocr-loader').style.display = 'none';
+                        document.getElementById(`camera-input-${mode}`).value = ''; 
+                        if(mode === 'entree') parseOCREntree(text);
+                        else parseOCRSortie(text);
+                    }).catch(err => {
+                        document.getElementById('ocr-loader').style.display = 'none';
+                        alert("Erreur de lecture de l'étiquette.");
+                    });
+                }
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+
+        function parseOCREntree(text) {
+            const lines = text.split('\n').map(l => l.trim().replace(/[^a-zA-ZÀ-ÿ0-9\s]/g, '')).filter(l => l.length > 4);
+            if(lines.length > 0) document.getElementById('domaine').value = lines[0].substring(0, 40);
             
-            wineInventory.forEach(wine => {
-                const tr = document.createElement('tr');
-                const colorClass = wine.couleur.toLowerCase().replace('é', 'e');
-                tr.innerHTML = `
-                    <td><strong>${wine.domaine}</strong><br><span style="font-size:12px;color:#666;">${wine.millesime || ''}</span></td>
-                    <td>
-                        <span class="badge ${colorClass}">${wine.couleur}</span>
-                        <div style="font-size:11px; margin-top:4px;">${wine.envergure || ''}</div>
-                    </td>
-                    <td><strong>${wine.emplacements.length}</strong></td>
-                    <td>
-                        <button class="btn-danger" onclick="if(confirm('Tout supprimer ?')) { wineInventory = wineInventory.filter(w => w.id !== '${wine.id}'); saveData(); renderMaCave(); }">Suppr.</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+            const milMatch = text.match(/\b(19[5-9]\d|20[0-2]\d)\b/);
+            if (milMatch) document.getElementById('millesime').value = milMatch[0];
+
+            for (const r of REGIONS_DICT) if (text.toLowerCase().includes(r)) { document.getElementById('region').value = r.charAt(0).toUpperCase() + r.slice(1); break; }
+            
+            document.getElementById('cave-visuelle-ranger').classList.add('active-placement');
+            document.getElementById('titre-placement').style.opacity = '1';
+        }
+
+        function parseOCRSortie(text) {
+            // Recherche d'une correspondance dans l'inventaire
+            const textLow = text.toLowerCase();
+            let bestMatch = null;
+            wineInventory.forEach(w => {
+                if(textLow.includes(w.domaine.toLowerCase()) || (w.millesime && textLow.includes(w.millesime.toString()))) {
+                    bestMatch = w;
+                }
             });
+            if(bestMatch) {
+                deboucherVin(bestMatch.id);
+            } else {
+                alert("Impossible de retrouver ce vin dans votre stock actuel.");
+            }
         }
 
         // ==========================================
-        // UTILS
+        // 7. ONGLET : MA CAVE
         // ==========================================
-        function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory)); }
+        function renderMaCave() {
+            const list = document.getElementById('inventory-list');
+            list.innerHTML = '';
+            wineInventory.forEach(wine => {
+                const item = document.createElement('div');
+                item.style.background = 'white'; item.style.padding = '15px'; item.style.marginBottom = '10px'; item.style.borderRadius = '8px';
+                item.innerHTML = `
+                    <div style="display:flex; justify-content:space-between;">
+                        <strong>${wine.domaine} (${wine.millesime || 'NV'})</strong>
+                        <span style="font-weight:bold; color:var(--primary-color);">${wine.emplacements.length} btl</span>
+                    </div>
+                    <button class="btn-danger" style="margin-top:10px;" onclick="if(confirm('Tout supprimer ?')){ wineInventory = wineInventory.filter(w => w.id !== '${wine.id}'); localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory)); renderMaCave(); }">🗑️ Forcer la suppression</button>
+                `;
+                list.appendChild(item);
+            });
+        }
 
-        // Démarrage par défaut sur l'onglet Déboucher
-        document.addEventListener('DOMContentLoaded', () => {
-            renderDeboucher();
-        });
+        document.addEventListener('DOMContentLoaded', renderDeboucher);
     </script>
 </body>
 </html>
