@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ma Cave à Vin - Gestion WMS Strict</title>
+    <title>Ma Cave à Vin - WMS Pro</title>
     <style>
         :root {
             --primary-color: #722F37;
@@ -17,7 +17,8 @@
             --success-color: #28a745;
             --danger-color: #d63031;
             --warning-color: #f39c12;
-            --info-color: #0984e3;
+            --picking-color: #0984e3; /* Bleu électrique pour la recherche */
+            --pending-color: #f1c40f; /* Jaune pour la réservation */
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -28,21 +29,20 @@
         header h1 { font-size: 20px; font-weight: 600; margin: 0; }
         .header-actions { display: flex; gap: 15px; }
         .header-btn { background: rgba(255, 255, 255, 0.2); border: none; color: white; font-size: 18px; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
-        .header-btn:hover { background: rgba(255, 255, 255, 0.3); }
 
         .tab-content { display: none; padding: 20px; max-width: 1200px; margin: 0 auto; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--nav-bg); display: flex; justify-content: space-around; padding: 10px 5px; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000; border-top: 1px solid var(--border-color); }
-        .nav-item { background: none; border: none; color: var(--text-muted); font-size: 12px; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 8px 15px; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .nav-item { background: none; border: none; color: var(--text-muted); font-size: 12px; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 8px 15px; border-radius: 8px; cursor: pointer; }
         .nav-item.active { color: var(--primary-color); background: rgba(114, 47, 55, 0.1); }
         .nav-icon { font-size: 20px; }
 
-        .btn-primary { background-color: var(--primary-color); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-primary { background-color: var(--primary-color); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; }
         .btn-secondary { background-color: #6c757d; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; }
         .btn-success { background-color: var(--success-color); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; }
-        .btn-info { background-color: var(--info-color); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; margin-top: 15px; box-shadow: 0 4px 6px rgba(9, 132, 227, 0.2); }
+        .btn-info { background-color: var(--picking-color); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; }
         .btn-danger { background-color: var(--danger-color); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
 
         /* ALERTES & CARROUSEL */
@@ -60,7 +60,7 @@
         .filter-title { font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; padding-left: 2px; }
         .chips-container { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
         .chips-container::-webkit-scrollbar { display: none; }
-        .chip { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-muted); padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
+        .chip { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-muted); padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; }
         .chip.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
 
         .wine-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
@@ -72,10 +72,8 @@
         .maturity-icon { font-size: 18px; margin-left: 8px; }
         .wine-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
         .tag { font-size: 11px; padding: 3px 8px; border-radius: 4px; background: #f1f2f6; color: #576574; font-weight: 600; }
-        .wine-stock { font-size: 13px; color: var(--text-main); margin-top:10px; padding-top: 10px; border-top: 1px dashed var(--border-color); }
-        .btn-deboucher { width: 100%; background: var(--primary-light); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; transition: background 0.2s; margin-top: 5px; }
         
-        /* ARRIVAGES (Formulaire) */
+        /* FORMULAIRE ARRIVAGES */
         #form-section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 30px; border-left: 4px solid var(--primary-color); }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
@@ -94,35 +92,44 @@
         .cave-container { display: flex; flex-direction: column; gap: 30px; margin-bottom: 40px; }
         .groupe-cave { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .groupe-cave h2 { border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; color: #444; font-size: 15px; }
-        .conteneur-blocs { display: flex; flex-wrap: wrap; gap: 15px; }
-        .groupe-garage .conteneur-blocs { flex-direction: column-reverse; }
-        .etage-complet { display: flex; gap: 15px; background: #fafafa; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
-        .bloc { flex: 1; min-width: 130px; background: #fff; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; }
+        .conteneur-blocs { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; }
+        .etage-complet { display: flex; gap: 15px; background: #fafafa; padding: 10px; border-radius: 8px; border: 1px solid #eee; width: 100%; max-width: 500px; }
+        .bloc { flex: 1; background: #fff; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; }
         .bloc h3 { font-size: 11px; text-transform: uppercase; color: #888; margin-bottom: 10px; text-align: center; }
         
         .grille-vins { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; justify-items: center; }
         
-        .case-grille { width: 32px; height: 32px; border: 2px dashed #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #aaa; cursor: pointer; transition: background 0.2s; }
-        .case-grille:hover { background: var(--primary-light); color: white; border-color: var(--primary-color); }
-        .pastille { width: 32px; height: 32px; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; cursor: help; }
+        .case-grille { width: 32px; height: 32px; border: 2px dashed #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #aaa; cursor: pointer; transition: all 0.2s; }
+        .case-grille:hover { border-color: var(--primary-color); }
         
+        .pastille { width: 32px; height: 32px; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; }
+        
+        /* COULEURS DES PASTILLES */
         .rouge { background: linear-gradient(135deg, #722F37, #4a1c22); color: transparent; }
         .blanc { background: linear-gradient(135deg, #F3E5AB, #d1c179); color: transparent; }
         .rose { background: linear-gradient(135deg, #FFC0CB, #d195a0); color: transparent; }
         .effervescent { background: linear-gradient(135deg, #FFD700, #c4a600); color: transparent; }
-
-        /* MODAL DE CONFIRMATION */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
-        .modal-box { background: white; width: 100%; max-width: 400px; border-radius: 12px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .modal-title { font-size: 18px; color: var(--primary-color); margin-bottom: 15px; font-weight: bold; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; }
-        .modal-body { font-size: 14px; margin-bottom: 20px; color: #444; line-height: 1.5; }
-        .modal-actions { display: flex; gap: 10px; }
         
+        /* WMS STATES (Jaune = Réservé, Bleu = Picking, Gris = Inactif) */
+        .pastille.jaune { background: var(--pending-color); color: #000; border: 2px solid #000; animation: pulseJaune 1.5s infinite; }
+        .pastille.bleue { background: var(--picking-color); color: #fff; border: 2px solid #fff; animation: pulseBleu 1.5s infinite; cursor: pointer; }
+        .pastille.grise { background: #bdc3c7; border: 2px solid #ecf0f1; opacity: 0.4; }
+
+        @keyframes pulseJaune { 0% { box-shadow: 0 0 0 0 rgba(241, 196, 15, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(241, 196, 15, 0); } 100% { box-shadow: 0 0 0 0 rgba(241, 196, 15, 0); } }
+        @keyframes pulseBleu { 0% { box-shadow: 0 0 0 0 rgba(9, 132, 227, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(9, 132, 227, 0); } 100% { box-shadow: 0 0 0 0 rgba(9, 132, 227, 0); } }
+
+        /* BANDEAU VALIDATION ARRIVAGE */
+        .validation-banner { position: sticky; top: 10px; background: white; border: 2px solid var(--pending-color); border-radius: 8px; padding: 15px; display: none; align-items: center; justify-content: space-between; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
+
         /* ADMINISTRATION */
         .dashboard { display: flex; gap: 15px; justify-content: center; margin-bottom: 25px; flex-wrap: wrap; }
         .kpi-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; flex: 1; min-width: 140px; }
         .kpi-card h3 { font-size: 12px; color: #666; text-transform: uppercase; }
         .kpi-card .value { font-size: 28px; font-weight: bold; color: var(--primary-color); margin-top: 5px; }
+
+        /* CONTENEUR PICKING */
+        #picking-view { display: none; }
+        #picking-header { background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; border: 1px solid #bbdefb; }
     </style>
 </head>
 <body>
@@ -136,46 +143,65 @@
     </header>
 
     <main>
-        <!-- ONGLET 1 : DÉBOUCHER -->
+        <!-- ========================================== -->
+        <!-- ONGLET 1 : DÉBOUCHER (Sortie)              -->
+        <!-- ========================================== -->
         <section id="tab-deboucher" class="tab-content active">
-            <div id="alerte-apogee" class="alert-banner">
-                <span id="alerte-texte">🚨 X bouteilles à boire d'urgence</span>
-                <button class="btn-danger" onclick="toggleFilter('apogee', 'urgence', null)">Voir</button>
+            
+            <!-- VUE RECHERCHE / LISTE -->
+            <div id="recherche-view">
+                <div id="alerte-apogee" class="alert-banner">
+                    <span id="alerte-texte">🚨 X bouteilles à boire d'urgence</span>
+                    <button class="btn-danger" onclick="toggleFilter('apogee', 'urgence', null)">Voir</button>
+                </div>
+                <div class="section-title">💡 Le Sommelier vous suggère :</div>
+                <div class="carousel" id="sommelier-carousel"></div>
+                <div class="filter-section">
+                    <div class="filter-group">
+                        <div class="filter-title">La Robe</div>
+                        <div class="chips-container" id="filter-robe">
+                            <div class="chip" onclick="toggleFilter('couleur', 'Rouge', this)">🔴 Rouge</div>
+                            <div class="chip" onclick="toggleFilter('couleur', 'Blanc', this)">⚪ Blanc</div>
+                            <div class="chip" onclick="toggleFilter('couleur', 'Rosé', this)">🌸 Rosé</div>
+                            <div class="chip" onclick="toggleFilter('couleur', 'Effervescent', this)">🍾 Bulles</div>
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <div class="filter-title">L'Envergure</div>
+                        <div class="chips-container" id="filter-envergure">
+                            <div class="chip" onclick="toggleFilter('envergure', 'Détente', this)">📅 Détente (Semaine)</div>
+                            <div class="chip" onclick="toggleFilter('envergure', 'Dégustation', this)">✨ Dégustation (W-E)</div>
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <div class="filter-title">Le Profil</div>
+                        <div class="chips-container" id="filter-profil">
+                            <div class="chip" onclick="toggleFilter('profil', 'Fruité/Vif', this)">🍇 Léger / Vif</div>
+                            <div class="chip" onclick="toggleFilter('profil', 'Puissant/Rond', this)">🥩 Puissant / Rond</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="wine-grid" id="wine-results"></div>
             </div>
-            <div class="section-title">💡 Le Sommelier vous suggère :</div>
-            <div class="carousel" id="sommelier-carousel"></div>
-            <div class="filter-section">
-                <div class="filter-group">
-                    <div class="filter-title">La Robe</div>
-                    <div class="chips-container" id="filter-robe">
-                        <div class="chip" onclick="toggleFilter('couleur', 'Rouge', this)">🔴 Rouge</div>
-                        <div class="chip" onclick="toggleFilter('couleur', 'Blanc', this)">⚪ Blanc</div>
-                        <div class="chip" onclick="toggleFilter('couleur', 'Rosé', this)">🌸 Rosé</div>
-                        <div class="chip" onclick="toggleFilter('couleur', 'Effervescent', this)">🍾 Bulles</div>
-                    </div>
+
+            <!-- VUE PICKING WMS (Plan de cave) -->
+            <div id="picking-view">
+                <div id="picking-header">
+                    <h3 style="color: var(--picking-color); margin-bottom: 5px;">📍 Mode Prélèvement</h3>
+                    <p style="font-size: 13px; color: #555; margin-bottom: 15px;">Cliquez sur la bouteille bleue (clignotante) que vous souhaitez sortir.</p>
+                    <button class="btn-secondary" onclick="fermerPicking()">Retour à la liste</button>
                 </div>
-                <div class="filter-group">
-                    <div class="filter-title">L'Envergure</div>
-                    <div class="chips-container" id="filter-envergure">
-                        <div class="chip" onclick="toggleFilter('envergure', 'Détente', this)">📅 Détente (Semaine)</div>
-                        <div class="chip" onclick="toggleFilter('envergure', 'Dégustation', this)">✨ Dégustation (W-E)</div>
-                    </div>
-                </div>
-                <div class="filter-group">
-                    <div class="filter-title">Le Profil</div>
-                    <div class="chips-container" id="filter-profil">
-                        <div class="chip" onclick="toggleFilter('profil', 'Fruité/Vif', this)">🍇 Léger / Vif</div>
-                        <div class="chip" onclick="toggleFilter('profil', 'Puissant/Rond', this)">🥩 Puissant / Rond</div>
-                    </div>
-                </div>
+                <div id="cave-visuelle-picking" class="cave-container active-placement"></div>
             </div>
-            <div class="wine-grid" id="wine-results"></div>
+
         </section>
 
-        <!-- ONGLET 2 : ARRIVAGES (WMS STRICT) -->
+        <!-- ========================================== -->
+        <!-- ONGLET 2 : ARRIVAGES (Entrée)              -->
+        <!-- ========================================== -->
         <section id="tab-arrivages" class="tab-content">
             <div id="form-section">
-                <h3 id="form-title" style="margin-bottom: 15px; color: var(--primary-color);">✍️ Saisir les bouteilles entrantes</h3>
+                <h3 id="form-title" style="margin-bottom: 15px; color: var(--primary-color);">✍️ Saisir l'Arrivage</h3>
                 <form id="wine-form">
                     <div class="form-grid">
                         <div class="form-group full-width">
@@ -201,7 +227,7 @@
                         </div>
                         
                         <div id="effervescent-options" class="effervescent-options">
-                            <label style="font-size: 12px; color: #666; margin-bottom: 5px; display: block;">Précisions Effervescent</label>
+                            <label style="font-size: 12px; color: #666; margin-bottom: 5px; display: block;">Spécificités Effervescent</label>
                             <div class="segmented-control">
                                 <input type="radio" id="eff_blanc" name="eff_color" value="Blanc" checked>
                                 <label for="eff_blanc">Blanc</label>
@@ -237,17 +263,31 @@
                     </div>
                 </form>
 
-                <button type="button" class="btn-info" onclick="actionAutoRangement()">🪄 Ranger automatiquement (De Haut en Bas)</button>
+                <button type="button" class="btn-primary" onclick="lancerAllocationAuto()" style="background-color:#f39c12; color:#fff;">🪄 Proposer le rangement (De Haut en Bas)</button>
+            </div>
+
+            <!-- Bandeau de Validation (Apparaît quand des cases sont jaunes) -->
+            <div id="arrivage-banner" class="validation-banner">
+                <div>
+                    <strong style="color:var(--pending-color); font-size:16px;">🟡 Allocation en attente</strong>
+                    <div style="font-size:12px; color:#555;" id="arrivage-banner-text">Vérifiez les cases jaunes sur le plan.</div>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-secondary" onclick="annulerAllocation()">Annuler</button>
+                    <button class="btn-success" onclick="validerAllocation()">✅ Confirmer</button>
+                </div>
             </div>
 
             <div class="section-title" id="titre-placement" style="text-align: center;">
-                👇 L'état actuel de votre stock. Cliquez sur un trou vide pour cibler le rangement 👇
+                👇 Plan de Cave : Cliquez sur un trou vide pour cibler une autre zone 👇
             </div>
             
-            <div id="cave-visuelle-ranger" class="cave-container"></div>
+            <div id="cave-visuelle-ranger" class="cave-container active-placement"></div>
         </section>
 
-        <!-- ONGLET 3 : MA CAVE -->
+        <!-- ========================================== -->
+        <!-- ONGLET 3 : MA CAVE                         -->
+        <!-- ========================================== -->
         <section id="tab-macave" class="tab-content">
             <div class="dashboard">
                 <div class="kpi-card">
@@ -271,39 +311,28 @@
         <button class="nav-item" onclick="switchTab('macave', this)"><span class="nav-icon">📊</span><span>Ma Cave</span></button>
     </nav>
 
-    <!-- MODAL DE CONFIRMATION -->
-    <div id="modal-confirmation" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-title">📌 Validation du rangement</div>
-            <div id="modal-body" class="modal-body">
-                <!-- Rempli par JS -->
-            </div>
-            <div class="modal-actions">
-                <button class="btn-secondary" onclick="fermerModal()">Annuler</button>
-                <button class="btn-success" onclick="validerRangement()">✅ Confirmer & Ranger</button>
-            </div>
-        </div>
-    </div>
-
     <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importerJSON(event)">
 
     <script>
         // ==========================================
-        // 1. DATA ET TOPOLOGIE STRICTE (WMS)
+        // 1. TOPOLOGIE WMS STRICTE & DONNÉES
         // ==========================================
         const STORAGE_KEY = 'ryzek_cave_a_vin_data';
         let wineInventory = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
         const CURRENT_YEAR = 2026;
 
-        // Le Garage est dorénavant une GRILLE stricte de 5 places. Zéro débordement virtuel.
-        const topologie = [
-            { id: "esc_casier", nom: "Casier", type: "grille", capacite: 12, groupe: "Sous l'escalier" },
-            { id: "esc_vrac", nom: "Vrac (Max 24)", type: "grille", capacite: 24, groupe: "Sous l'escalier" }
-        ];
-        for (let i = 1; i <= 10; i++) {
-            topologie.push({ id: `g_e${i}_g`, nom: `Étage ${i} G`, type: "grille", capacite: 5, groupe: "Garage", etage: i });
+        // Ordre strict du WMS : De Haut en Bas (Étage 10 à 1), et Droite (D) avant Gauche (G).
+        const topologie = [];
+        for (let i = 10; i >= 1; i--) {
             topologie.push({ id: `g_e${i}_d`, nom: `Étage ${i} D`, type: "grille", capacite: 5, groupe: "Garage", etage: i });
+            topologie.push({ id: `g_e${i}_g`, nom: `Étage ${i} G`, type: "grille", capacite: 5, groupe: "Garage", etage: i });
         }
+        topologie.push({ id: "esc_casier", nom: "Casier escalier", type: "grille", capacite: 12, groupe: "Sous l'escalier" });
+        topologie.push({ id: "esc_vrac", nom: "Caisse escalier", type: "grille", capacite: 24, groupe: "Sous l'escalier" });
+
+        // Variables d'état WMS
+        let pendingSlots = []; // Les cases jaunes
+        let pickingWineId = null; // L'ID du vin cherché pour le picking bleu
 
         // ==========================================
         // 2. MOTEUR D'APOGÉE
@@ -361,7 +390,7 @@
                         wineInventory = importedData;
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
                         alert("Restauration réussie !");
-                        document.querySelectorAll('.nav-item').forEach(btn => { if(btn.classList.contains('active')) btn.click(); });
+                        location.reload(); // Rafraîchissement brutal pour la sécurité
                     }
                 } catch (error) { alert("Erreur de fichier JSON."); }
             };
@@ -377,13 +406,16 @@
             document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
             btnElement.classList.add('active');
             
+            fermerPicking(); // Quitte le mode picking au changement d'onglet
+            annulerAllocation(); // Annule les sélections en cours au changement d'onglet
+            
             if (tabId === 'deboucher') renderDeboucher();
-            if (tabId === 'arrivages') renderCaveArrivages();
+            if (tabId === 'arrivages') renderCellar('cave-visuelle-ranger', 'arrivages');
             if (tabId === 'macave') renderMaCave();
         }
 
         // ==========================================
-        // 5. ONGLET : DÉBOUCHER & SOMMELIER
+        // 5. ONGLET : DÉBOUCHER (RECHERCHE + PICKING)
         // ==========================================
         let activeFilters = { couleur: null, envergure: null, profil: null, apogee: null };
         function toggleFilter(category, value, element) {
@@ -433,14 +465,6 @@
 
             filteredWines.forEach(wine => {
                 const stock = wine.emplacements.length;
-                
-                // Formater les emplacements bruts pour affichage propre
-                let locsFormatted = [...new Set(wine.emplacements.map(loc => {
-                    let text = loc.replace(/_/g, ' ').toUpperCase();
-                    text = text.replace('G E', 'Garage Etage ').replace(' D ', ' Droite ').replace(' G ', ' Gauche ').replace('POS', 'Case');
-                    return text;
-                }))].join(', ');
-
                 let tagCouleur = wine.couleur;
                 if (wine.couleur === 'Effervescent' && wine.eff_color && wine.eff_type) tagCouleur = `🍾 ${wine.eff_color} ${wine.eff_type}`;
 
@@ -460,9 +484,8 @@
                             <span class="tag">${wine.envergure || 'N/A'}</span>
                             <span class="tag">${wine.profil || 'N/A'}</span>
                         </div>
-                        <div class="wine-stock" style="font-size:12px; line-height: 1.4;">📍 Dispo : <strong>${locsFormatted}</strong></div>
                     </div>
-                    <button class="btn-deboucher" onclick="deboucherVin('${wine.id}')">🍾 Déboucher 1 bouteille</button>
+                    <button class="btn-info" onclick="ouvrirPicking('${wine.id}')">📍 Localiser sur le plan</button>
                 `;
                 container.appendChild(card);
             });
@@ -475,241 +498,204 @@
                 <div class="suggestion-motive">${motive}</div>
                 <div style="font-weight:bold; font-size: 15px;">${wine.domaine}</div>
                 <div style="font-size:12px; color:#666; margin-bottom:10px;">${wine.millesime}</div>
-                <button class="btn-primary" style="padding:8px; font-size:12px;" onclick="deboucherVin('${wine.id}')">Sortir</button>
+                <button class="btn-info" style="padding:8px; font-size:12px;" onclick="ouvrirPicking('${wine.id}')">📍 Localiser</button>
             `;
             return card;
         }
 
-        function deboucherVin(idVin) {
-            const index = wineInventory.findIndex(w => w.id === idVin);
-            if (index !== -1) {
-                if(confirm(`Sortir 1 bouteille de :\n${wineInventory[index].domaine} ?\nL'emplacement physique sera immédiatement libéré.`)) {
-                    // Libération stricte (pop enlève la dernière coordonnée insérée)
-                    wineInventory[index].emplacements.pop();
-                    if(wineInventory[index].emplacements.length === 0) wineInventory.splice(index, 1);
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
-                    renderDeboucher(); // Refresh Sortie
+        // ==========================================
+        // 6. LOGIQUE WMS : LES COORDONNÉES
+        // ==========================================
+        function getToutesLesPositionsOccupees() {
+            let occupees = new Set();
+            wineInventory.forEach(w => {
+                w.emplacements.forEach(emp => occupees.add(emp));
+            });
+            return occupees;
+        }
+
+        // L'ordre strict WMS : Garage 10D -> Garage 1G -> Escalier
+        function getOrderedSlots() {
+            let slots = [];
+            topologie.forEach(bloc => {
+                for(let p=1; p<=bloc.capacite; p++) {
+                    slots.push(`${bloc.id}_pos_${p}`);
                 }
-            }
+            });
+            return slots;
         }
 
         // ==========================================
-        // 6. ONGLET : ARRIVAGES (ALGORITHME PROXIMITÉ EXACT)
+        // 7. WMS : ALLOCATION (ARRIVAGES)
         // ==========================================
         document.getElementById('couleur').addEventListener('change', (e) => {
             const effOptions = document.getElementById('effervescent-options');
             effOptions.style.display = (e.target.value === 'Effervescent') ? 'block' : 'none';
         });
 
-        // Fonction pour connaitre exactement quelles positions sont prises dans un bloc
-        function getPositionsOccupees(blocId) {
-            let occ = [];
-            let vracLegacyCount = 0;
-            wineInventory.forEach(w => {
-                w.emplacements.forEach(emp => {
-                    if (emp === blocId) vracLegacyCount++; // Migration silencieuse des anciennes data sans position
-                    else if (emp.startsWith(blocId + '_pos_')) occ.push(parseInt(emp.split('_pos_')[1], 10));
-                });
-            });
-            // Si vieilles données, on force l'occupation des cases 1, 2, 3...
-            for(let i=0; i<vracLegacyCount; i++) {
-                for(let p=1; p<=50; p++) {
-                    if(!occ.includes(p)) { occ.push(p); break; }
-                }
-            }
-            return occ;
-        }
+        function lancerAllocationAuto() { lancerAllocation(null); }
+        function allocationClicManuel(cibleExacteId) { lancerAllocation(cibleExacteId); }
 
-        // Calcule la distance entre la case cliquée et une autre case vide
-        function calculerDistance(blocCible, blocTest) {
-            if (blocCible.id === blocTest.id) return 0; // Même demi-étagère = Parfait
-            if (blocCible.groupe !== blocTest.groupe) return 1000; // Pas la même pièce (Escalier vs Garage)
-            if (blocCible.groupe === 'Garage') {
-                let diffEtage = Math.abs(blocCible.etage - blocTest.etage);
-                let memeCote = (blocCible.id.endsWith('_g') === blocTest.id.endsWith('_g')) ? 0 : 5;
-                return (diffEtage * 10) + memeCote; 
-                // Ex: clic E2 Gauche. 
-                // E2 Droite = distance 5. 
-                // E3 Gauche = distance 10. 
-                // -> Il ira d'abord remplir le côté opposé avant de changer d'étage.
-            }
-            return 500;
-        }
-
-        // Variable de mémoire pour la modale
-        let propositionRangement = null;
-
-        function lancerRangement(cibleExacteId = null) {
+        function lancerAllocation(cibleId = null) {
             const domaine = document.getElementById('domaine').value;
-            if (!domaine) return alert("Veuillez d'abord renseigner le nom du domaine avant de chercher un emplacement.");
+            if (!domaine) return alert("Veuillez d'abord renseigner le nom du domaine dans le formulaire.");
             
             const qty = parseInt(document.getElementById('quantite').value, 10) || 1;
+            const occ = getToutesLesPositionsOccupees();
+            const allSlots = getOrderedSlots();
+            const freeSlots = allSlots.filter(s => !occ.has(s));
+
+            if (freeSlots.length < qty) {
+                return alert(`⚠️ Cave pleine ! Il manque ${qty - freeSlots.length} place(s) pour ranger ces bouteilles.`);
+            }
+
+            pendingSlots = [];
             
-            // 1. Recenser absolument TOUS les trous vides de la cave
-            let tousLesTrous = [];
-            topologie.forEach(bloc => {
-                let occ = getPositionsOccupees(bloc.id);
-                for (let i = 1; i <= bloc.capacite; i++) {
-                    if (!occ.includes(i)) {
-                        tousLesTrous.push({
-                            idExact: `${bloc.id}_pos_${i}`,
-                            bloc: bloc,
-                            pos: i
-                        });
-                    }
+            if (cibleId) {
+                // LOGIQUE EPICENTRE
+                let startIndex = freeSlots.indexOf(cibleId);
+                if (startIndex === -1) return; // Case déjà occupée
+                // On prend qty places en partant de l'épicentre et en descendant
+                for(let i=0; i<qty; i++) {
+                    let index = (startIndex + i) % freeSlots.length; // Boucle au début si on atteint la fin de la cave
+                    pendingSlots.push(freeSlots[index]);
                 }
-            });
-
-            if (tousLesTrous.length < qty) {
-                return alert(`⚠️ Cave pleine ! Il manque ${qty - tousLesTrous.length} place(s) pour ranger ces bouteilles.`);
-            }
-
-            // 2. Trier ces trous selon la méthode (Clic/Épicentre OU Bouton Auto/Haut en bas)
-            if (cibleExacteId) {
-                // LOGIQUE ÉPICENTRE
-                const [baseBlocId, posStr] = cibleExacteId.split('_pos_');
-                const clickedBloc = topologie.find(b => b.id === baseBlocId);
-                
-                tousLesTrous.sort((a, b) => {
-                    // Le trou cliqué est la priorité absolue 0
-                    if (a.idExact === cibleExacteId) return -1; 
-                    if (b.idExact === cibleExacteId) return 1;
-
-                    let distA = calculerDistance(clickedBloc, a.bloc);
-                    let distB = calculerDistance(clickedBloc, b.bloc);
-                    
-                    if (distA !== distB) return distA - distB;
-                    // À distance égale, on remplit bêtement de la position 1 à 5
-                    return a.pos - b.pos; 
-                });
             } else {
-                // LOGIQUE AUTO (Par défaut, le garage se remplit de l'étage 10 vers le 1)
-                tousLesTrous.sort((a, b) => {
-                    if (a.bloc.groupe === 'Garage' && b.bloc.groupe === 'Garage') {
-                        if (a.bloc.etage !== b.bloc.etage) return b.bloc.etage - a.bloc.etage; 
-                        if (a.bloc.id !== b.bloc.id) return a.bloc.id.localeCompare(b.bloc.id);
-                        return a.pos - b.pos;
-                    }
-                    return 0;
-                });
+                // LOGIQUE AUTO (De haut en bas)
+                pendingSlots = freeSlots.slice(0, qty);
             }
 
-            // 3. Prendre les N premiers trous de la liste triée
-            let selection = tousLesTrous.slice(0, qty);
-            let emplacementsAssignes = selection.map(t => t.idExact);
-            
-            // 4. Générer le résumé pour affichage
-            let resumeAffichage = {};
-            selection.forEach(t => {
-                let nomClair = t.bloc.nom.replace('G', 'Gauche').replace('D', 'Droite');
-                if(!resumeAffichage[nomClair]) resumeAffichage[nomClair] = 0;
-                resumeAffichage[nomClair]++;
-            });
-
-            preparerSauvegarde(emplacementsAssignes);
-            afficherModal(resumeAffichage, qty);
+            document.getElementById('arrivage-banner').style.display = 'flex';
+            document.getElementById('arrivage-banner-text').innerText = `${qty} emplacement(s) réservé(s) en JAUNE sur le plan.`;
+            renderCellar('cave-visuelle-ranger', 'arrivages');
         }
 
-        function actionAutoRangement() { lancerRangement(null); }
-        function actionSlotVide(cibleId) { lancerRangement(cibleId); }
+        function annulerAllocation() {
+            pendingSlots = [];
+            document.getElementById('arrivage-banner').style.display = 'none';
+            renderCellar('cave-visuelle-ranger', 'arrivages');
+        }
 
-        // --- PREPARATION & MODAL ---
-        function preparerSauvegarde(emplacementsAssignes) {
+        function validerAllocation() {
+            if (pendingSlots.length === 0) return;
+
             const couleur = document.getElementById('couleur').value;
-            propositionRangement = {
+            const newWine = {
                 id: Date.now().toString(),
-                domaine: document.getElementById('domaine').value, 
+                domaine: document.getElementById('domaine').value,
                 region: document.getElementById('region').value,
-                millesime: document.getElementById('millesime').value, 
+                millesime: document.getElementById('millesime').value,
                 couleur: couleur,
-                envergure: document.getElementById('envergure').value, 
+                envergure: document.getElementById('envergure').value,
                 profil: document.getElementById('profil').value,
-                emplacements: emplacementsAssignes
+                emplacements: [...pendingSlots]
             };
+
             if (couleur === 'Effervescent') {
-                propositionRangement.eff_color = document.querySelector('input[name="eff_color"]:checked').value;
-                propositionRangement.eff_type = document.querySelector('input[name="eff_type"]:checked').value;
+                newWine.eff_color = document.querySelector('input[name="eff_color"]:checked').value;
+                newWine.eff_type = document.querySelector('input[name="eff_type"]:checked').value;
             }
+
+            wineInventory.push(newWine);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
+
+            // Reset
+            document.getElementById('wine-form').reset();
+            document.getElementById('effervescent-options').style.display = 'none';
+            annulerAllocation(); // Vide les jaunes et rafraîchit
         }
 
-        function afficherModal(resumeAffichage, qty) {
-            const domaine = document.getElementById('domaine').value;
-            let html = `<p style="margin-bottom:15px;">Proposition de rangement pour <strong>${qty} bouteille(s)</strong> de ${domaine} :</p><ul style="list-style-type:none; padding:0;">`;
-            
-            for (const [lieu, nb] of Object.entries(resumeAffichage)) {
-                html += `<li style="padding:10px; background:#f8f9fa; border:1px solid #ccc; margin-bottom:5px; border-radius:6px; font-size:15px;">📍 <strong>${nb}</strong> bouteille(s) ➔ <strong>${lieu}</strong></li>`;
-            }
-            html += `</ul>`;
-            
-            document.getElementById('modal-body').innerHTML = html;
-            document.getElementById('modal-confirmation').style.display = 'flex';
+        // ==========================================
+        // 8. WMS : PICKING (DÉBOUCHER)
+        // ==========================================
+        function ouvrirPicking(idVin) {
+            pickingWineId = idVin;
+            document.getElementById('recherche-view').style.display = 'none';
+            document.getElementById('picking-view').style.display = 'block';
+            window.scrollTo(0, 0);
+            renderCellar('cave-visuelle-picking', 'picking');
         }
 
-        function fermerModal() {
-            document.getElementById('modal-confirmation').style.display = 'none';
-            propositionRangement = null;
+        function fermerPicking() {
+            pickingWineId = null;
+            document.getElementById('recherche-view').style.display = 'block';
+            document.getElementById('picking-view').style.display = 'none';
+            renderDeboucher(); // Rafraîchit les stocks de la liste
         }
 
-        function validerRangement() {
-            if(propositionRangement) {
-                wineInventory.push(propositionRangement);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
+        function extraireBouteille(slotId) {
+            const wine = wineInventory.find(w => w.id === pickingWineId);
+            if (!wine) return;
+
+            if (confirm("Confirmer la sortie de cette bouteille ?\nL'emplacement sera immédiatement libéré.")) {
+                wine.emplacements = wine.emplacements.filter(e => e !== slotId);
                 
-                document.getElementById('wine-form').reset();
-                document.getElementById('effervescent-options').style.display = 'none';
-                
-                fermerModal();
-                renderCaveArrivages(); // Rafraîchit instantanément la vue
+                if (wine.emplacements.length === 0) {
+                    wineInventory = wineInventory.filter(w => w.id !== pickingWineId);
+                    alert("C'était votre dernière bouteille de cette référence !");
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
+                    fermerPicking(); // Plus de bouteille, on retourne à la liste
+                } else {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
+                    renderCellar('cave-visuelle-picking', 'picking'); // Met à jour le plan
+                }
             }
         }
 
-        // --- DESSIN DU WMS STRICT ---
-        function renderCaveArrivages() {
-            const container = document.getElementById('cave-visuelle-ranger');
+        // ==========================================
+        // 9. RENDU DU PLAN DE CAVE (MOTEUR UNIQUE)
+        // ==========================================
+        function renderCellar(containerId, mode) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
             container.innerHTML = '';
 
+            // Map pour savoir rapidement ce qui est où
             const mapEmplacements = {};
             wineInventory.forEach(vin => {
                 vin.emplacements.forEach(empStr => {
-                    let baseId = empStr.split('_pos_')[0];
-                    let pos = empStr.includes('_pos_') ? parseInt(empStr.split('_pos_')[1], 10) : null;
-                    if (!mapEmplacements[baseId]) mapEmplacements[baseId] = [];
-                    mapEmplacements[baseId].push({ vin: vin, exactPos: pos });
+                    mapEmplacements[empStr] = vin;
                 });
             });
 
-            const groupes = { "Garage": [], "Sous l'escalier": [] };
-            topologie.forEach(bloc => groupes[bloc.groupe].push(bloc));
+            // Groupement par étage pour affichage compact (Garage D/G sur même ligne)
+            const etagesGarage = {};
+            const escBlocs = [];
 
-            for (const [nomGroupe, blocs] of Object.entries(groupes)) {
-                const section = document.createElement('div');
-                section.className = `groupe-cave groupe-${nomGroupe.toLowerCase().replace(/[' ]/g, '')}`;
-                section.innerHTML = `<h2>📍 ${nomGroupe}</h2>`;
-                const conteneurBlocs = document.createElement('div');
-                conteneurBlocs.className = 'conteneur-blocs';
-
-                if (nomGroupe === "Garage") {
-                    const etages = {};
-                    blocs.forEach(b => { if(!etages[b.etage]) etages[b.etage] = []; etages[b.etage].push(b); });
-                    Object.values(etages).forEach(paire => {
-                        const divEtage = document.createElement('div');
-                        divEtage.className = 'etage-complet';
-                        paire.forEach(b => divEtage.appendChild(creerHTMLBlocArr(b, mapEmplacements[b.id])));
-                        conteneurBlocs.appendChild(divEtage);
-                    });
+            topologie.forEach(bloc => {
+                if (bloc.groupe === "Garage") {
+                    if(!etagesGarage[bloc.etage]) etagesGarage[bloc.etage] = [];
+                    etagesGarage[bloc.etage].push(bloc);
                 } else {
-                    blocs.forEach(b => conteneurBlocs.appendChild(creerHTMLBlocArr(b, mapEmplacements[b.id])));
+                    escBlocs.push(bloc);
                 }
-                section.appendChild(conteneurBlocs);
-                container.appendChild(section);
-            }
+            });
+
+            // Rendu Garage
+            const secGarage = document.createElement('div');
+            secGarage.className = 'groupe-cave';
+            secGarage.innerHTML = `<h2>📍 Garage (De Haut en Bas)</h2><div class="conteneur-blocs" id="grp-garage-${mode}"></div>`;
+            container.appendChild(secGarage);
+            const cg = secGarage.querySelector('.conteneur-blocs');
+
+            // Garage est trié de 10 à 1
+            Object.keys(etagesGarage).sort((a,b) => b - a).forEach(etage => {
+                const ligne = document.createElement('div');
+                ligne.className = 'etage-complet';
+                etagesGarage[etage].forEach(bloc => ligne.appendChild(creerHTMLBloc(bloc, mode, mapEmplacements)));
+                cg.appendChild(ligne);
+            });
+
+            // Rendu Escalier
+            const secEsc = document.createElement('div');
+            secEsc.className = 'groupe-cave';
+            secEsc.innerHTML = `<h2>📍 Sous l'escalier</h2><div class="conteneur-blocs" id="grp-esc-${mode}"></div>`;
+            container.appendChild(secEsc);
+            const ce = secEsc.querySelector('.conteneur-blocs');
+            escBlocs.forEach(bloc => ce.appendChild(creerHTMLBloc(bloc, mode, mapEmplacements)));
         }
 
-        // Dessine la grille de manière stricte, case par case (Vide ou Pleine, rien de plus)
-        function creerHTMLBlocArr(bloc, bouteillesPures = []) {
-            // Traitement pour les vieilles données migrés sans _pos_
-            let occGlobales = getPositionsOccupees(bloc.id); 
-            
+        function creerHTMLBloc(bloc, mode, mapEmplacements) {
             const divBloc = document.createElement('div');
             divBloc.className = `bloc`;
             divBloc.innerHTML = `<h3>${bloc.nom}</h3>`;
@@ -717,26 +703,45 @@
             grille.className = `grille-vins`; 
 
             for (let i = 1; i <= bloc.capacite; i++) {
+                const slotId = `${bloc.id}_pos_${i}`;
                 const caseDiv = document.createElement('div');
                 
-                // Si la case i est dans le tableau des occupations, c'est plein
-                if (occGlobales.includes(i)) {
-                    // Trouver quelle bouteille c'est visuellement
-                    let btlDetail = bouteillesPures.find(b => b.exactPos === i);
-                    if(!btlDetail && bouteillesPures.length > 0) btlDetail = bouteillesPures[0]; // Fallback visuel vieilles datas
-                    
-                    let colorClass = btlDetail ? btlDetail.vin.couleur.toLowerCase().replace('é','e') : 'rouge';
-                    let domainInitial = btlDetail && btlDetail.vin.domaine ? btlDetail.vin.domaine.substring(0,2).toUpperCase() : '';
-                    
-                    caseDiv.className = `pastille ${colorClass}`;
-                    caseDiv.innerHTML = domainInitial;
-                    caseDiv.title = btlDetail ? btlDetail.vin.domaine : 'Occupé';
-                } else {
-                    // C'est un vrai trou vide et cliquable
-                    caseDiv.className = 'case-grille';
-                    caseDiv.innerHTML = i;
-                    caseDiv.onclick = () => actionSlotVide(`${bloc.id}_pos_${i}`);
+                const vinOccupe = mapEmplacements[slotId];
+                
+                // MOTEUR DE DESSIN WMS
+                if (mode === 'arrivages') {
+                    if (pendingSlots.includes(slotId)) {
+                        // Réservation en cours (JAUNE)
+                        caseDiv.className = 'pastille jaune';
+                        caseDiv.title = "Réservé";
+                    } else if (vinOccupe) {
+                        // Occupé par un vin (COULEUR)
+                        let colorClass = vinOccupe.couleur.toLowerCase().replace('é','e');
+                        caseDiv.className = `pastille ${colorClass}`;
+                        caseDiv.title = vinOccupe.domaine;
+                    } else {
+                        // Trou vide cliquable
+                        caseDiv.className = 'case-grille';
+                        caseDiv.onclick = () => allocationClicManuel(slotId);
+                    }
+                } 
+                else if (mode === 'picking') {
+                    if (vinOccupe && vinOccupe.id === pickingWineId) {
+                        // C'est le vin que je cherche (BLEU)
+                        caseDiv.className = 'pastille bleue';
+                        caseDiv.title = "Cliquez pour extraire !";
+                        caseDiv.onclick = () => extraireBouteille(slotId);
+                    } else if (vinOccupe) {
+                        // C'est un autre vin (GRIS)
+                        caseDiv.className = `pastille grise`;
+                    } else {
+                        // C'est un trou vide (Gris/Dashed, non cliquable)
+                        caseDiv.className = 'case-grille';
+                        caseDiv.style.cursor = 'default';
+                        caseDiv.style.borderColor = '#eee';
+                    }
                 }
+
                 grille.appendChild(caseDiv);
             }
             
@@ -745,7 +750,7 @@
         }
 
         // ==========================================
-        // 7. ONGLET : MA CAVE
+        // 10. ONGLET : MA CAVE
         // ==========================================
         function renderMaCave() {
             document.getElementById('kpi-total').innerText = wineInventory.reduce((sum, w) => sum + w.emplacements.length, 0);
@@ -767,15 +772,28 @@
                         </div>
                         <span style="font-weight:bold; color:var(--primary-color);">${wine.emplacements.length} btl</span>
                     </div>
-                    <button class="btn-danger" style="margin-top:10px;" onclick="if(confirm('Tout supprimer ?')){ wineInventory = wineInventory.filter(w => w.id !== '${wine.id}'); localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory)); renderMaCave(); }">🗑️ Forcer la suppression globale</button>
+                    <button class="btn-danger" style="margin-top:10px;" onclick="if(confirm('Tout supprimer ?')){ wineInventory = wineInventory.filter(w => w.id !== '${wine.id}'); localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory)); renderMaCave(); }">🗑️ Forcer la suppression</button>
                 `;
                 list.appendChild(item);
             });
         }
 
-        // Initialisation : L'onglet Arrivages doit être dessiné même en fond pour être prêt
+        // INIT
         document.addEventListener('DOMContentLoaded', () => {
-            renderCaveArrivages();
+            // Nettoyage silencieux des vieilles données sans _pos_ au premier chargement pour garantir la stabilité du WMS strict
+            let needsSave = false;
+            wineInventory.forEach(w => {
+                for(let i=0; i<w.emplacements.length; i++) {
+                    if(!w.emplacements[i].includes('_pos_')) {
+                        // On lui force une position par défaut juste pour qu'il s'affiche
+                        w.emplacements[i] = `${w.emplacements[i]}_pos_${i+1}`; 
+                        needsSave = true;
+                    }
+                }
+            });
+            if(needsSave) localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
+
+            renderCellar('cave-visuelle-ranger', 'arrivages');
             renderDeboucher();
         });
     </script>
