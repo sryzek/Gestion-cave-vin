@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ma Cave à Vin - Assistant Intelligent</title>
+    <title>Ma Cave à Vin - Rangement Intelligent</title>
     <style>
         :root {
             --primary-color: #722F37;
@@ -17,28 +17,17 @@
             --success-color: #28a745;
             --danger-color: #d63031;
             --warning-color: #f39c12;
+            --info-color: #0984e3;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 80px; }
         
-        /* HEADER AVEC ACTIONS GLOBALES */
-        header { 
-            background: var(--primary-color); 
-            color: white; 
-            padding: 15px 20px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        header { background: var(--primary-color); color: white; padding: 15px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
         header h1 { font-size: 20px; font-weight: 600; margin: 0; }
         .header-actions { display: flex; gap: 15px; }
-        .header-btn {
-            background: rgba(255, 255, 255, 0.2); border: none; color: white;
-            font-size: 18px; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: background 0.2s;
-        }
+        .header-btn { background: rgba(255, 255, 255, 0.2); border: none; color: white; font-size: 18px; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
         .header-btn:hover { background: rgba(255, 255, 255, 0.3); }
 
         .tab-content { display: none; padding: 20px; max-width: 1200px; margin: 0 auto; }
@@ -51,10 +40,13 @@
         .nav-icon { font-size: 20px; }
 
         .btn-primary { background-color: var(--primary-color); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-secondary { background-color: #6c757d; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; }
+        .btn-success { background-color: var(--success-color); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; }
+        .btn-info { background-color: var(--info-color); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; margin-top: 15px; box-shadow: 0 4px 6px rgba(9, 132, 227, 0.2); }
         .btn-danger { background-color: var(--danger-color); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
 
-        /* ALERTES & CARROUSEL SOMMELIER */
-        .alert-banner { background: #ffeaa7; border-left: 5px solid var(--warning-color); padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; align-items: center; justify-content: space-between; font-weight: bold; color: #d35400; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        /* ALERTES & CARROUSEL */
+        .alert-banner { background: #ffeaa7; border-left: 5px solid var(--warning-color); padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; align-items: center; justify-content: space-between; font-weight: bold; color: #d35400; }
         .section-title { font-size: 16px; color: var(--primary-color); margin-bottom: 12px; font-weight: bold; }
         
         .carousel { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 25px; scrollbar-width: none; }
@@ -83,7 +75,7 @@
         .wine-stock { font-size: 13px; color: var(--text-main); margin-top:10px; padding-top: 10px; border-top: 1px dashed var(--border-color); }
         .btn-deboucher { width: 100%; background: var(--primary-light); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; transition: background 0.2s; margin-top: 5px; }
         
-        /* ARRIVAGES (Formulaire & Cave) */
+        /* ARRIVAGES (Formulaire) */
         #form-section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 30px; border-left: 4px solid var(--primary-color); }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
@@ -99,9 +91,9 @@
         .segmented-control input[type="radio"] { display: none; }
         .segmented-control input[type="radio"]:checked + label { background: var(--primary-color); color: white; }
 
-        .cave-container { display: flex; flex-direction: column; gap: 30px; margin-bottom: 40px; opacity: 0.5; pointer-events: none; transition: opacity 0.3s; }
-        .cave-container.active-placement { opacity: 1; pointer-events: auto; }
-        
+        /* CAVE VISUELLE */
+        .cave-container { display: flex; flex-direction: column; gap: 30px; margin-bottom: 40px; opacity: 0.5; transition: opacity 0.3s; }
+        .cave-container.active-placement { opacity: 1; }
         .groupe-cave { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .groupe-cave h2 { border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; color: #444; font-size: 15px; }
         .conteneur-blocs { display: flex; flex-wrap: wrap; gap: 15px; }
@@ -109,10 +101,11 @@
         .etage-complet { display: flex; gap: 15px; background: #fafafa; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
         .bloc { flex: 1; min-width: 130px; background: #fff; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; }
         .bloc h3 { font-size: 11px; text-transform: uppercase; color: #888; margin-bottom: 10px; text-align: center; }
-        .grille-vins.grille { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; justify-items: center; }
-        .grille-vins.vrac { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
-        .case-grille, .case-vrac-vide { width: 32px; height: 32px; border: 2px dashed #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #aaa; cursor: pointer; transition: background 0.2s; }
-        .case-grille:hover, .case-vrac-vide:hover { background: var(--primary-light); color: white; border-color: var(--primary-color); }
+        .grille-vins.grille, .grille-vins.vrac { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; justify-items: center; }
+        
+        /* Verrouillage strict : La case est soit pleine, soit un trou cliquable */
+        .case-vrac-vide, .case-grille { width: 32px; height: 32px; border: 2px dashed #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #aaa; cursor: pointer; transition: background 0.2s; }
+        .case-vrac-vide:hover, .case-grille:hover { background: var(--primary-light); color: white; border-color: var(--primary-color); }
         .pastille { width: 32px; height: 32px; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; }
         
         .rouge { background: linear-gradient(135deg, #722F37, #4a1c22); }
@@ -120,6 +113,13 @@
         .rose { background: linear-gradient(135deg, #FFC0CB, #d195a0); }
         .effervescent { background: linear-gradient(135deg, #FFD700, #c4a600); }
 
+        /* MODAL DE CONFIRMATION */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-box { background: white; width: 100%; max-width: 400px; border-radius: 12px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-title { font-size: 18px; color: var(--primary-color); margin-bottom: 15px; font-weight: bold; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; }
+        .modal-body { font-size: 14px; margin-bottom: 20px; color: #444; line-height: 1.5; }
+        .modal-actions { display: flex; gap: 10px; }
+        
         /* ADMINISTRATION (KPI) */
         .dashboard { display: flex; gap: 15px; justify-content: center; margin-bottom: 25px; flex-wrap: wrap; }
         .kpi-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; flex: 1; min-width: 140px; }
@@ -144,11 +144,10 @@
                 <span id="alerte-texte">🚨 X bouteilles à boire d'urgence</span>
                 <button class="btn-danger" onclick="toggleFilter('apogee', 'urgence', null)">Voir</button>
             </div>
-
             <div class="section-title">💡 Le Sommelier vous suggère :</div>
             <div class="carousel" id="sommelier-carousel"></div>
-
             <div class="filter-section">
+                <!-- Filtres tactiles identiques -->
                 <div class="filter-group">
                     <div class="filter-title">La Robe</div>
                     <div class="chips-container" id="filter-robe">
@@ -173,7 +172,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="wine-grid" id="wine-results"></div>
         </section>
 
@@ -205,7 +203,6 @@
                             </select>
                         </div>
                         
-                        <!-- SOUS-TYPES EFFERVESCENTS (Caché par défaut) -->
                         <div id="effervescent-options" class="effervescent-options">
                             <label style="font-size: 12px; color: #666; margin-bottom: 5px; display: block;">Précisions Effervescent</label>
                             <div class="segmented-control">
@@ -242,9 +239,11 @@
                         </div>
                     </div>
                 </form>
+
+                <button type="button" class="btn-info" onclick="actionAutoRangement()">🪄 Ranger automatiquement (Du Haut vers le Bas)</button>
             </div>
 
-            <div class="section-title" id="titre-placement" style="text-align: center; opacity: 0.5;">👇 Sélectionnez l'emplacement de départ 👇</div>
+            <div class="section-title" id="titre-placement" style="text-align: center; opacity: 0.5;">👇 Ou forcez un emplacement spécifique (Épicentre) 👇</div>
             
             <div id="cave-visuelle-ranger" class="cave-container"></div>
         </section>
@@ -273,11 +272,25 @@
         <button class="nav-item" onclick="switchTab('macave', this)"><span class="nav-icon">📊</span><span>Ma Cave</span></button>
     </nav>
 
+    <!-- MODAL DE CONFIRMATION -->
+    <div id="modal-confirmation" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-title">📌 Validation du rangement</div>
+            <div id="modal-body" class="modal-body">
+                <!-- Rempli par JS -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="fermerModal()">Annuler</button>
+                <button class="btn-success" onclick="validerRangement()">✅ Confirmer</button>
+            </div>
+        </div>
+    </div>
+
     <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importerJSON(event)">
 
     <script>
         // ==========================================
-        // 1. DATA ET TOPOLOGIE
+        // 1. DATA ET TOPOLOGIE STRICTE
         // ==========================================
         const STORAGE_KEY = 'ryzek_cave_a_vin_data';
         let wineInventory = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
@@ -287,9 +300,10 @@
             { id: "esc_casier", nom: "Casier Précis", type: "grille", capacite: 12, groupe: "Sous l'escalier" },
             { id: "esc_vrac", nom: "Caisse en Vrac", type: "vrac", capacite: 24, groupe: "Sous l'escalier" }
         ];
+        // GARAGE : Capacité stricte de 5 par demi-étagère
         for (let i = 1; i <= 10; i++) {
-            topologie.push({ id: `g_e${i}_g`, nom: `Étage ${i} - G`, type: "vrac", capacite: 5, groupe: "Garage", etage: i });
-            topologie.push({ id: `g_e${i}_d`, nom: `Étage ${i} - D`, type: "vrac", capacite: 5, groupe: "Garage", etage: i });
+            topologie.push({ id: `g_e${i}_g`, nom: `Étage ${i} G`, type: "vrac", capacite: 5, groupe: "Garage", etage: i });
+            topologie.push({ id: `g_e${i}_d`, nom: `Étage ${i} D`, type: "vrac", capacite: 5, groupe: "Garage", etage: i });
         }
 
         // ==========================================
@@ -298,8 +312,6 @@
         function calculerMaturite(wine) {
             if (!wine.millesime) return { statut: 'inconnu', icone: '' };
             const age = CURRENT_YEAR - parseInt(wine.millesime, 10);
-            
-            // On considère les effervescents Rosés comme des Rosés classiques pour l'apogée
             const couleurApparente = wine.eff_color && wine.couleur === 'Effervescent' ? wine.eff_color : wine.couleur;
 
             if (couleurApparente === 'Rosé' || (wine.couleur === 'Blanc' && wine.profil === 'Fruité/Vif') || wine.couleur === 'Effervescent') {
@@ -337,9 +349,7 @@
             a.href = url;
             a.download = `ma_cave_ryzek_${new Date().toISOString().slice(0,10)}.json`;
             document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
         }
 
         function importerJSON(event) {
@@ -358,8 +368,7 @@
                     }
                 } catch (error) { alert("Erreur de fichier JSON."); }
             };
-            reader.readAsText(file);
-            event.target.value = ''; 
+            reader.readAsText(file); event.target.value = ''; 
         }
 
         // ==========================================
@@ -380,7 +389,6 @@
         // 5. ONGLET : DÉBOUCHER & SOMMELIER
         // ==========================================
         let activeFilters = { couleur: null, envergure: null, profil: null, apogee: null };
-
         function toggleFilter(category, value, element) {
             if (activeFilters[category] === value) {
                 activeFilters[category] = null;
@@ -429,12 +437,8 @@
             filteredWines.forEach(wine => {
                 const stock = wine.emplacements.length;
                 const locs = [...new Set(wine.emplacements.map(loc => loc.replace(/_/g, ' ').toUpperCase()))].join(', ');
-                
-                // Formatage du nom de couleur avec prise en compte de l'Effervescent
                 let tagCouleur = wine.couleur;
-                if (wine.couleur === 'Effervescent' && wine.eff_color && wine.eff_type) {
-                    tagCouleur = `🍾 ${wine.eff_color} ${wine.eff_type}`;
-                }
+                if (wine.couleur === 'Effervescent' && wine.eff_color && wine.eff_type) tagCouleur = `🍾 ${wine.eff_color} ${wine.eff_type}`;
 
                 const card = document.createElement('div');
                 card.className = 'wine-card';
@@ -485,24 +489,18 @@
         }
 
         // ==========================================
-        // 6. ONGLET : ARRIVAGES & DEBORDEMENT
+        // 6. ONGLET : ARRIVAGES & LOGIQUE GRAVITÉ/ÉPICENTRE
         // ==========================================
         document.getElementById('wine-form').addEventListener('input', () => {
             document.getElementById('cave-visuelle-ranger').classList.add('active-placement');
             document.getElementById('titre-placement').style.opacity = '1';
         });
 
-        // Afficher/Cacher les options Effervescent
         document.getElementById('couleur').addEventListener('change', (e) => {
             const effOptions = document.getElementById('effervescent-options');
-            if(e.target.value === 'Effervescent') {
-                effOptions.style.display = 'block';
-            } else {
-                effOptions.style.display = 'none';
-            }
+            effOptions.style.display = (e.target.value === 'Effervescent') ? 'block' : 'none';
         });
 
-        // Fonction pour calculer l'espace occupé dans un bloc précis
         function getOccupationBloc(blocId) {
             let occupation = 0;
             let positionsOccupees = [];
@@ -519,92 +517,171 @@
             return { occupation, positionsOccupees };
         }
 
-        function actionSlotVide(cibleId) {
-            const domaine = document.getElementById('domaine').value;
-            if (!domaine) { alert("Veuillez d'abord renseigner le nom du domaine."); return; }
-            
-            let qty = parseInt(document.getElementById('quantite').value, 10) || 1;
-            const couleur = document.getElementById('couleur').value;
-            
-            let emplacementsAssignes = [];
-            let resteAPlacer = qty;
+        // Variable temporaire pour la sauvegarde du placement en attente
+        let propositionRangement = null;
 
-            // Déterminer le bloc de départ
-            const baseBlocId = cibleId.includes('_pos_') ? cibleId.split('_pos_')[0] : cibleId;
-            const startIndex = topologie.findIndex(b => b.id === baseBlocId);
-            
-            if (startIndex === -1) return;
+        function calculerDistribution(qty, cibleId = null) {
+            // 1. Lister tous les blocs dispos
+            let blocsDispos = topologie.map(b => {
+                let occ = getOccupationBloc(b.id);
+                let free = b.capacite - occ.occupation;
+                let positionsLibres = [];
+                if(b.type === 'grille') {
+                    for(let i=1; i<=b.capacite; i++) {
+                        if(!occ.positionsOccupees.includes(i)) positionsLibres.push(i);
+                    }
+                    free = positionsLibres.length;
+                }
+                return { ...b, free, positionsLibres };
+            }).filter(b => b.free > 0);
 
-            // ALGORITHME DE DÉBORDEMENT (Overflow)
-            for (let i = startIndex; i < topologie.length && resteAPlacer > 0; i++) {
-                let bloc = topologie[i];
-                let etatBloc = getOccupationBloc(bloc.id);
+            // 2. Trier les blocs selon la logique (Auto vs Épicentre)
+            if (cibleId) {
+                // LOGIQUE ÉPICENTRE (Proximité physique)
+                const baseBlocId = cibleId.includes('_pos_') ? cibleId.split('_pos_')[0] : cibleId;
+                const clickedBlock = topologie.find(b => b.id === baseBlocId);
                 
-                if (bloc.type === 'grille') {
-                    // On boucle sur toutes les positions possibles du casier (de 1 à la capacité)
-                    for (let pos = 1; pos <= bloc.capacite && resteAPlacer > 0; pos++) {
-                        let positionId = `${bloc.id}_pos_${pos}`;
-                        
-                        // Si le clic initial visait précisément cette case, on la prend
-                        if (cibleId === positionId && !etatBloc.positionsOccupees.includes(pos)) {
-                            emplacementsAssignes.push(positionId);
-                            resteAPlacer--;
-                            etatBloc.positionsOccupees.push(pos);
-                        } 
-                        // Sinon, si on déborde (ou si c'est une autre case libre du bloc)
-                        else if (!etatBloc.positionsOccupees.includes(pos) && cibleId !== positionId && (baseBlocId !== bloc.id || !cibleId.includes('_pos_'))) {
-                            emplacementsAssignes.push(positionId);
-                            resteAPlacer--;
-                            etatBloc.positionsOccupees.push(pos);
-                        }
+                blocsDispos.sort((a, b) => {
+                    if (a.id === clickedBlock.id) return -1;
+                    if (b.id === clickedBlock.id) return 1;
+
+                    if (a.groupe === 'Garage' && b.groupe === 'Garage' && clickedBlock.groupe === 'Garage') {
+                        let distA = Math.abs(a.etage - clickedBlock.etage);
+                        let distB = Math.abs(b.etage - clickedBlock.etage);
+                        if (distA === distB) return a.etage > b.etage ? -1 : 1; // Priorité haut à distance égale
+                        return distA - distB;
                     }
-                } else if (bloc.type === 'vrac') {
-                    // Pour le vrac (ex: Garage Étage 10 Gauche)
-                    let espaceLibre = bloc.capacite - etatBloc.occupation;
-                    let aPlacerIci = Math.min(espaceLibre, resteAPlacer);
-                    
-                    for(let j=0; j < aPlacerIci; j++) {
-                        emplacementsAssignes.push(bloc.id);
-                    }
-                    resteAPlacer -= aPlacerIci;
-                    etatBloc.occupation += aPlacerIci;
+                    if (a.groupe === clickedBlock.groupe && b.groupe !== clickedBlock.groupe) return -1;
+                    if (b.groupe === clickedBlock.groupe && a.groupe !== clickedBlock.groupe) return 1;
+                    return 0;
+                });
+            } else {
+                // LOGIQUE AUTO (De Haut en Bas)
+                blocsDispos.sort((a, b) => {
+                    if (a.groupe === 'Garage' && b.groupe === 'Garage') return b.etage - a.etage; // 10 vers 1
+                    return 0;
+                });
+            }
+
+            // 3. Distribuer les bouteilles
+            let reste = qty;
+            let emplacementsAssignes = [];
+            let resumeAffichage = {};
+
+            // Traitement spécifique du premier clic si c'est une grille
+            if (cibleId && cibleId.includes('_pos_') && reste > 0) {
+                let exactPos = parseInt(cibleId.split('_pos_')[1]);
+                let baseId = cibleId.split('_pos_')[0];
+                let targetBloc = blocsDispos.find(b => b.id === baseId);
+                if(targetBloc && targetBloc.positionsLibres.includes(exactPos)) {
+                    emplacementsAssignes.push(cibleId);
+                    targetBloc.positionsLibres = targetBloc.positionsLibres.filter(p => p !== exactPos);
+                    targetBloc.free--;
+                    reste--;
+                    resumeAffichage[targetBloc.nom] = 1;
                 }
             }
 
-            if (resteAPlacer > 0) {
-                alert(`⚠️ Espace insuffisant ! Il n'y a pas assez de place libre dans la cave pour placer les ${resteAPlacer} bouteille(s) restante(s). L'ajout est annulé.`);
-                return;
+            for (let b of blocsDispos) {
+                if (reste <= 0) break;
+                let aPlacer = Math.min(b.free, reste);
+                
+                if (b.type === 'vrac') {
+                    for (let i = 0; i < aPlacer; i++) emplacementsAssignes.push(b.id);
+                } else {
+                    for (let i = 0; i < aPlacer; i++) {
+                        emplacementsAssignes.push(`${b.id}_pos_${b.positionsLibres[i]}`);
+                    }
+                }
+                reste -= aPlacer;
+                if (!resumeAffichage[b.nom]) resumeAffichage[b.nom] = 0;
+                resumeAffichage[b.nom] += aPlacer;
             }
 
-            const newWine = {
+            return { emplacementsAssignes, reste, resumeAffichage };
+        }
+
+        function preparerSauvegarde(emplacementsAssignes) {
+            const domaine = document.getElementById('domaine').value;
+            const couleur = document.getElementById('couleur').value;
+            
+            propositionRangement = {
                 id: Date.now().toString(),
-                domaine: domaine, region: document.getElementById('region').value,
-                millesime: document.getElementById('millesime').value, couleur: couleur,
-                envergure: document.getElementById('envergure').value, profil: document.getElementById('profil').value,
+                domaine: domaine, 
+                region: document.getElementById('region').value,
+                millesime: document.getElementById('millesime').value, 
+                couleur: couleur,
+                envergure: document.getElementById('envergure').value, 
+                profil: document.getElementById('profil').value,
                 emplacements: emplacementsAssignes
             };
 
-            // Ajout des données spécifiques Effervescent
             if (couleur === 'Effervescent') {
-                newWine.eff_color = document.querySelector('input[name="eff_color"]:checked').value;
-                newWine.eff_type = document.querySelector('input[name="eff_type"]:checked').value;
+                propositionRangement.eff_color = document.querySelector('input[name="eff_color"]:checked').value;
+                propositionRangement.eff_type = document.querySelector('input[name="eff_type"]:checked').value;
             }
-            
-            wineInventory.push(newWine);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
-            
-            // Message intelligent
-            let message = `✅ ${qty} bouteille(s) de ${domaine} ajoutée(s) !`;
-            if (emplacementsAssignes[0] !== emplacementsAssignes[emplacementsAssignes.length - 1] || (qty > 1 && baseBlocId !== emplacementsAssignes[emplacementsAssignes.length - 1].split('_pos_')[0])) {
-                message += `\n\n🔄 L'emplacement initial était plein (ou partiel). Le reste a été automatiquement placé sur les emplacements libres les plus proches.`;
-            }
-            alert(message);
+        }
 
-            document.getElementById('wine-form').reset();
-            document.getElementById('effervescent-options').style.display = 'none';
-            document.getElementById('cave-visuelle-ranger').classList.remove('active-placement');
-            document.getElementById('titre-placement').style.opacity = '0.5';
-            renderCaveArrivages();
+        // Action 1 : Bouton "Baguette magique"
+        function actionAutoRangement() {
+            const domaine = document.getElementById('domaine').value;
+            if (!domaine) return alert("Veuillez d'abord renseigner le nom du domaine.");
+            
+            const qty = parseInt(document.getElementById('quantite').value, 10) || 1;
+            const dist = calculerDistribution(qty, null);
+            
+            if (dist.reste > 0) return alert(`⚠️ Espace insuffisant ! Il manque ${dist.reste} place(s) dans la cave.`);
+            
+            preparerSauvegarde(dist.emplacementsAssignes);
+            afficherModal(dist.resumeAffichage, qty);
+        }
+
+        // Action 2 : Clic forcé sur la carte (Épicentre)
+        function actionSlotVide(cibleId) {
+            const domaine = document.getElementById('domaine').value;
+            if (!domaine) return alert("Veuillez d'abord renseigner le nom du domaine avant de cliquer sur le plan.");
+            
+            const qty = parseInt(document.getElementById('quantite').value, 10) || 1;
+            const dist = calculerDistribution(qty, cibleId);
+            
+            if (dist.reste > 0) return alert(`⚠️ Espace insuffisant ! Il manque ${dist.reste} place(s) dans la cave.`);
+            
+            preparerSauvegarde(dist.emplacementsAssignes);
+            afficherModal(dist.resumeAffichage, qty);
+        }
+
+        // MODAL ET SAUVEGARDE
+        function afficherModal(resumeAffichage, qty) {
+            const domaine = document.getElementById('domaine').value;
+            let html = `<p style="margin-bottom:15px;">Répartition calculée pour vos <strong>${qty} bouteille(s)</strong> de ${domaine} :</p><ul style="list-style-type:none; padding:0;">`;
+            
+            for (const [lieu, nb] of Object.entries(resumeAffichage)) {
+                html += `<li style="padding:8px; background:#f8f9fa; border:1px solid #eee; margin-bottom:5px; border-radius:4px;">📍 <strong>${nb}</strong> bouteille(s) ➔ <strong>${lieu}</strong></li>`;
+            }
+            html += `</ul>`;
+            
+            document.getElementById('modal-body').innerHTML = html;
+            document.getElementById('modal-confirmation').style.display = 'flex';
+        }
+
+        function fermerModal() {
+            document.getElementById('modal-confirmation').style.display = 'none';
+            propositionRangement = null;
+        }
+
+        function validerRangement() {
+            if(propositionRangement) {
+                wineInventory.push(propositionRangement);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
+                
+                document.getElementById('wine-form').reset();
+                document.getElementById('effervescent-options').style.display = 'none';
+                document.getElementById('cave-visuelle-ranger').classList.remove('active-placement');
+                document.getElementById('titre-placement').style.opacity = '0.5';
+                
+                fermerModal();
+                renderCaveArrivages();
+            }
         }
 
         function renderCaveArrivages() {
@@ -648,12 +725,15 @@
             }
         }
 
+        // Rendu strict : On affiche exactement la capacité, pas plus.
         function creerHTMLBlocArr(bloc, bouteilles = []) {
             const divBloc = document.createElement('div');
             divBloc.className = `bloc`;
             divBloc.innerHTML = `<h3>${bloc.nom}</h3>`;
             const grille = document.createElement('div');
-            grille.className = `grille-vins ${bloc.type}`;
+            
+            // On utilise la classe "grille" même pour le vrac pour que les 5 pastilles s'alignent proprement
+            grille.className = `grille-vins grille`; 
 
             if (bloc.type === 'grille') {
                 for (let i = 1; i <= bloc.capacite; i++) {
@@ -663,22 +743,23 @@
                         caseDiv.className = `pastille ${btl.vin.couleur.toLowerCase().replace('é','e')}`;
                     } else {
                         caseDiv.className = 'case-grille';
-                        caseDiv.innerHTML = i;
                         caseDiv.onclick = () => actionSlotVide(`${bloc.id}_pos_${i}`);
                     }
                     grille.appendChild(caseDiv);
                 }
             } else {
-                bouteilles.forEach(btl => {
+                // Pour le vrac (Garage), on affiche stricto-sensu les pastilles puis les trous vides restants
+                let nbOccupe = Math.min(bouteilles.length, bloc.capacite); // Sécurité
+                for (let i = 0; i < nbOccupe; i++) {
                     const p = document.createElement('div');
-                    p.className = `pastille ${btl.vin.couleur.toLowerCase().replace('é','e')}`;
+                    p.className = `pastille ${bouteilles[i].vin.couleur.toLowerCase().replace('é','e')}`;
                     grille.appendChild(p);
-                });
-                const libres = bloc.capacite ? Math.max(1, bloc.capacite - bouteilles.length) : 1;
-                for(let i = 0; i < libres; i++) {
+                }
+                
+                let nbLibre = bloc.capacite - nbOccupe;
+                for(let i = 0; i < nbLibre; i++) {
                     const slot = document.createElement('div');
                     slot.className = 'case-vrac-vide';
-                    slot.innerHTML = "+";
                     slot.onclick = () => actionSlotVide(bloc.id);
                     grille.appendChild(slot);
                 }
@@ -698,9 +779,7 @@
             list.innerHTML = '';
             wineInventory.forEach(wine => {
                 let infosSupp = "";
-                if (wine.couleur === 'Effervescent' && wine.eff_color && wine.eff_type) {
-                    infosSupp = ` - ${wine.eff_color} ${wine.eff_type}`;
-                }
+                if (wine.couleur === 'Effervescent' && wine.eff_color && wine.eff_type) infosSupp = ` - ${wine.eff_color} ${wine.eff_type}`;
 
                 const item = document.createElement('div');
                 item.style.background = 'white'; item.style.padding = '15px'; item.style.marginBottom = '10px'; item.style.borderRadius = '8px';
