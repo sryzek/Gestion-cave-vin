@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ma Cave à Vin - Saisie & Sécurité globale</title>
+    <title>Ma Cave à Vin - Assistant Intelligent</title>
     <style>
         :root {
             --primary-color: #722F37;
@@ -36,14 +36,8 @@
         header h1 { font-size: 20px; font-weight: 600; margin: 0; }
         .header-actions { display: flex; gap: 15px; }
         .header-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            font-size: 18px;
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
+            background: rgba(255, 255, 255, 0.2); border: none; color: white;
+            font-size: 18px; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: background 0.2s;
         }
         .header-btn:hover { background: rgba(255, 255, 255, 0.3); }
 
@@ -97,6 +91,14 @@
         .form-group.full-width { grid-column: 1 / -1; }
         .form-group label { margin-bottom: 5px; font-weight: bold; font-size: 13px; color: #444; }
         .form-group input, .form-group select { padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; }
+        
+        /* Options spécifiques Effervescents */
+        .effervescent-options { display: none; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e1e4e8; margin-top: 5px; grid-column: 1 / -1; }
+        .segmented-control { display: flex; border: 1px solid var(--primary-color); border-radius: 6px; overflow: hidden; margin-bottom: 10px; }
+        .segmented-control label { flex: 1; text-align: center; padding: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--primary-color); background: white; margin: 0; }
+        .segmented-control input[type="radio"] { display: none; }
+        .segmented-control input[type="radio"]:checked + label { background: var(--primary-color); color: white; }
+
         .cave-container { display: flex; flex-direction: column; gap: 30px; margin-bottom: 40px; opacity: 0.5; pointer-events: none; transition: opacity 0.3s; }
         .cave-container.active-placement { opacity: 1; pointer-events: auto; }
         
@@ -136,20 +138,15 @@
     </header>
 
     <main>
-        <!-- ========================================== -->
-        <!-- ONGLET 1 : DÉBOUCHER (Workflow de Sortie)  -->
-        <!-- ========================================== -->
+        <!-- ONGLET 1 : DÉBOUCHER -->
         <section id="tab-deboucher" class="tab-content active">
-            
             <div id="alerte-apogee" class="alert-banner">
                 <span id="alerte-texte">🚨 X bouteilles à boire d'urgence</span>
                 <button class="btn-danger" onclick="toggleFilter('apogee', 'urgence', null)">Voir</button>
             </div>
 
             <div class="section-title">💡 Le Sommelier vous suggère :</div>
-            <div class="carousel" id="sommelier-carousel">
-                <!-- Généré par JS -->
-            </div>
+            <div class="carousel" id="sommelier-carousel"></div>
 
             <div class="filter-section">
                 <div class="filter-group">
@@ -180,11 +177,8 @@
             <div class="wine-grid" id="wine-results"></div>
         </section>
 
-        <!-- ========================================== -->
-        <!-- ONGLET 2 : ARRIVAGES (Saisie Manuelle Ciblée)-->
-        <!-- ========================================== -->
+        <!-- ONGLET 2 : ARRIVAGES -->
         <section id="tab-arrivages" class="tab-content">
-            
             <div id="form-section">
                 <h3 id="form-title" style="margin-bottom: 15px; color: var(--primary-color);">✍️ Renseigner la nouvelle bouteille</h3>
                 <form id="wine-form">
@@ -210,6 +204,24 @@
                                 <option value="Effervescent">Effervescent</option>
                             </select>
                         </div>
+                        
+                        <!-- SOUS-TYPES EFFERVESCENTS (Caché par défaut) -->
+                        <div id="effervescent-options" class="effervescent-options">
+                            <label style="font-size: 12px; color: #666; margin-bottom: 5px; display: block;">Précisions Effervescent</label>
+                            <div class="segmented-control">
+                                <input type="radio" id="eff_blanc" name="eff_color" value="Blanc" checked>
+                                <label for="eff_blanc">Blanc</label>
+                                <input type="radio" id="eff_rose" name="eff_color" value="Rosé">
+                                <label for="eff_rose">Rosé</label>
+                            </div>
+                            <div class="segmented-control">
+                                <input type="radio" id="eff_brut" name="eff_type" value="Brut" checked>
+                                <label for="eff_brut">Brut</label>
+                                <input type="radio" id="eff_demisec" name="eff_type" value="Demi-sec">
+                                <label for="eff_demisec">Demi-sec</label>
+                            </div>
+                        </div>
+
                         <div class="form-group">
                             <label>Envergure</label>
                             <select id="envergure">
@@ -232,16 +244,13 @@
                 </form>
             </div>
 
-            <div class="section-title" id="titre-placement" style="text-align: center; opacity: 0.5;">👇 Sélectionnez un emplacement libre ci-dessous 👇</div>
+            <div class="section-title" id="titre-placement" style="text-align: center; opacity: 0.5;">👇 Sélectionnez l'emplacement de départ 👇</div>
             
             <div id="cave-visuelle-ranger" class="cave-container"></div>
         </section>
 
-        <!-- ========================================== -->
-        <!-- ONGLET 3 : MA CAVE (Administration)         -->
-        <!-- ========================================== -->
+        <!-- ONGLET 3 : MA CAVE -->
         <section id="tab-macave" class="tab-content">
-            
             <div class="dashboard">
                 <div class="kpi-card">
                     <h3>Bouteilles en Cave</h3>
@@ -252,7 +261,6 @@
                     <div class="value" id="kpi-refs">0</div>
                 </div>
             </div>
-
             <h2 style="color: var(--primary-color); margin-bottom: 20px;">Détail de l'inventaire</h2>
             <div id="inventory-list"></div>
         </section>
@@ -260,18 +268,11 @@
 
     <!-- NAVIGATION BASSE -->
     <nav class="bottom-nav">
-        <button class="nav-item active" onclick="switchTab('deboucher', this)">
-            <span class="nav-icon">🍷</span><span>Déboucher</span>
-        </button>
-        <button class="nav-item" onclick="switchTab('arrivages', this)">
-            <span class="nav-icon">📥</span><span>Arrivages</span>
-        </button>
-        <button class="nav-item" onclick="switchTab('macave', this)">
-            <span class="nav-icon">📊</span><span>Ma Cave</span>
-        </button>
+        <button class="nav-item active" onclick="switchTab('deboucher', this)"><span class="nav-icon">🍷</span><span>Déboucher</span></button>
+        <button class="nav-item" onclick="switchTab('arrivages', this)"><span class="nav-icon">📥</span><span>Arrivages</span></button>
+        <button class="nav-item" onclick="switchTab('macave', this)"><span class="nav-icon">📊</span><span>Ma Cave</span></button>
     </nav>
 
-    <!-- Input d'import global caché -->
     <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importerJSON(event)">
 
     <script>
@@ -292,14 +293,17 @@
         }
 
         // ==========================================
-        // 2. MOTEUR D'APOGÉE (Règles 2026)
+        // 2. MOTEUR D'APOGÉE
         // ==========================================
         function calculerMaturite(wine) {
             if (!wine.millesime) return { statut: 'inconnu', icone: '' };
             const age = CURRENT_YEAR - parseInt(wine.millesime, 10);
             
-            if (wine.couleur === 'Rosé' || (wine.couleur === 'Blanc' && wine.profil === 'Fruité/Vif')) {
-                if (age > 2) return { statut: 'urgence', icone: '🔥' };
+            // On considère les effervescents Rosés comme des Rosés classiques pour l'apogée
+            const couleurApparente = wine.eff_color && wine.couleur === 'Effervescent' ? wine.eff_color : wine.couleur;
+
+            if (couleurApparente === 'Rosé' || (wine.couleur === 'Blanc' && wine.profil === 'Fruité/Vif') || wine.couleur === 'Effervescent') {
+                if (age > 4) return { statut: 'urgence', icone: '🔥' };
                 if (age >= 1) return { statut: 'apogee', icone: '✅' };
                 return { statut: 'jeune', icone: '⏳' };
             }
@@ -322,17 +326,13 @@
         }
 
         // ==========================================
-        // 3. GESTION DES FICHIERS JSON (Export/Import Globaux)
+        // 3. EXPORT / IMPORT
         // ==========================================
         function exporterJSON() {
-            if (wineInventory.length === 0) {
-                alert("Votre cave est vide, rien à exporter !");
-                return;
-            }
+            if (wineInventory.length === 0) return alert("Cave vide !");
             const dataStr = JSON.stringify(wineInventory, null, 2);
             const blob = new Blob([dataStr], { type: "application/json" });
             const url = URL.createObjectURL(blob);
-            
             const a = document.createElement('a');
             a.href = url;
             a.download = `ma_cave_ryzek_${new Date().toISOString().slice(0,10)}.json`;
@@ -345,32 +345,25 @@
         function importerJSON(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const importedData = JSON.parse(e.target.result);
                     if (!Array.isArray(importedData)) throw new Error("Format invalide.");
-                    
-                    if(confirm(`Êtes-vous sûr de vouloir écraser votre cave actuelle par ce fichier ? (${importedData.length} références trouvées)`)) {
+                    if(confirm(`Écraser la cave actuelle ? (${importedData.length} références trouvées)`)) {
                         wineInventory = importedData;
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
                         alert("Restauration réussie !");
-                        // Recharge la vue active
-                        document.querySelectorAll('.nav-item').forEach(btn => {
-                            if(btn.classList.contains('active')) btn.click();
-                        });
+                        document.querySelectorAll('.nav-item').forEach(btn => { if(btn.classList.contains('active')) btn.click(); });
                     }
-                } catch (error) {
-                    alert("Erreur lors de la lecture du fichier JSON. Assurez-vous qu'il s'agit du bon fichier.");
-                }
+                } catch (error) { alert("Erreur de fichier JSON."); }
             };
             reader.readAsText(file);
             event.target.value = ''; 
         }
 
         // ==========================================
-        // 4. NAVIGATION (SPA)
+        // 4. NAVIGATION
         // ==========================================
         function switchTab(tabId, btnElement) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -411,11 +404,9 @@
             carousel.innerHTML = '';
             
             const suggUrgence = winesWithMaturity.find(w => w.maturite.statut === 'urgence');
-            if(suggUrgence) carousel.appendChild(createSuggestionCard("A boire ce soir", suggUrgence));
-            
+            if(suggUrgence) carousel.appendChild(createSuggestionCard("A boire", suggUrgence));
             const suggApogee = winesWithMaturity.find(w => w.maturite.statut === 'apogee' && w.envergure === 'Dégustation');
             if(suggApogee) carousel.appendChild(createSuggestionCard("Trésor à maturité", suggApogee));
-            
             const suggStock = [...winesWithMaturity].sort((a,b) => b.emplacements.length - a.emplacements.length)[0];
             if(suggStock && suggStock.emplacements.length > 3) carousel.appendChild(createSuggestionCard("Faites de la place", suggStock));
 
@@ -433,13 +424,18 @@
             if (countUrgence > 0 && activeFilters.apogee !== 'urgence') {
                 document.getElementById('alerte-texte').innerText = `🚨 ${countUrgence} vin(s) à boire d'urgence !`;
                 alerteDiv.style.display = 'flex';
-            } else {
-                alerteDiv.style.display = 'none';
-            }
+            } else { alerteDiv.style.display = 'none'; }
 
             filteredWines.forEach(wine => {
                 const stock = wine.emplacements.length;
                 const locs = [...new Set(wine.emplacements.map(loc => loc.replace(/_/g, ' ').toUpperCase()))].join(', ');
+                
+                // Formatage du nom de couleur avec prise en compte de l'Effervescent
+                let tagCouleur = wine.couleur;
+                if (wine.couleur === 'Effervescent' && wine.eff_color && wine.eff_type) {
+                    tagCouleur = `🍾 ${wine.eff_color} ${wine.eff_type}`;
+                }
+
                 const card = document.createElement('div');
                 card.className = 'wine-card';
                 card.innerHTML = `
@@ -452,7 +448,7 @@
                             <div style="background:var(--primary-color);color:white;padding:3px 8px;border-radius:12px;font-weight:bold;">${stock}</div>
                         </div>
                         <div class="wine-tags">
-                            <span class="tag">${wine.couleur}</span>
+                            <span class="tag">${tagCouleur}</span>
                             <span class="tag">${wine.envergure || 'N/A'}</span>
                             <span class="tag">${wine.profil || 'N/A'}</span>
                         </div>
@@ -470,7 +466,7 @@
             card.innerHTML = `
                 <div class="suggestion-motive">${motive}</div>
                 <div style="font-weight:bold; font-size: 15px;">${wine.domaine}</div>
-                <div style="font-size:12px; color:#666; margin-bottom:10px;">${wine.millesime} - ${wine.couleur}</div>
+                <div style="font-size:12px; color:#666; margin-bottom:10px;">${wine.millesime}</div>
                 <button class="btn-primary" style="padding:8px; font-size:12px;" onclick="deboucherVin('${wine.id}')">Sortir</button>
             `;
             return card;
@@ -489,34 +485,123 @@
         }
 
         // ==========================================
-        // 6. ONGLET : ARRIVAGES (Saisie Manuelle)
+        // 6. ONGLET : ARRIVAGES & DEBORDEMENT
         // ==========================================
         document.getElementById('wine-form').addEventListener('input', () => {
             document.getElementById('cave-visuelle-ranger').classList.add('active-placement');
             document.getElementById('titre-placement').style.opacity = '1';
         });
 
+        // Afficher/Cacher les options Effervescent
+        document.getElementById('couleur').addEventListener('change', (e) => {
+            const effOptions = document.getElementById('effervescent-options');
+            if(e.target.value === 'Effervescent') {
+                effOptions.style.display = 'block';
+            } else {
+                effOptions.style.display = 'none';
+            }
+        });
+
+        // Fonction pour calculer l'espace occupé dans un bloc précis
+        function getOccupationBloc(blocId) {
+            let occupation = 0;
+            let positionsOccupees = [];
+            wineInventory.forEach(w => {
+                w.emplacements.forEach(emp => {
+                    if (emp === blocId) {
+                        occupation++;
+                    } else if (emp.startsWith(blocId + '_pos_')) {
+                        occupation++;
+                        positionsOccupees.push(parseInt(emp.split('_pos_')[1]));
+                    }
+                });
+            });
+            return { occupation, positionsOccupees };
+        }
+
         function actionSlotVide(cibleId) {
             const domaine = document.getElementById('domaine').value;
-            if (!domaine) { 
-                alert("Veuillez d'abord renseigner le nom du domaine avant de choisir l'emplacement sur la grille."); 
-                return; 
-            }
+            if (!domaine) { alert("Veuillez d'abord renseigner le nom du domaine."); return; }
             
-            const qty = parseInt(document.getElementById('quantite').value, 10) || 1;
+            let qty = parseInt(document.getElementById('quantite').value, 10) || 1;
+            const couleur = document.getElementById('couleur').value;
+            
+            let emplacementsAssignes = [];
+            let resteAPlacer = qty;
+
+            // Déterminer le bloc de départ
+            const baseBlocId = cibleId.includes('_pos_') ? cibleId.split('_pos_')[0] : cibleId;
+            const startIndex = topologie.findIndex(b => b.id === baseBlocId);
+            
+            if (startIndex === -1) return;
+
+            // ALGORITHME DE DÉBORDEMENT (Overflow)
+            for (let i = startIndex; i < topologie.length && resteAPlacer > 0; i++) {
+                let bloc = topologie[i];
+                let etatBloc = getOccupationBloc(bloc.id);
+                
+                if (bloc.type === 'grille') {
+                    // On boucle sur toutes les positions possibles du casier (de 1 à la capacité)
+                    for (let pos = 1; pos <= bloc.capacite && resteAPlacer > 0; pos++) {
+                        let positionId = `${bloc.id}_pos_${pos}`;
+                        
+                        // Si le clic initial visait précisément cette case, on la prend
+                        if (cibleId === positionId && !etatBloc.positionsOccupees.includes(pos)) {
+                            emplacementsAssignes.push(positionId);
+                            resteAPlacer--;
+                            etatBloc.positionsOccupees.push(pos);
+                        } 
+                        // Sinon, si on déborde (ou si c'est une autre case libre du bloc)
+                        else if (!etatBloc.positionsOccupees.includes(pos) && cibleId !== positionId && (baseBlocId !== bloc.id || !cibleId.includes('_pos_'))) {
+                            emplacementsAssignes.push(positionId);
+                            resteAPlacer--;
+                            etatBloc.positionsOccupees.push(pos);
+                        }
+                    }
+                } else if (bloc.type === 'vrac') {
+                    // Pour le vrac (ex: Garage Étage 10 Gauche)
+                    let espaceLibre = bloc.capacite - etatBloc.occupation;
+                    let aPlacerIci = Math.min(espaceLibre, resteAPlacer);
+                    
+                    for(let j=0; j < aPlacerIci; j++) {
+                        emplacementsAssignes.push(bloc.id);
+                    }
+                    resteAPlacer -= aPlacerIci;
+                    etatBloc.occupation += aPlacerIci;
+                }
+            }
+
+            if (resteAPlacer > 0) {
+                alert(`⚠️ Espace insuffisant ! Il n'y a pas assez de place libre dans la cave pour placer les ${resteAPlacer} bouteille(s) restante(s). L'ajout est annulé.`);
+                return;
+            }
+
             const newWine = {
                 id: Date.now().toString(),
                 domaine: domaine, region: document.getElementById('region').value,
-                millesime: document.getElementById('millesime').value, couleur: document.getElementById('couleur').value,
+                millesime: document.getElementById('millesime').value, couleur: couleur,
                 envergure: document.getElementById('envergure').value, profil: document.getElementById('profil').value,
-                emplacements: Array(qty).fill(cibleId)
+                emplacements: emplacementsAssignes
             };
+
+            // Ajout des données spécifiques Effervescent
+            if (couleur === 'Effervescent') {
+                newWine.eff_color = document.querySelector('input[name="eff_color"]:checked').value;
+                newWine.eff_type = document.querySelector('input[name="eff_type"]:checked').value;
+            }
             
             wineInventory.push(newWine);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
             
-            alert(`✅ ${qty} bouteille(s) de ${domaine} ajoutée(s) avec succès !`);
+            // Message intelligent
+            let message = `✅ ${qty} bouteille(s) de ${domaine} ajoutée(s) !`;
+            if (emplacementsAssignes[0] !== emplacementsAssignes[emplacementsAssignes.length - 1] || (qty > 1 && baseBlocId !== emplacementsAssignes[emplacementsAssignes.length - 1].split('_pos_')[0])) {
+                message += `\n\n🔄 L'emplacement initial était plein (ou partiel). Le reste a été automatiquement placé sur les emplacements libres les plus proches.`;
+            }
+            alert(message);
+
             document.getElementById('wine-form').reset();
+            document.getElementById('effervescent-options').style.display = 'none';
             document.getElementById('cave-visuelle-ranger').classList.remove('active-placement');
             document.getElementById('titre-placement').style.opacity = '0.5';
             renderCaveArrivages();
@@ -612,11 +697,19 @@
             const list = document.getElementById('inventory-list');
             list.innerHTML = '';
             wineInventory.forEach(wine => {
+                let infosSupp = "";
+                if (wine.couleur === 'Effervescent' && wine.eff_color && wine.eff_type) {
+                    infosSupp = ` - ${wine.eff_color} ${wine.eff_type}`;
+                }
+
                 const item = document.createElement('div');
                 item.style.background = 'white'; item.style.padding = '15px'; item.style.marginBottom = '10px'; item.style.borderRadius = '8px';
                 item.innerHTML = `
-                    <div style="display:flex; justify-content:space-between;">
-                        <strong>${wine.domaine} (${wine.millesime || 'NV'})</strong>
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div>
+                            <strong>${wine.domaine} (${wine.millesime || 'NV'})</strong>
+                            <div style="font-size: 12px; color: #666; margin-top: 3px;">${wine.couleur}${infosSupp}</div>
+                        </div>
                         <span style="font-weight:bold; color:var(--primary-color);">${wine.emplacements.length} btl</span>
                     </div>
                     <button class="btn-danger" style="margin-top:10px;" onclick="if(confirm('Tout supprimer ?')){ wineInventory = wineInventory.filter(w => w.id !== '${wine.id}'); localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory)); renderMaCave(); }">🗑️ Forcer la suppression</button>
