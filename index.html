@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ma Cave à Vin - Rangement Intelligent</title>
+    <title>Ma Cave à Vin - Gestion WMS Strict</title>
     <style>
         :root {
             --primary-color: #722F37;
@@ -84,16 +84,14 @@
         .form-group label { margin-bottom: 5px; font-weight: bold; font-size: 13px; color: #444; }
         .form-group input, .form-group select { padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; }
         
-        /* Options spécifiques Effervescents */
         .effervescent-options { display: none; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e1e4e8; margin-top: 5px; grid-column: 1 / -1; }
         .segmented-control { display: flex; border: 1px solid var(--primary-color); border-radius: 6px; overflow: hidden; margin-bottom: 10px; }
         .segmented-control label { flex: 1; text-align: center; padding: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--primary-color); background: white; margin: 0; }
         .segmented-control input[type="radio"] { display: none; }
         .segmented-control input[type="radio"]:checked + label { background: var(--primary-color); color: white; }
 
-        /* CAVE VISUELLE */
-        .cave-container { display: flex; flex-direction: column; gap: 30px; margin-bottom: 40px; opacity: 0.5; transition: opacity 0.3s; }
-        .cave-container.active-placement { opacity: 1; }
+        /* CAVE VISUELLE WMS STRICT */
+        .cave-container { display: flex; flex-direction: column; gap: 30px; margin-bottom: 40px; }
         .groupe-cave { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .groupe-cave h2 { border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; color: #444; font-size: 15px; }
         .conteneur-blocs { display: flex; flex-wrap: wrap; gap: 15px; }
@@ -101,17 +99,17 @@
         .etage-complet { display: flex; gap: 15px; background: #fafafa; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
         .bloc { flex: 1; min-width: 130px; background: #fff; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; }
         .bloc h3 { font-size: 11px; text-transform: uppercase; color: #888; margin-bottom: 10px; text-align: center; }
-        .grille-vins.grille, .grille-vins.vrac { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; justify-items: center; }
         
-        /* Verrouillage strict : La case est soit pleine, soit un trou cliquable */
-        .case-vrac-vide, .case-grille { width: 32px; height: 32px; border: 2px dashed #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #aaa; cursor: pointer; transition: background 0.2s; }
-        .case-vrac-vide:hover, .case-grille:hover { background: var(--primary-light); color: white; border-color: var(--primary-color); }
-        .pastille { width: 32px; height: 32px; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; }
+        .grille-vins { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; justify-items: center; }
         
-        .rouge { background: linear-gradient(135deg, #722F37, #4a1c22); }
-        .blanc { background: linear-gradient(135deg, #F3E5AB, #d1c179); }
-        .rose { background: linear-gradient(135deg, #FFC0CB, #d195a0); }
-        .effervescent { background: linear-gradient(135deg, #FFD700, #c4a600); }
+        .case-grille { width: 32px; height: 32px; border: 2px dashed #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #aaa; cursor: pointer; transition: background 0.2s; }
+        .case-grille:hover { background: var(--primary-light); color: white; border-color: var(--primary-color); }
+        .pastille { width: 32px; height: 32px; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; cursor: help; }
+        
+        .rouge { background: linear-gradient(135deg, #722F37, #4a1c22); color: transparent; }
+        .blanc { background: linear-gradient(135deg, #F3E5AB, #d1c179); color: transparent; }
+        .rose { background: linear-gradient(135deg, #FFC0CB, #d195a0); color: transparent; }
+        .effervescent { background: linear-gradient(135deg, #FFD700, #c4a600); color: transparent; }
 
         /* MODAL DE CONFIRMATION */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
@@ -120,7 +118,7 @@
         .modal-body { font-size: 14px; margin-bottom: 20px; color: #444; line-height: 1.5; }
         .modal-actions { display: flex; gap: 10px; }
         
-        /* ADMINISTRATION (KPI) */
+        /* ADMINISTRATION */
         .dashboard { display: flex; gap: 15px; justify-content: center; margin-bottom: 25px; flex-wrap: wrap; }
         .kpi-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; flex: 1; min-width: 140px; }
         .kpi-card h3 { font-size: 12px; color: #666; text-transform: uppercase; }
@@ -147,7 +145,6 @@
             <div class="section-title">💡 Le Sommelier vous suggère :</div>
             <div class="carousel" id="sommelier-carousel"></div>
             <div class="filter-section">
-                <!-- Filtres tactiles identiques -->
                 <div class="filter-group">
                     <div class="filter-title">La Robe</div>
                     <div class="chips-container" id="filter-robe">
@@ -175,10 +172,10 @@
             <div class="wine-grid" id="wine-results"></div>
         </section>
 
-        <!-- ONGLET 2 : ARRIVAGES -->
+        <!-- ONGLET 2 : ARRIVAGES (WMS STRICT) -->
         <section id="tab-arrivages" class="tab-content">
             <div id="form-section">
-                <h3 id="form-title" style="margin-bottom: 15px; color: var(--primary-color);">✍️ Renseigner la nouvelle bouteille</h3>
+                <h3 id="form-title" style="margin-bottom: 15px; color: var(--primary-color);">✍️ Saisir les bouteilles entrantes</h3>
                 <form id="wine-form">
                     <div class="form-grid">
                         <div class="form-group full-width">
@@ -234,16 +231,18 @@
                             </select>
                         </div>
                         <div class="form-group full-width">
-                            <label>Combien de bouteilles à ranger ?</label>
+                            <label>Quantité exacte à ranger</label>
                             <input type="number" id="quantite" min="1" value="1" required style="font-size: 18px; font-weight: bold; text-align: center;">
                         </div>
                     </div>
                 </form>
 
-                <button type="button" class="btn-info" onclick="actionAutoRangement()">🪄 Ranger automatiquement (Du Haut vers le Bas)</button>
+                <button type="button" class="btn-info" onclick="actionAutoRangement()">🪄 Ranger automatiquement (De Haut en Bas)</button>
             </div>
 
-            <div class="section-title" id="titre-placement" style="text-align: center; opacity: 0.5;">👇 Ou forcez un emplacement spécifique (Épicentre) 👇</div>
+            <div class="section-title" id="titre-placement" style="text-align: center;">
+                👇 L'état actuel de votre stock. Cliquez sur un trou vide pour cibler le rangement 👇
+            </div>
             
             <div id="cave-visuelle-ranger" class="cave-container"></div>
         </section>
@@ -281,7 +280,7 @@
             </div>
             <div class="modal-actions">
                 <button class="btn-secondary" onclick="fermerModal()">Annuler</button>
-                <button class="btn-success" onclick="validerRangement()">✅ Confirmer</button>
+                <button class="btn-success" onclick="validerRangement()">✅ Confirmer & Ranger</button>
             </div>
         </div>
     </div>
@@ -290,20 +289,20 @@
 
     <script>
         // ==========================================
-        // 1. DATA ET TOPOLOGIE STRICTE
+        // 1. DATA ET TOPOLOGIE STRICTE (WMS)
         // ==========================================
         const STORAGE_KEY = 'ryzek_cave_a_vin_data';
         let wineInventory = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
         const CURRENT_YEAR = 2026;
 
+        // Le Garage est dorénavant une GRILLE stricte de 5 places. Zéro débordement virtuel.
         const topologie = [
-            { id: "esc_casier", nom: "Casier Précis", type: "grille", capacite: 12, groupe: "Sous l'escalier" },
-            { id: "esc_vrac", nom: "Caisse en Vrac", type: "vrac", capacite: 24, groupe: "Sous l'escalier" }
+            { id: "esc_casier", nom: "Casier", type: "grille", capacite: 12, groupe: "Sous l'escalier" },
+            { id: "esc_vrac", nom: "Vrac (Max 24)", type: "grille", capacite: 24, groupe: "Sous l'escalier" }
         ];
-        // GARAGE : Capacité stricte de 5 par demi-étagère
         for (let i = 1; i <= 10; i++) {
-            topologie.push({ id: `g_e${i}_g`, nom: `Étage ${i} G`, type: "vrac", capacite: 5, groupe: "Garage", etage: i });
-            topologie.push({ id: `g_e${i}_d`, nom: `Étage ${i} D`, type: "vrac", capacite: 5, groupe: "Garage", etage: i });
+            topologie.push({ id: `g_e${i}_g`, nom: `Étage ${i} G`, type: "grille", capacite: 5, groupe: "Garage", etage: i });
+            topologie.push({ id: `g_e${i}_d`, nom: `Étage ${i} D`, type: "grille", capacite: 5, groupe: "Garage", etage: i });
         }
 
         // ==========================================
@@ -345,11 +344,9 @@
             const dataStr = JSON.stringify(wineInventory, null, 2);
             const blob = new Blob([dataStr], { type: "application/json" });
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
+            const a = document.createElement('a'); a.href = url;
             a.download = `ma_cave_ryzek_${new Date().toISOString().slice(0,10)}.json`;
-            document.body.appendChild(a);
-            a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
         }
 
         function importerJSON(event) {
@@ -436,7 +433,14 @@
 
             filteredWines.forEach(wine => {
                 const stock = wine.emplacements.length;
-                const locs = [...new Set(wine.emplacements.map(loc => loc.replace(/_/g, ' ').toUpperCase()))].join(', ');
+                
+                // Formater les emplacements bruts pour affichage propre
+                let locsFormatted = [...new Set(wine.emplacements.map(loc => {
+                    let text = loc.replace(/_/g, ' ').toUpperCase();
+                    text = text.replace('G E', 'Garage Etage ').replace(' D ', ' Droite ').replace(' G ', ' Gauche ').replace('POS', 'Case');
+                    return text;
+                }))].join(', ');
+
                 let tagCouleur = wine.couleur;
                 if (wine.couleur === 'Effervescent' && wine.eff_color && wine.eff_type) tagCouleur = `🍾 ${wine.eff_color} ${wine.eff_type}`;
 
@@ -456,7 +460,7 @@
                             <span class="tag">${wine.envergure || 'N/A'}</span>
                             <span class="tag">${wine.profil || 'N/A'}</span>
                         </div>
-                        <div class="wine-stock">📍 Emplacements : <strong>${locs}</strong></div>
+                        <div class="wine-stock" style="font-size:12px; line-height: 1.4;">📍 Dispo : <strong>${locsFormatted}</strong></div>
                     </div>
                     <button class="btn-deboucher" onclick="deboucherVin('${wine.id}')">🍾 Déboucher 1 bouteille</button>
                 `;
@@ -479,135 +483,142 @@
         function deboucherVin(idVin) {
             const index = wineInventory.findIndex(w => w.id === idVin);
             if (index !== -1) {
-                if(confirm(`Confirmer l'ouverture de :\n${wineInventory[index].domaine} ?`)) {
+                if(confirm(`Sortir 1 bouteille de :\n${wineInventory[index].domaine} ?\nL'emplacement physique sera immédiatement libéré.`)) {
+                    // Libération stricte (pop enlève la dernière coordonnée insérée)
                     wineInventory[index].emplacements.pop();
                     if(wineInventory[index].emplacements.length === 0) wineInventory.splice(index, 1);
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
-                    renderDeboucher();
+                    renderDeboucher(); // Refresh Sortie
                 }
             }
         }
 
         // ==========================================
-        // 6. ONGLET : ARRIVAGES & LOGIQUE GRAVITÉ/ÉPICENTRE
+        // 6. ONGLET : ARRIVAGES (ALGORITHME PROXIMITÉ EXACT)
         // ==========================================
-        document.getElementById('wine-form').addEventListener('input', () => {
-            document.getElementById('cave-visuelle-ranger').classList.add('active-placement');
-            document.getElementById('titre-placement').style.opacity = '1';
-        });
-
         document.getElementById('couleur').addEventListener('change', (e) => {
             const effOptions = document.getElementById('effervescent-options');
             effOptions.style.display = (e.target.value === 'Effervescent') ? 'block' : 'none';
         });
 
-        function getOccupationBloc(blocId) {
-            let occupation = 0;
-            let positionsOccupees = [];
+        // Fonction pour connaitre exactement quelles positions sont prises dans un bloc
+        function getPositionsOccupees(blocId) {
+            let occ = [];
+            let vracLegacyCount = 0;
             wineInventory.forEach(w => {
                 w.emplacements.forEach(emp => {
-                    if (emp === blocId) {
-                        occupation++;
-                    } else if (emp.startsWith(blocId + '_pos_')) {
-                        occupation++;
-                        positionsOccupees.push(parseInt(emp.split('_pos_')[1]));
-                    }
+                    if (emp === blocId) vracLegacyCount++; // Migration silencieuse des anciennes data sans position
+                    else if (emp.startsWith(blocId + '_pos_')) occ.push(parseInt(emp.split('_pos_')[1], 10));
                 });
             });
-            return { occupation, positionsOccupees };
+            // Si vieilles données, on force l'occupation des cases 1, 2, 3...
+            for(let i=0; i<vracLegacyCount; i++) {
+                for(let p=1; p<=50; p++) {
+                    if(!occ.includes(p)) { occ.push(p); break; }
+                }
+            }
+            return occ;
         }
 
-        // Variable temporaire pour la sauvegarde du placement en attente
+        // Calcule la distance entre la case cliquée et une autre case vide
+        function calculerDistance(blocCible, blocTest) {
+            if (blocCible.id === blocTest.id) return 0; // Même demi-étagère = Parfait
+            if (blocCible.groupe !== blocTest.groupe) return 1000; // Pas la même pièce (Escalier vs Garage)
+            if (blocCible.groupe === 'Garage') {
+                let diffEtage = Math.abs(blocCible.etage - blocTest.etage);
+                let memeCote = (blocCible.id.endsWith('_g') === blocTest.id.endsWith('_g')) ? 0 : 5;
+                return (diffEtage * 10) + memeCote; 
+                // Ex: clic E2 Gauche. 
+                // E2 Droite = distance 5. 
+                // E3 Gauche = distance 10. 
+                // -> Il ira d'abord remplir le côté opposé avant de changer d'étage.
+            }
+            return 500;
+        }
+
+        // Variable de mémoire pour la modale
         let propositionRangement = null;
 
-        function calculerDistribution(qty, cibleId = null) {
-            // 1. Lister tous les blocs dispos
-            let blocsDispos = topologie.map(b => {
-                let occ = getOccupationBloc(b.id);
-                let free = b.capacite - occ.occupation;
-                let positionsLibres = [];
-                if(b.type === 'grille') {
-                    for(let i=1; i<=b.capacite; i++) {
-                        if(!occ.positionsOccupees.includes(i)) positionsLibres.push(i);
+        function lancerRangement(cibleExacteId = null) {
+            const domaine = document.getElementById('domaine').value;
+            if (!domaine) return alert("Veuillez d'abord renseigner le nom du domaine avant de chercher un emplacement.");
+            
+            const qty = parseInt(document.getElementById('quantite').value, 10) || 1;
+            
+            // 1. Recenser absolument TOUS les trous vides de la cave
+            let tousLesTrous = [];
+            topologie.forEach(bloc => {
+                let occ = getPositionsOccupees(bloc.id);
+                for (let i = 1; i <= bloc.capacite; i++) {
+                    if (!occ.includes(i)) {
+                        tousLesTrous.push({
+                            idExact: `${bloc.id}_pos_${i}`,
+                            bloc: bloc,
+                            pos: i
+                        });
                     }
-                    free = positionsLibres.length;
                 }
-                return { ...b, free, positionsLibres };
-            }).filter(b => b.free > 0);
+            });
 
-            // 2. Trier les blocs selon la logique (Auto vs Épicentre)
-            if (cibleId) {
-                // LOGIQUE ÉPICENTRE (Proximité physique)
-                const baseBlocId = cibleId.includes('_pos_') ? cibleId.split('_pos_')[0] : cibleId;
-                const clickedBlock = topologie.find(b => b.id === baseBlocId);
+            if (tousLesTrous.length < qty) {
+                return alert(`⚠️ Cave pleine ! Il manque ${qty - tousLesTrous.length} place(s) pour ranger ces bouteilles.`);
+            }
+
+            // 2. Trier ces trous selon la méthode (Clic/Épicentre OU Bouton Auto/Haut en bas)
+            if (cibleExacteId) {
+                // LOGIQUE ÉPICENTRE
+                const [baseBlocId, posStr] = cibleExacteId.split('_pos_');
+                const clickedBloc = topologie.find(b => b.id === baseBlocId);
                 
-                blocsDispos.sort((a, b) => {
-                    if (a.id === clickedBlock.id) return -1;
-                    if (b.id === clickedBlock.id) return 1;
+                tousLesTrous.sort((a, b) => {
+                    // Le trou cliqué est la priorité absolue 0
+                    if (a.idExact === cibleExacteId) return -1; 
+                    if (b.idExact === cibleExacteId) return 1;
 
-                    if (a.groupe === 'Garage' && b.groupe === 'Garage' && clickedBlock.groupe === 'Garage') {
-                        let distA = Math.abs(a.etage - clickedBlock.etage);
-                        let distB = Math.abs(b.etage - clickedBlock.etage);
-                        if (distA === distB) return a.etage > b.etage ? -1 : 1; // Priorité haut à distance égale
-                        return distA - distB;
-                    }
-                    if (a.groupe === clickedBlock.groupe && b.groupe !== clickedBlock.groupe) return -1;
-                    if (b.groupe === clickedBlock.groupe && a.groupe !== clickedBlock.groupe) return 1;
-                    return 0;
+                    let distA = calculerDistance(clickedBloc, a.bloc);
+                    let distB = calculerDistance(clickedBloc, b.bloc);
+                    
+                    if (distA !== distB) return distA - distB;
+                    // À distance égale, on remplit bêtement de la position 1 à 5
+                    return a.pos - b.pos; 
                 });
             } else {
-                // LOGIQUE AUTO (De Haut en Bas)
-                blocsDispos.sort((a, b) => {
-                    if (a.groupe === 'Garage' && b.groupe === 'Garage') return b.etage - a.etage; // 10 vers 1
+                // LOGIQUE AUTO (Par défaut, le garage se remplit de l'étage 10 vers le 1)
+                tousLesTrous.sort((a, b) => {
+                    if (a.bloc.groupe === 'Garage' && b.bloc.groupe === 'Garage') {
+                        if (a.bloc.etage !== b.bloc.etage) return b.bloc.etage - a.bloc.etage; 
+                        if (a.bloc.id !== b.bloc.id) return a.bloc.id.localeCompare(b.bloc.id);
+                        return a.pos - b.pos;
+                    }
                     return 0;
                 });
             }
 
-            // 3. Distribuer les bouteilles
-            let reste = qty;
-            let emplacementsAssignes = [];
+            // 3. Prendre les N premiers trous de la liste triée
+            let selection = tousLesTrous.slice(0, qty);
+            let emplacementsAssignes = selection.map(t => t.idExact);
+            
+            // 4. Générer le résumé pour affichage
             let resumeAffichage = {};
+            selection.forEach(t => {
+                let nomClair = t.bloc.nom.replace('G', 'Gauche').replace('D', 'Droite');
+                if(!resumeAffichage[nomClair]) resumeAffichage[nomClair] = 0;
+                resumeAffichage[nomClair]++;
+            });
 
-            // Traitement spécifique du premier clic si c'est une grille
-            if (cibleId && cibleId.includes('_pos_') && reste > 0) {
-                let exactPos = parseInt(cibleId.split('_pos_')[1]);
-                let baseId = cibleId.split('_pos_')[0];
-                let targetBloc = blocsDispos.find(b => b.id === baseId);
-                if(targetBloc && targetBloc.positionsLibres.includes(exactPos)) {
-                    emplacementsAssignes.push(cibleId);
-                    targetBloc.positionsLibres = targetBloc.positionsLibres.filter(p => p !== exactPos);
-                    targetBloc.free--;
-                    reste--;
-                    resumeAffichage[targetBloc.nom] = 1;
-                }
-            }
-
-            for (let b of blocsDispos) {
-                if (reste <= 0) break;
-                let aPlacer = Math.min(b.free, reste);
-                
-                if (b.type === 'vrac') {
-                    for (let i = 0; i < aPlacer; i++) emplacementsAssignes.push(b.id);
-                } else {
-                    for (let i = 0; i < aPlacer; i++) {
-                        emplacementsAssignes.push(`${b.id}_pos_${b.positionsLibres[i]}`);
-                    }
-                }
-                reste -= aPlacer;
-                if (!resumeAffichage[b.nom]) resumeAffichage[b.nom] = 0;
-                resumeAffichage[b.nom] += aPlacer;
-            }
-
-            return { emplacementsAssignes, reste, resumeAffichage };
+            preparerSauvegarde(emplacementsAssignes);
+            afficherModal(resumeAffichage, qty);
         }
 
+        function actionAutoRangement() { lancerRangement(null); }
+        function actionSlotVide(cibleId) { lancerRangement(cibleId); }
+
+        // --- PREPARATION & MODAL ---
         function preparerSauvegarde(emplacementsAssignes) {
-            const domaine = document.getElementById('domaine').value;
             const couleur = document.getElementById('couleur').value;
-            
             propositionRangement = {
                 id: Date.now().toString(),
-                domaine: domaine, 
+                domaine: document.getElementById('domaine').value, 
                 region: document.getElementById('region').value,
                 millesime: document.getElementById('millesime').value, 
                 couleur: couleur,
@@ -615,48 +626,18 @@
                 profil: document.getElementById('profil').value,
                 emplacements: emplacementsAssignes
             };
-
             if (couleur === 'Effervescent') {
                 propositionRangement.eff_color = document.querySelector('input[name="eff_color"]:checked').value;
                 propositionRangement.eff_type = document.querySelector('input[name="eff_type"]:checked').value;
             }
         }
 
-        // Action 1 : Bouton "Baguette magique"
-        function actionAutoRangement() {
-            const domaine = document.getElementById('domaine').value;
-            if (!domaine) return alert("Veuillez d'abord renseigner le nom du domaine.");
-            
-            const qty = parseInt(document.getElementById('quantite').value, 10) || 1;
-            const dist = calculerDistribution(qty, null);
-            
-            if (dist.reste > 0) return alert(`⚠️ Espace insuffisant ! Il manque ${dist.reste} place(s) dans la cave.`);
-            
-            preparerSauvegarde(dist.emplacementsAssignes);
-            afficherModal(dist.resumeAffichage, qty);
-        }
-
-        // Action 2 : Clic forcé sur la carte (Épicentre)
-        function actionSlotVide(cibleId) {
-            const domaine = document.getElementById('domaine').value;
-            if (!domaine) return alert("Veuillez d'abord renseigner le nom du domaine avant de cliquer sur le plan.");
-            
-            const qty = parseInt(document.getElementById('quantite').value, 10) || 1;
-            const dist = calculerDistribution(qty, cibleId);
-            
-            if (dist.reste > 0) return alert(`⚠️ Espace insuffisant ! Il manque ${dist.reste} place(s) dans la cave.`);
-            
-            preparerSauvegarde(dist.emplacementsAssignes);
-            afficherModal(dist.resumeAffichage, qty);
-        }
-
-        // MODAL ET SAUVEGARDE
         function afficherModal(resumeAffichage, qty) {
             const domaine = document.getElementById('domaine').value;
-            let html = `<p style="margin-bottom:15px;">Répartition calculée pour vos <strong>${qty} bouteille(s)</strong> de ${domaine} :</p><ul style="list-style-type:none; padding:0;">`;
+            let html = `<p style="margin-bottom:15px;">Proposition de rangement pour <strong>${qty} bouteille(s)</strong> de ${domaine} :</p><ul style="list-style-type:none; padding:0;">`;
             
             for (const [lieu, nb] of Object.entries(resumeAffichage)) {
-                html += `<li style="padding:8px; background:#f8f9fa; border:1px solid #eee; margin-bottom:5px; border-radius:4px;">📍 <strong>${nb}</strong> bouteille(s) ➔ <strong>${lieu}</strong></li>`;
+                html += `<li style="padding:10px; background:#f8f9fa; border:1px solid #ccc; margin-bottom:5px; border-radius:6px; font-size:15px;">📍 <strong>${nb}</strong> bouteille(s) ➔ <strong>${lieu}</strong></li>`;
             }
             html += `</ul>`;
             
@@ -676,14 +657,13 @@
                 
                 document.getElementById('wine-form').reset();
                 document.getElementById('effervescent-options').style.display = 'none';
-                document.getElementById('cave-visuelle-ranger').classList.remove('active-placement');
-                document.getElementById('titre-placement').style.opacity = '0.5';
                 
                 fermerModal();
-                renderCaveArrivages();
+                renderCaveArrivages(); // Rafraîchit instantanément la vue
             }
         }
 
+        // --- DESSIN DU WMS STRICT ---
         function renderCaveArrivages() {
             const container = document.getElementById('cave-visuelle-ranger');
             container.innerHTML = '';
@@ -725,45 +705,41 @@
             }
         }
 
-        // Rendu strict : On affiche exactement la capacité, pas plus.
-        function creerHTMLBlocArr(bloc, bouteilles = []) {
+        // Dessine la grille de manière stricte, case par case (Vide ou Pleine, rien de plus)
+        function creerHTMLBlocArr(bloc, bouteillesPures = []) {
+            // Traitement pour les vieilles données migrés sans _pos_
+            let occGlobales = getPositionsOccupees(bloc.id); 
+            
             const divBloc = document.createElement('div');
             divBloc.className = `bloc`;
             divBloc.innerHTML = `<h3>${bloc.nom}</h3>`;
             const grille = document.createElement('div');
-            
-            // On utilise la classe "grille" même pour le vrac pour que les 5 pastilles s'alignent proprement
-            grille.className = `grille-vins grille`; 
+            grille.className = `grille-vins`; 
 
-            if (bloc.type === 'grille') {
-                for (let i = 1; i <= bloc.capacite; i++) {
-                    const caseDiv = document.createElement('div');
-                    const btl = bouteilles.find(b => b.exactPos === i);
-                    if (btl) {
-                        caseDiv.className = `pastille ${btl.vin.couleur.toLowerCase().replace('é','e')}`;
-                    } else {
-                        caseDiv.className = 'case-grille';
-                        caseDiv.onclick = () => actionSlotVide(`${bloc.id}_pos_${i}`);
-                    }
-                    grille.appendChild(caseDiv);
-                }
-            } else {
-                // Pour le vrac (Garage), on affiche stricto-sensu les pastilles puis les trous vides restants
-                let nbOccupe = Math.min(bouteilles.length, bloc.capacite); // Sécurité
-                for (let i = 0; i < nbOccupe; i++) {
-                    const p = document.createElement('div');
-                    p.className = `pastille ${bouteilles[i].vin.couleur.toLowerCase().replace('é','e')}`;
-                    grille.appendChild(p);
-                }
+            for (let i = 1; i <= bloc.capacite; i++) {
+                const caseDiv = document.createElement('div');
                 
-                let nbLibre = bloc.capacite - nbOccupe;
-                for(let i = 0; i < nbLibre; i++) {
-                    const slot = document.createElement('div');
-                    slot.className = 'case-vrac-vide';
-                    slot.onclick = () => actionSlotVide(bloc.id);
-                    grille.appendChild(slot);
+                // Si la case i est dans le tableau des occupations, c'est plein
+                if (occGlobales.includes(i)) {
+                    // Trouver quelle bouteille c'est visuellement
+                    let btlDetail = bouteillesPures.find(b => b.exactPos === i);
+                    if(!btlDetail && bouteillesPures.length > 0) btlDetail = bouteillesPures[0]; // Fallback visuel vieilles datas
+                    
+                    let colorClass = btlDetail ? btlDetail.vin.couleur.toLowerCase().replace('é','e') : 'rouge';
+                    let domainInitial = btlDetail && btlDetail.vin.domaine ? btlDetail.vin.domaine.substring(0,2).toUpperCase() : '';
+                    
+                    caseDiv.className = `pastille ${colorClass}`;
+                    caseDiv.innerHTML = domainInitial;
+                    caseDiv.title = btlDetail ? btlDetail.vin.domaine : 'Occupé';
+                } else {
+                    // C'est un vrai trou vide et cliquable
+                    caseDiv.className = 'case-grille';
+                    caseDiv.innerHTML = i;
+                    caseDiv.onclick = () => actionSlotVide(`${bloc.id}_pos_${i}`);
                 }
+                grille.appendChild(caseDiv);
             }
+            
             divBloc.appendChild(grille);
             return divBloc;
         }
@@ -791,13 +767,17 @@
                         </div>
                         <span style="font-weight:bold; color:var(--primary-color);">${wine.emplacements.length} btl</span>
                     </div>
-                    <button class="btn-danger" style="margin-top:10px;" onclick="if(confirm('Tout supprimer ?')){ wineInventory = wineInventory.filter(w => w.id !== '${wine.id}'); localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory)); renderMaCave(); }">🗑️ Forcer la suppression</button>
+                    <button class="btn-danger" style="margin-top:10px;" onclick="if(confirm('Tout supprimer ?')){ wineInventory = wineInventory.filter(w => w.id !== '${wine.id}'); localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory)); renderMaCave(); }">🗑️ Forcer la suppression globale</button>
                 `;
                 list.appendChild(item);
             });
         }
 
-        document.addEventListener('DOMContentLoaded', renderDeboucher);
+        // Initialisation : L'onglet Arrivages doit être dessiné même en fond pour être prêt
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCaveArrivages();
+            renderDeboucher();
+        });
     </script>
 </body>
 </html>
