@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ma Cave à Vin - WMS Pro</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#722F37">
     <style>
         :root {
             --primary-color: #722F37;
@@ -796,6 +798,14 @@
             renderCellar('cave-visuelle-ranger', 'arrivages');
             renderDeboucher();
         });
+        // Initialisation de la PWA (Mode hors-ligne)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Appli hors-ligne activée !'))
+                .catch(err => console.error('Erreur PWA', err));
+            });
+        }
     </script>
 </body>
 </html>
