@@ -19,8 +19,8 @@
             --success-color: #28a745;
             --danger-color: #d63031;
             --warning-color: #f39c12;
-            --picking-color: #0984e3; /* Bleu électrique pour la recherche */
-            --pending-color: #f1c40f; /* Jaune pour la réservation */
+            --picking-color: #0984e3; 
+            --pending-color: #f1c40f; 
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -47,7 +47,6 @@
         .btn-info { background-color: var(--picking-color); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; }
         .btn-danger { background-color: var(--danger-color); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
 
-        /* ALERTES & CARROUSEL */
         .alert-banner { background: #ffeaa7; border-left: 5px solid var(--warning-color); padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; align-items: center; justify-content: space-between; font-weight: bold; color: #d35400; }
         .section-title { font-size: 16px; color: var(--primary-color); margin-bottom: 12px; font-weight: bold; }
         
@@ -56,7 +55,6 @@
         .suggestion-card { min-width: 260px; background: linear-gradient(135deg, #fff, #f8f9fa); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.04); flex-shrink: 0; }
         .suggestion-motive { font-size: 11px; text-transform: uppercase; color: var(--primary-light); font-weight: bold; margin-bottom: 5px; }
         
-        /* FILTRES & GRILLE DE VINS */
         .filter-section { margin-bottom: 25px; background: var(--card-bg); padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
         .filter-group { margin-bottom: 12px; }
         .filter-title { font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; padding-left: 2px; }
@@ -75,7 +73,6 @@
         .wine-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
         .tag { font-size: 11px; padding: 3px 8px; border-radius: 4px; background: #f1f2f6; color: #576574; font-weight: 600; }
         
-        /* FORMULAIRE ARRIVAGES */
         #form-section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 30px; border-left: 4px solid var(--primary-color); }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
@@ -90,7 +87,6 @@
         .segmented-control input[type="radio"] { display: none; }
         .segmented-control input[type="radio"]:checked + label { background: var(--primary-color); color: white; }
 
-        /* CAVE VISUELLE WMS STRICT */
         .cave-container { display: flex; flex-direction: column; gap: 30px; margin-bottom: 40px; }
         .groupe-cave { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .groupe-cave h2 { border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; color: #444; font-size: 15px; }
@@ -100,19 +96,15 @@
         .bloc h3 { font-size: 11px; text-transform: uppercase; color: #888; margin-bottom: 10px; text-align: center; }
         
         .grille-vins { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; justify-items: center; }
-        
         .case-grille { width: 32px; height: 32px; border: 2px dashed #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #aaa; cursor: pointer; transition: all 0.2s; }
         .case-grille:hover { border-color: var(--primary-color); }
-        
         .pastille { width: 32px; height: 32px; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; }
         
-        /* COULEURS DES PASTILLES */
         .rouge { background: linear-gradient(135deg, #722F37, #4a1c22); color: transparent; }
         .blanc { background: linear-gradient(135deg, #F3E5AB, #d1c179); color: transparent; }
         .rose { background: linear-gradient(135deg, #FFC0CB, #d195a0); color: transparent; }
         .effervescent { background: linear-gradient(135deg, #FFD700, #c4a600); color: transparent; }
         
-        /* WMS STATES (Jaune = Réservé, Bleu = Picking, Gris = Inactif) */
         .pastille.jaune { background: var(--pending-color); color: #000; border: 2px solid #000; animation: pulseJaune 1.5s infinite; }
         .pastille.bleue { background: var(--picking-color); color: #fff; border: 2px solid #fff; animation: pulseBleu 1.5s infinite; cursor: pointer; }
         .pastille.grise { background: #bdc3c7; border: 2px solid #ecf0f1; opacity: 0.4; }
@@ -120,16 +112,13 @@
         @keyframes pulseJaune { 0% { box-shadow: 0 0 0 0 rgba(241, 196, 15, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(241, 196, 15, 0); } 100% { box-shadow: 0 0 0 0 rgba(241, 196, 15, 0); } }
         @keyframes pulseBleu { 0% { box-shadow: 0 0 0 0 rgba(9, 132, 227, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(9, 132, 227, 0); } 100% { box-shadow: 0 0 0 0 rgba(9, 132, 227, 0); } }
 
-        /* BANDEAU VALIDATION ARRIVAGE */
         .validation-banner { position: sticky; top: 10px; background: white; border: 2px solid var(--pending-color); border-radius: 8px; padding: 15px; display: none; align-items: center; justify-content: space-between; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
 
-        /* ADMINISTRATION */
         .dashboard { display: flex; gap: 15px; justify-content: center; margin-bottom: 25px; flex-wrap: wrap; }
         .kpi-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; flex: 1; min-width: 140px; }
         .kpi-card h3 { font-size: 12px; color: #666; text-transform: uppercase; }
         .kpi-card .value { font-size: 28px; font-weight: bold; color: var(--primary-color); margin-top: 5px; }
 
-        /* CONTENEUR PICKING */
         #picking-view { display: none; }
         #picking-header { background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; border: 1px solid #bbdefb; }
     </style>
@@ -145,12 +134,7 @@
     </header>
 
     <main>
-        <!-- ========================================== -->
-        <!-- ONGLET 1 : DÉBOUCHER (Sortie)              -->
-        <!-- ========================================== -->
         <section id="tab-deboucher" class="tab-content active">
-            
-            <!-- VUE RECHERCHE / LISTE -->
             <div id="recherche-view">
                 <div id="alerte-apogee" class="alert-banner">
                     <span id="alerte-texte">🚨 X bouteilles à boire d'urgence</span>
@@ -186,7 +170,6 @@
                 <div class="wine-grid" id="wine-results"></div>
             </div>
 
-            <!-- VUE PICKING WMS (Plan de cave) -->
             <div id="picking-view">
                 <div id="picking-header">
                     <h3 style="color: var(--picking-color); margin-bottom: 5px;">📍 Mode Prélèvement</h3>
@@ -195,12 +178,8 @@
                 </div>
                 <div id="cave-visuelle-picking" class="cave-container active-placement"></div>
             </div>
-
         </section>
 
-        <!-- ========================================== -->
-        <!-- ONGLET 2 : ARRIVAGES (Entrée)              -->
-        <!-- ========================================== -->
         <section id="tab-arrivages" class="tab-content">
             <div id="form-section">
                 <h3 id="form-title" style="margin-bottom: 15px; color: var(--primary-color);">✍️ Saisir l'Arrivage</h3>
@@ -208,7 +187,9 @@
                     <div class="form-grid">
                         <div class="form-group full-width">
                             <label>Domaine / Nom du Vin</label>
-                            <input type="text" id="domaine" required placeholder="Ex: Château Margaux">
+                            <!-- AUTOCOMPLÉTION LIEE A LA DATALIST -->
+                            <input type="text" id="domaine" required placeholder="Ex: Château Margaux" list="domaines-list">
+                            <datalist id="domaines-list"></datalist>
                         </div>
                         <div class="form-group">
                             <label>Région</label>
@@ -268,7 +249,6 @@
                 <button type="button" class="btn-primary" onclick="lancerAllocationAuto()" style="background-color:#f39c12; color:#fff;">🪄 Proposer le rangement (De Haut en Bas)</button>
             </div>
 
-            <!-- Bandeau de Validation (Apparaît quand des cases sont jaunes) -->
             <div id="arrivage-banner" class="validation-banner">
                 <div>
                     <strong style="color:var(--pending-color); font-size:16px;">🟡 Allocation en attente</strong>
@@ -287,9 +267,6 @@
             <div id="cave-visuelle-ranger" class="cave-container active-placement"></div>
         </section>
 
-        <!-- ========================================== -->
-        <!-- ONGLET 3 : MA CAVE                         -->
-        <!-- ========================================== -->
         <section id="tab-macave" class="tab-content">
             <div class="dashboard">
                 <div class="kpi-card">
@@ -306,7 +283,6 @@
         </section>
     </main>
 
-    <!-- NAVIGATION BASSE -->
     <nav class="bottom-nav">
         <button class="nav-item active" onclick="switchTab('deboucher', this)"><span class="nav-icon">🍷</span><span>Déboucher</span></button>
         <button class="nav-item" onclick="switchTab('arrivages', this)"><span class="nav-icon">📥</span><span>Arrivages</span></button>
@@ -316,14 +292,17 @@
     <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importerJSON(event)">
 
     <script>
-        // ==========================================
-        // 1. TOPOLOGIE WMS STRICTE & DONNÉES
-        // ==========================================
+        // PWA SERVICE WORKER
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW setup error', err));
+            });
+        }
+
         const STORAGE_KEY = 'ryzek_cave_a_vin_data';
         let wineInventory = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
         const CURRENT_YEAR = 2026;
 
-        // Ordre strict du WMS : De Haut en Bas (Étage 10 à 1), et Droite (D) avant Gauche (G).
         const topologie = [];
         for (let i = 10; i >= 1; i--) {
             topologie.push({ id: `g_e${i}_d`, nom: `Étage ${i} D`, type: "grille", capacite: 5, groupe: "Garage", etage: i });
@@ -332,18 +311,75 @@
         topologie.push({ id: "esc_casier", nom: "Casier escalier", type: "grille", capacite: 12, groupe: "Sous l'escalier" });
         topologie.push({ id: "esc_vrac", nom: "Caisse escalier", type: "grille", capacite: 24, groupe: "Sous l'escalier" });
 
-        // Variables d'état WMS
-        let pendingSlots = []; // Les cases jaunes
-        let pickingWineId = null; // L'ID du vin cherché pour le picking bleu
+        let pendingSlots = [];
+        let pickingWineId = null;
 
         // ==========================================
-        // 2. MOTEUR D'APOGÉE
+        // AUTOCOMPLÉTION & CLONAGE
+        // ==========================================
+        function updateDatalist() {
+            const dataList = document.getElementById('domaines-list');
+            dataList.innerHTML = '';
+            const domainesUniques = [...new Set(wineInventory.map(w => w.domaine))];
+            domainesUniques.forEach(d => {
+                const option = document.createElement('option');
+                option.value = d;
+                dataList.appendChild(option);
+            });
+        }
+
+        document.getElementById('domaine').addEventListener('input', (e) => {
+            const nomSaisi = e.target.value;
+            const vinExistant = wineInventory.find(w => w.domaine === nomSaisi);
+            if(vinExistant) {
+                document.getElementById('region').value = vinExistant.region || '';
+                document.getElementById('couleur').value = vinExistant.couleur || 'Rouge';
+                document.getElementById('envergure').value = vinExistant.envergure || 'Détente';
+                document.getElementById('profil').value = vinExistant.profil || 'Fruité/Vif';
+                
+                if (vinExistant.couleur === 'Effervescent') {
+                    document.getElementById('effervescent-options').style.display = 'block';
+                    if (vinExistant.eff_color) document.querySelector(`input[name="eff_color"][value="${vinExistant.eff_color}"]`).checked = true;
+                    if (vinExistant.eff_type) document.querySelector(`input[name="eff_type"][value="${vinExistant.eff_type}"]`).checked = true;
+                } else {
+                    document.getElementById('effervescent-options').style.display = 'none';
+                }
+            }
+        });
+
+        function clonerVin(id) {
+            const vin = wineInventory.find(w => w.id === id);
+            if(!vin) return;
+            
+            document.querySelectorAll('.nav-item')[1].click();
+            
+            document.getElementById('domaine').value = vin.domaine;
+            document.getElementById('region').value = vin.region || '';
+            document.getElementById('millesime').value = vin.millesime || '';
+            document.getElementById('couleur').value = vin.couleur || 'Rouge';
+            document.getElementById('envergure').value = vin.envergure || 'Détente';
+            document.getElementById('profil').value = vin.profil || 'Fruité/Vif';
+            document.getElementById('quantite').value = 1;
+            
+            if (vin.couleur === 'Effervescent') {
+                document.getElementById('effervescent-options').style.display = 'block';
+                if(vin.eff_color) document.querySelector(`input[name="eff_color"][value="${vin.eff_color}"]`).checked = true;
+                if(vin.eff_type) document.querySelector(`input[name="eff_type"][value="${vin.eff_type}"]`).checked = true;
+            } else {
+                document.getElementById('effervescent-options').style.display = 'none';
+            }
+            
+            document.getElementById('quantite').focus();
+            window.scrollTo(0, 0);
+        }
+
+        // ==========================================
+        // RESTE DU CODE (WMS, Export, etc.)
         // ==========================================
         function calculerMaturite(wine) {
             if (!wine.millesime) return { statut: 'inconnu', icone: '' };
             const age = CURRENT_YEAR - parseInt(wine.millesime, 10);
             const couleurApparente = wine.eff_color && wine.couleur === 'Effervescent' ? wine.eff_color : wine.couleur;
-
             if (couleurApparente === 'Rosé' || (wine.couleur === 'Blanc' && wine.profil === 'Fruité/Vif') || wine.couleur === 'Effervescent') {
                 if (age > 4) return { statut: 'urgence', icone: '🔥' };
                 if (age >= 1) return { statut: 'apogee', icone: '✅' };
@@ -367,9 +403,6 @@
             return { statut: 'inconnu', icone: '' };
         }
 
-        // ==========================================
-        // 3. EXPORT / IMPORT
-        // ==========================================
         function exporterJSON() {
             if (wineInventory.length === 0) return alert("Cave vide !");
             const dataStr = JSON.stringify(wineInventory, null, 2);
@@ -392,33 +425,26 @@
                         wineInventory = importedData;
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
                         alert("Restauration réussie !");
-                        location.reload(); // Rafraîchissement brutal pour la sécurité
+                        location.reload(); 
                     }
                 } catch (error) { alert("Erreur de fichier JSON."); }
             };
             reader.readAsText(file); event.target.value = ''; 
         }
 
-        // ==========================================
-        // 4. NAVIGATION
-        // ==========================================
         function switchTab(tabId, btnElement) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.getElementById(`tab-${tabId}`).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
             btnElement.classList.add('active');
-            
-            fermerPicking(); // Quitte le mode picking au changement d'onglet
-            annulerAllocation(); // Annule les sélections en cours au changement d'onglet
+            fermerPicking(); 
+            annulerAllocation(); 
             
             if (tabId === 'deboucher') renderDeboucher();
             if (tabId === 'arrivages') renderCellar('cave-visuelle-ranger', 'arrivages');
             if (tabId === 'macave') renderMaCave();
         }
 
-        // ==========================================
-        // 5. ONGLET : DÉBOUCHER (RECHERCHE + PICKING)
-        // ==========================================
         let activeFilters = { couleur: null, envergure: null, profil: null, apogee: null };
         function toggleFilter(category, value, element) {
             if (activeFilters[category] === value) {
@@ -505,31 +531,20 @@
             return card;
         }
 
-        // ==========================================
-        // 6. LOGIQUE WMS : LES COORDONNÉES
-        // ==========================================
         function getToutesLesPositionsOccupees() {
             let occupees = new Set();
-            wineInventory.forEach(w => {
-                w.emplacements.forEach(emp => occupees.add(emp));
-            });
+            wineInventory.forEach(w => w.emplacements.forEach(emp => occupees.add(emp)));
             return occupees;
         }
 
-        // L'ordre strict WMS : Garage 10D -> Garage 1G -> Escalier
         function getOrderedSlots() {
             let slots = [];
             topologie.forEach(bloc => {
-                for(let p=1; p<=bloc.capacite; p++) {
-                    slots.push(`${bloc.id}_pos_${p}`);
-                }
+                for(let p=1; p<=bloc.capacite; p++) slots.push(`${bloc.id}_pos_${p}`);
             });
             return slots;
         }
 
-        // ==========================================
-        // 7. WMS : ALLOCATION (ARRIVAGES)
-        // ==========================================
         document.getElementById('couleur').addEventListener('change', (e) => {
             const effOptions = document.getElementById('effervescent-options');
             effOptions.style.display = (e.target.value === 'Effervescent') ? 'block' : 'none';
@@ -547,23 +562,18 @@
             const allSlots = getOrderedSlots();
             const freeSlots = allSlots.filter(s => !occ.has(s));
 
-            if (freeSlots.length < qty) {
-                return alert(`⚠️ Cave pleine ! Il manque ${qty - freeSlots.length} place(s) pour ranger ces bouteilles.`);
-            }
+            if (freeSlots.length < qty) return alert(`⚠️ Cave pleine ! Il manque ${qty - freeSlots.length} place(s).`);
 
             pendingSlots = [];
             
             if (cibleId) {
-                // LOGIQUE EPICENTRE
                 let startIndex = freeSlots.indexOf(cibleId);
-                if (startIndex === -1) return; // Case déjà occupée
-                // On prend qty places en partant de l'épicentre et en descendant
+                if (startIndex === -1) return; 
                 for(let i=0; i<qty; i++) {
-                    let index = (startIndex + i) % freeSlots.length; // Boucle au début si on atteint la fin de la cave
+                    let index = (startIndex + i) % freeSlots.length; 
                     pendingSlots.push(freeSlots[index]);
                 }
             } else {
-                // LOGIQUE AUTO (De haut en bas)
                 pendingSlots = freeSlots.slice(0, qty);
             }
 
@@ -600,16 +610,13 @@
 
             wineInventory.push(newWine);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
+            updateDatalist();
 
-            // Reset
             document.getElementById('wine-form').reset();
             document.getElementById('effervescent-options').style.display = 'none';
-            annulerAllocation(); // Vide les jaunes et rafraîchit
+            annulerAllocation(); 
         }
 
-        // ==========================================
-        // 8. WMS : PICKING (DÉBOUCHER)
-        // ==========================================
         function ouvrirPicking(idVin) {
             pickingWineId = idVin;
             document.getElementById('recherche-view').style.display = 'none';
@@ -622,7 +629,7 @@
             pickingWineId = null;
             document.getElementById('recherche-view').style.display = 'block';
             document.getElementById('picking-view').style.display = 'none';
-            renderDeboucher(); // Rafraîchit les stocks de la liste
+            renderDeboucher(); 
         }
 
         function extraireBouteille(slotId) {
@@ -634,33 +641,26 @@
                 
                 if (wine.emplacements.length === 0) {
                     wineInventory = wineInventory.filter(w => w.id !== pickingWineId);
-                    alert("C'était votre dernière bouteille de cette référence !");
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
-                    fermerPicking(); // Plus de bouteille, on retourne à la liste
+                    updateDatalist();
+                    fermerPicking(); 
                 } else {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
-                    renderCellar('cave-visuelle-picking', 'picking'); // Met à jour le plan
+                    renderCellar('cave-visuelle-picking', 'picking'); 
                 }
             }
         }
 
-        // ==========================================
-        // 9. RENDU DU PLAN DE CAVE (MOTEUR UNIQUE)
-        // ==========================================
         function renderCellar(containerId, mode) {
             const container = document.getElementById(containerId);
             if (!container) return;
             container.innerHTML = '';
 
-            // Map pour savoir rapidement ce qui est où
             const mapEmplacements = {};
             wineInventory.forEach(vin => {
-                vin.emplacements.forEach(empStr => {
-                    mapEmplacements[empStr] = vin;
-                });
+                vin.emplacements.forEach(empStr => mapEmplacements[empStr] = vin);
             });
 
-            // Groupement par étage pour affichage compact (Garage D/G sur même ligne)
             const etagesGarage = {};
             const escBlocs = [];
 
@@ -673,14 +673,12 @@
                 }
             });
 
-            // Rendu Garage
             const secGarage = document.createElement('div');
             secGarage.className = 'groupe-cave';
             secGarage.innerHTML = `<h2>📍 Garage (De Haut en Bas)</h2><div class="conteneur-blocs" id="grp-garage-${mode}"></div>`;
             container.appendChild(secGarage);
             const cg = secGarage.querySelector('.conteneur-blocs');
 
-            // Garage est trié de 10 à 1
             Object.keys(etagesGarage).sort((a,b) => b - a).forEach(etage => {
                 const ligne = document.createElement('div');
                 ligne.className = 'etage-complet';
@@ -688,7 +686,6 @@
                 cg.appendChild(ligne);
             });
 
-            // Rendu Escalier
             const secEsc = document.createElement('div');
             secEsc.className = 'groupe-cave';
             secEsc.innerHTML = `<h2>📍 Sous l'escalier</h2><div class="conteneur-blocs" id="grp-esc-${mode}"></div>`;
@@ -707,43 +704,34 @@
             for (let i = 1; i <= bloc.capacite; i++) {
                 const slotId = `${bloc.id}_pos_${i}`;
                 const caseDiv = document.createElement('div');
-                
                 const vinOccupe = mapEmplacements[slotId];
                 
-                // MOTEUR DE DESSIN WMS
                 if (mode === 'arrivages') {
                     if (pendingSlots.includes(slotId)) {
-                        // Réservation en cours (JAUNE)
                         caseDiv.className = 'pastille jaune';
                         caseDiv.title = "Réservé";
                     } else if (vinOccupe) {
-                        // Occupé par un vin (COULEUR)
                         let colorClass = vinOccupe.couleur.toLowerCase().replace('é','e');
                         caseDiv.className = `pastille ${colorClass}`;
                         caseDiv.title = vinOccupe.domaine;
                     } else {
-                        // Trou vide cliquable
                         caseDiv.className = 'case-grille';
                         caseDiv.onclick = () => allocationClicManuel(slotId);
                     }
                 } 
                 else if (mode === 'picking') {
                     if (vinOccupe && vinOccupe.id === pickingWineId) {
-                        // C'est le vin que je cherche (BLEU)
                         caseDiv.className = 'pastille bleue';
                         caseDiv.title = "Cliquez pour extraire !";
                         caseDiv.onclick = () => extraireBouteille(slotId);
                     } else if (vinOccupe) {
-                        // C'est un autre vin (GRIS)
                         caseDiv.className = `pastille grise`;
                     } else {
-                        // C'est un trou vide (Gris/Dashed, non cliquable)
                         caseDiv.className = 'case-grille';
                         caseDiv.style.cursor = 'default';
                         caseDiv.style.borderColor = '#eee';
                     }
                 }
-
                 grille.appendChild(caseDiv);
             }
             
@@ -751,21 +739,24 @@
             return divBloc;
         }
 
-        // ==========================================
-        // 10. ONGLET : MA CAVE
-        // ==========================================
         function renderMaCave() {
             document.getElementById('kpi-total').innerText = wineInventory.reduce((sum, w) => sum + w.emplacements.length, 0);
             document.getElementById('kpi-refs').innerText = wineInventory.length;
 
             const list = document.getElementById('inventory-list');
             list.innerHTML = '';
-            wineInventory.forEach(wine => {
+            
+            const sortedInventory = [...wineInventory].sort((a,b) => a.domaine.localeCompare(b.domaine));
+
+            sortedInventory.forEach(wine => {
                 let infosSupp = "";
                 if (wine.couleur === 'Effervescent' && wine.eff_color && wine.eff_type) infosSupp = ` - ${wine.eff_color} ${wine.eff_type}`;
 
                 const item = document.createElement('div');
-                item.style.background = 'white'; item.style.padding = '15px'; item.style.marginBottom = '10px'; item.style.borderRadius = '8px';
+                item.style.background = 'white';
+                item.style.padding = '15px';
+                item.style.marginBottom = '10px';
+                item.style.borderRadius = '8px';
                 item.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                         <div>
@@ -774,38 +765,20 @@
                         </div>
                         <span style="font-weight:bold; color:var(--primary-color);">${wine.emplacements.length} btl</span>
                     </div>
-                    <button class="btn-danger" style="margin-top:10px;" onclick="if(confirm('Tout supprimer ?')){ wineInventory = wineInventory.filter(w => w.id !== '${wine.id}'); localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory)); renderMaCave(); }">🗑️ Forcer la suppression</button>
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <button class="btn-info" onclick="clonerVin('${wine.id}')" style="flex:1; padding:6px; font-size:12px;">🔄 Cloner</button>
+                        <button class="btn-danger" style="flex:1; padding:6px; font-size:12px;" onclick="if(confirm('Tout supprimer ?')){ wineInventory = wineInventory.filter(w => w.id !== '${wine.id}'); localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory)); updateDatalist(); renderMaCave(); }">🗑️ Supprimer</button>
+                    </div>
                 `;
                 list.appendChild(item);
             });
         }
 
-        // INIT
         document.addEventListener('DOMContentLoaded', () => {
-            // Nettoyage silencieux des vieilles données sans _pos_ au premier chargement pour garantir la stabilité du WMS strict
-            let needsSave = false;
-            wineInventory.forEach(w => {
-                for(let i=0; i<w.emplacements.length; i++) {
-                    if(!w.emplacements[i].includes('_pos_')) {
-                        // On lui force une position par défaut juste pour qu'il s'affiche
-                        w.emplacements[i] = `${w.emplacements[i]}_pos_${i+1}`; 
-                        needsSave = true;
-                    }
-                }
-            });
-            if(needsSave) localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
-
+            updateDatalist();
             renderCellar('cave-visuelle-ranger', 'arrivages');
             renderDeboucher();
         });
-        // Initialisation de la PWA (Mode hors-ligne)
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('Appli hors-ligne activée !'))
-                .catch(err => console.error('Erreur PWA', err));
-            });
-        }
     </script>
 </body>
 </html>
