@@ -1,21 +1,31 @@
-const CACHE_NAME = 'cave-a-vin-v3'; // On passe en v3 ici
-const urlsToCache = [
-    './',
-    './index.html',
-    './manifest.json',
-    './icon.png'
-];
+const CACHE_NAME = 'cave-v4';
+const urlsToCache = ['./', './index.html', './manifest.json'];
 
+// Installation et forçage immédiat
 self.addEventListener('install', event => {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
-    );
+    self.skipWaiting(); 
+    event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
 });
 
+// Nettoyage impitoyable des anciens caches
+self.addEventListener('activate', event => {
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cacheName => {
+                    if (cacheName !== CACHE_NAME) {
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+        })
+    );
+    self.clients.claim();
+});
+
+// Stratégie "Réseau d'abord, Cache ensuite"
 self.addEventListener('fetch', event => {
     event.respondWith(
-        caches.match(event.request).then(response => {
-            return response || fetch(event.request);
-        })
+        fetch(event.request).catch(() => caches.match(event.request))
     );
 });
