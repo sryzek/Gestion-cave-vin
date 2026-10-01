@@ -132,7 +132,8 @@
 <body>
 
     <header>
-        <h1>🍷 Ma Cave</h1>
+        <!-- MARQUEUR VISUEL DE VERSION V4 ICI -->
+        <h1>🍷 Ma Cave <span style="font-size: 10px; opacity: 0.7;">v4</span></h1>
         <div class="header-actions">
             <button class="header-btn" onclick="exporterJSON()" title="Sauvegarder">💾</button>
             <button class="header-btn" onclick="document.getElementById('import-file').click()" title="Restaurer">📂</button>
@@ -188,18 +189,18 @@
 
         <section id="tab-arrivages" class="tab-content">
             <div id="form-section">
-                <h3 id="form-title" style="margin-bottom: 15px; color: var(--primary-color);">✍️️ Saisir l'Arrivage</h3>
+                <h3 id="form-title" style="margin-bottom: 15px; color: var(--primary-color);">✍️ Saisir l'Arrivage</h3>
                 <form id="wine-form" autocomplete="off">
                     <div class="form-grid">
                         <div class="form-group full-width">
                             <label>Domaine / Nom du Vin</label>
-                            <!-- AUTOCOMPLÉTION SUR MESURE -->
-                            <input type="text" id="domaine" required placeholder="Ex: Château Margaux">
+                            <!-- AUTOCOMPLÉTION SUR MESURE SANS CLAVIER PAR DEFAUT -->
+                            <input type="text" id="domaine" required placeholder="Ex: Château Margaux" autocomplete="off">
                             <div id="autocomplete-list" class="autocomplete-items"></div>
                         </div>
                         <div class="form-group">
                             <label>Région</label>
-                            <input type="text" id="region">
+                            <input type="text" id="region" autocomplete="off">
                         </div>
                         <div class="form-group">
                             <label>Millésime</label>
@@ -335,27 +336,21 @@
                 return;
             }
 
-            // Récupère les domaines uniques de ton stock
             const domainesUniques = [...new Set(wineInventory.map(w => w.domaine))];
-            
-            // Cherche les correspondances
             const matches = domainesUniques.filter(d => d.toLowerCase().includes(val.toLowerCase()));
 
             if (matches.length > 0) {
                 autocompleteList.style.display = 'block';
                 matches.forEach(match => {
                     const item = document.createElement('div');
-                    // Met en gras la partie tapée
                     const regex = new RegExp(`(${val})`, "gi");
                     item.innerHTML = match.replace(regex, "<strong>$1</strong>");
                     
-                    // Si on clique sur une suggestion
                     item.addEventListener('click', function() {
                         domaineInput.value = match;
                         autocompleteList.innerHTML = '';
                         autocompleteList.style.display = 'none';
                         
-                        // Déclenche le remplissage automatique du formulaire
                         const vinExistant = wineInventory.find(w => w.domaine === match);
                         if(vinExistant) {
                             document.getElementById('region').value = vinExistant.region || '';
@@ -379,7 +374,6 @@
             }
         });
 
-        // Ferme la liste si on clique ailleurs sur l'écran
         document.addEventListener('click', function(e) {
             if (e.target !== domaineInput) {
                 autocompleteList.style.display = 'none';
