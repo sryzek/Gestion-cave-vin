@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cave-a-vin-v1';
+const CACHE_NAME = 'cave-a-vin-v2'; // <-- C'est ce "v2" qui force la mise à jour
 const urlsToCache = [
     './',
     './index.html',
