@@ -76,11 +76,17 @@
         #form-section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 30px; border-left: 4px solid var(--primary-color); }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
-        .form-group { display: flex; flex-direction: column; }
+        .form-group { display: flex; flex-direction: column; position: relative; }
         .form-group.full-width { grid-column: 1 / -1; }
         .form-group label { margin-bottom: 5px; font-weight: bold; font-size: 13px; color: #444; }
         .form-group input, .form-group select { padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; }
         
+        /* STYLE DU MENU DEROULANT SUR MESURE */
+        .autocomplete-items { position: absolute; border: 1px solid var(--border-color); border-top: none; z-index: 99; top: 100%; left: 0; right: 0; background-color: #fff; max-height: 200px; overflow-y: auto; border-radius: 0 0 8px 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: none; }
+        .autocomplete-items div { padding: 12px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 14px; color: var(--text-main); }
+        .autocomplete-items div:hover { background-color: #f8f9fa; color: var(--primary-color); font-weight: bold; }
+        .autocomplete-items div strong { color: var(--primary-color); }
+
         .effervescent-options { display: none; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e1e4e8; margin-top: 5px; grid-column: 1 / -1; }
         .segmented-control { display: flex; border: 1px solid var(--primary-color); border-radius: 6px; overflow: hidden; margin-bottom: 10px; }
         .segmented-control label { flex: 1; text-align: center; padding: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--primary-color); background: white; margin: 0; }
@@ -182,14 +188,14 @@
 
         <section id="tab-arrivages" class="tab-content">
             <div id="form-section">
-                <h3 id="form-title" style="margin-bottom: 15px; color: var(--primary-color);">✍️ Saisir l'Arrivage</h3>
-                <form id="wine-form">
+                <h3 id="form-title" style="margin-bottom: 15px; color: var(--primary-color);">✍️️ Saisir l'Arrivage</h3>
+                <form id="wine-form" autocomplete="off">
                     <div class="form-grid">
                         <div class="form-group full-width">
                             <label>Domaine / Nom du Vin</label>
-                            <!-- AUTOCOMPLÉTION LIEE A LA DATALIST -->
-                            <input type="text" id="domaine" required placeholder="Ex: Château Margaux" list="domaines-list">
-                            <datalist id="domaines-list"></datalist>
+                            <!-- AUTOCOMPLÉTION SUR MESURE -->
+                            <input type="text" id="domaine" required placeholder="Ex: Château Margaux">
+                            <div id="autocomplete-list" class="autocomplete-items"></div>
                         </div>
                         <div class="form-group">
                             <label>Région</label>
@@ -315,35 +321,68 @@
         let pickingWineId = null;
 
         // ==========================================
-        // AUTOCOMPLÉTION & CLONAGE
+        // LE MOTEUR D'AUTOCOMPLÉTION SUR MESURE
         // ==========================================
-        function updateDatalist() {
-            const dataList = document.getElementById('domaines-list');
-            dataList.innerHTML = '';
-            const domainesUniques = [...new Set(wineInventory.map(w => w.domaine))];
-            domainesUniques.forEach(d => {
-                const option = document.createElement('option');
-                option.value = d;
-                dataList.appendChild(option);
-            });
-        }
+        const domaineInput = document.getElementById('domaine');
+        const autocompleteList = document.getElementById('autocomplete-list');
 
-        document.getElementById('domaine').addEventListener('input', (e) => {
-            const nomSaisi = e.target.value;
-            const vinExistant = wineInventory.find(w => w.domaine === nomSaisi);
-            if(vinExistant) {
-                document.getElementById('region').value = vinExistant.region || '';
-                document.getElementById('couleur').value = vinExistant.couleur || 'Rouge';
-                document.getElementById('envergure').value = vinExistant.envergure || 'Détente';
-                document.getElementById('profil').value = vinExistant.profil || 'Fruité/Vif';
-                
-                if (vinExistant.couleur === 'Effervescent') {
-                    document.getElementById('effervescent-options').style.display = 'block';
-                    if (vinExistant.eff_color) document.querySelector(`input[name="eff_color"][value="${vinExistant.eff_color}"]`).checked = true;
-                    if (vinExistant.eff_type) document.querySelector(`input[name="eff_type"][value="${vinExistant.eff_type}"]`).checked = true;
-                } else {
-                    document.getElementById('effervescent-options').style.display = 'none';
-                }
+        domaineInput.addEventListener('input', function() {
+            const val = this.value;
+            autocompleteList.innerHTML = '';
+            
+            if (!val) {
+                autocompleteList.style.display = 'none';
+                return;
+            }
+
+            // Récupère les domaines uniques de ton stock
+            const domainesUniques = [...new Set(wineInventory.map(w => w.domaine))];
+            
+            // Cherche les correspondances
+            const matches = domainesUniques.filter(d => d.toLowerCase().includes(val.toLowerCase()));
+
+            if (matches.length > 0) {
+                autocompleteList.style.display = 'block';
+                matches.forEach(match => {
+                    const item = document.createElement('div');
+                    // Met en gras la partie tapée
+                    const regex = new RegExp(`(${val})`, "gi");
+                    item.innerHTML = match.replace(regex, "<strong>$1</strong>");
+                    
+                    // Si on clique sur une suggestion
+                    item.addEventListener('click', function() {
+                        domaineInput.value = match;
+                        autocompleteList.innerHTML = '';
+                        autocompleteList.style.display = 'none';
+                        
+                        // Déclenche le remplissage automatique du formulaire
+                        const vinExistant = wineInventory.find(w => w.domaine === match);
+                        if(vinExistant) {
+                            document.getElementById('region').value = vinExistant.region || '';
+                            document.getElementById('couleur').value = vinExistant.couleur || 'Rouge';
+                            document.getElementById('envergure').value = vinExistant.envergure || 'Détente';
+                            document.getElementById('profil').value = vinExistant.profil || 'Fruité/Vif';
+                            
+                            if (vinExistant.couleur === 'Effervescent') {
+                                document.getElementById('effervescent-options').style.display = 'block';
+                                if (vinExistant.eff_color) document.querySelector(`input[name="eff_color"][value="${vinExistant.eff_color}"]`).checked = true;
+                                if (vinExistant.eff_type) document.querySelector(`input[name="eff_type"][value="${vinExistant.eff_type}"]`).checked = true;
+                            } else {
+                                document.getElementById('effervescent-options').style.display = 'none';
+                            }
+                        }
+                    });
+                    autocompleteList.appendChild(item);
+                });
+            } else {
+                autocompleteList.style.display = 'none';
+            }
+        });
+
+        // Ferme la liste si on clique ailleurs sur l'écran
+        document.addEventListener('click', function(e) {
+            if (e.target !== domaineInput) {
+                autocompleteList.style.display = 'none';
             }
         });
 
@@ -610,7 +649,6 @@
 
             wineInventory.push(newWine);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
-            updateDatalist();
 
             document.getElementById('wine-form').reset();
             document.getElementById('effervescent-options').style.display = 'none';
@@ -642,7 +680,6 @@
                 if (wine.emplacements.length === 0) {
                     wineInventory = wineInventory.filter(w => w.id !== pickingWineId);
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
-                    updateDatalist();
                     fermerPicking(); 
                 } else {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
@@ -767,7 +804,7 @@
                     </div>
                     <div style="display:flex; gap:10px; margin-top:10px;">
                         <button class="btn-info" onclick="clonerVin('${wine.id}')" style="flex:1; padding:6px; font-size:12px;">🔄 Cloner</button>
-                        <button class="btn-danger" style="flex:1; padding:6px; font-size:12px;" onclick="if(confirm('Tout supprimer ?')){ wineInventory = wineInventory.filter(w => w.id !== '${wine.id}'); localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory)); updateDatalist(); renderMaCave(); }">🗑️ Supprimer</button>
+                        <button class="btn-danger" style="flex:1; padding:6px; font-size:12px;" onclick="if(confirm('Tout supprimer ?')){ wineInventory = wineInventory.filter(w => w.id !== '${wine.id}'); localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory)); renderMaCave(); }">🗑️ Supprimer</button>
                     </div>
                 `;
                 list.appendChild(item);
@@ -775,7 +812,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            updateDatalist();
             renderCellar('cave-visuelle-ranger', 'arrivages');
             renderDeboucher();
         });
