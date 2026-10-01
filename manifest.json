@@ -1,0 +1,16 @@
+{
+  "name": "Ma Cave à Vin",
+  "short_name": "Ma Cave",
+  "description": "Système de gestion WMS pour la cave",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f6f8",
+  "theme_color": "#722F37",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
