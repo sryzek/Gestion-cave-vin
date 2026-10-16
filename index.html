@@ -81,7 +81,6 @@
         .form-group label { margin-bottom: 5px; font-weight: bold; font-size: 13px; color: #444; }
         .form-group input, .form-group select { padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; }
         
-        /* STYLE DU MENU DEROULANT SUR MESURE */
         .autocomplete-items { position: absolute; border: 1px solid var(--border-color); border-top: none; z-index: 99; top: 100%; left: 0; right: 0; background-color: #fff; max-height: 200px; overflow-y: auto; border-radius: 0 0 8px 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: none; }
         .autocomplete-items div { padding: 12px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 14px; color: var(--text-main); }
         .autocomplete-items div:hover { background-color: #f8f9fa; color: var(--primary-color); font-weight: bold; }
@@ -132,8 +131,7 @@
 <body>
 
     <header>
-        <!-- MARQUEUR VISUEL DE VERSION V4 ICI -->
-        <h1>🍷 Ma Cave <span style="font-size: 10px; opacity: 0.7;">v4</span></h1>
+        <h1>🍷 Ma Cave <span style="font-size: 10px; opacity: 0.7;">v5</span></h1>
         <div class="header-actions">
             <button class="header-btn" onclick="exporterJSON()" title="Sauvegarder">💾</button>
             <button class="header-btn" onclick="document.getElementById('import-file').click()" title="Restaurer">📂</button>
@@ -194,7 +192,6 @@
                     <div class="form-grid">
                         <div class="form-group full-width">
                             <label>Domaine / Nom du Vin</label>
-                            <!-- AUTOCOMPLÉTION SUR MESURE SANS CLAVIER PAR DEFAUT -->
                             <input type="text" id="domaine" required placeholder="Ex: Château Margaux" autocomplete="off">
                             <div id="autocomplete-list" class="autocomplete-items"></div>
                         </div>
@@ -310,20 +307,19 @@
         let wineInventory = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
         const CURRENT_YEAR = 2026;
 
+        // TOPOLOGIE MODIFIÉE : Le bloc esc_vrac devient de type "extensible"
         const topologie = [];
         for (let i = 10; i >= 1; i--) {
             topologie.push({ id: `g_e${i}_d`, nom: `Étage ${i} D`, type: "grille", capacite: 5, groupe: "Garage", etage: i });
             topologie.push({ id: `g_e${i}_g`, nom: `Étage ${i} G`, type: "grille", capacite: 5, groupe: "Garage", etage: i });
         }
         topologie.push({ id: "esc_casier", nom: "Casier escalier", type: "grille", capacite: 12, groupe: "Sous l'escalier" });
-        topologie.push({ id: "esc_vrac", nom: "Caisse escalier", type: "grille", capacite: 24, groupe: "Sous l'escalier" });
+        topologie.push({ id: "esc_vrac", nom: "Caisse escalier (Vrac)", type: "extensible", baseCapacite: 15, groupe: "Sous l'escalier" });
 
         let pendingSlots = [];
         let pickingWineId = null;
 
-        // ==========================================
-        // LE MOTEUR D'AUTOCOMPLÉTION SUR MESURE
-        // ==========================================
+        // AUTOCOMPLÉTION
         const domaineInput = document.getElementById('domaine');
         const autocompleteList = document.getElementById('autocomplete-list');
 
@@ -406,9 +402,7 @@
             window.scrollTo(0, 0);
         }
 
-        // ==========================================
-        // RESTE DU CODE (WMS, Export, etc.)
-        // ==========================================
+        // MOTEUR D'APOGEE
         function calculerMaturite(wine) {
             if (!wine.millesime) return { statut: 'inconnu', icone: '' };
             const age = CURRENT_YEAR - parseInt(wine.millesime, 10);
@@ -570,10 +564,12 @@
             return occupees;
         }
 
+        // GENERATION DES SLOTS AVEC GESTION DU VRAC INFINI
         function getOrderedSlots() {
             let slots = [];
             topologie.forEach(bloc => {
-                for(let p=1; p<=bloc.capacite; p++) slots.push(`${bloc.id}_pos_${p}`);
+                let cap = bloc.type === 'extensible' ? 1000 : bloc.capacite;
+                for(let p=1; p<=cap; p++) slots.push(`${bloc.id}_pos_${p}`);
             });
             return slots;
         }
@@ -725,6 +721,7 @@
             escBlocs.forEach(bloc => ce.appendChild(creerHTMLBloc(bloc, mode, mapEmplacements)));
         }
 
+        // MOTEUR D'AFFICHAGE AVEC GESTION DE LA ZONE EXTENSIBLE
         function creerHTMLBloc(bloc, mode, mapEmplacements) {
             const divBloc = document.createElement('div');
             divBloc.className = `bloc`;
@@ -732,7 +729,29 @@
             const grille = document.createElement('div');
             grille.className = `grille-vins`; 
 
-            for (let i = 1; i <= bloc.capacite; i++) {
+            // Calcul du nombre de cases à afficher (Fixe ou Extensible)
+            let nbCases = bloc.capacite;
+            if (bloc.type === 'extensible') {
+                let maxPos = 0;
+                // Trouver la bouteille la plus "loin" stockée
+                Object.keys(mapEmplacements).forEach(slotId => {
+                    if (slotId.startsWith(bloc.id + '_pos_')) {
+                        let pos = parseInt(slotId.split('_pos_')[1]);
+                        if (pos > maxPos) maxPos = pos;
+                    }
+                });
+                // Prendre en compte les réservations en cours
+                pendingSlots.forEach(slotId => {
+                    if (slotId.startsWith(bloc.id + '_pos_')) {
+                        let pos = parseInt(slotId.split('_pos_')[1]);
+                        if (pos > maxPos) maxPos = pos;
+                    }
+                });
+                // Affiche la capacité de base (15), ou s'adapte en ajoutant 5 trous vides après la dernière bouteille
+                nbCases = Math.max(bloc.baseCapacite, maxPos + (mode === 'arrivages' ? 5 : 0));
+            }
+
+            for (let i = 1; i <= nbCases; i++) {
                 const slotId = `${bloc.id}_pos_${i}`;
                 const caseDiv = document.createElement('div');
                 const vinOccupe = mapEmplacements[slotId];
