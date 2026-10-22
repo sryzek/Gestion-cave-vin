@@ -139,7 +139,7 @@
 <body>
 
     <header>
-        <h1>🍷 Ma Cave <span style="font-size: 10px; opacity: 0.7;">v6</span></h1>
+        <h1>🍷 Ma Cave <span style="font-size: 10px; opacity: 0.7;">v6.1</span></h1>
         <div class="header-actions">
             <button class="header-btn" onclick="exporterJSON()" title="Sauvegarder">💾</button>
             <button class="header-btn" onclick="document.getElementById('import-file').click()" title="Restaurer">📂</button>
@@ -159,13 +159,15 @@
                 <div class="carousel" id="sommelier-carousel"></div>
                 
                 <div class="filter-section">
-                    <!-- NOUVEAU : Accords Mets & Vins -->
+                    <!-- Accords Mets & Vins -->
                     <div class="filter-group">
                         <div class="filter-title" style="color: #e67e22;">🍽️ Qu'est-ce qu'on mange ? (Accords Mets & Vins)</div>
                         <div class="chips-container" id="filter-mets">
-                            <div class="chip" onclick="toggleFilterMets('ViandeRouge', this)">🥩 Viande Rouge</div>
+                            <div class="chip" onclick="toggleFilterMets('ViandeRougeLegere', this)">🥩 Viande Rouge (Grillade)</div>
+                            <div class="chip" onclick="toggleFilterMets('Gibier', this)">🐗 Gibier / En Sauce</div>
                             <div class="chip" onclick="toggleFilterMets('Volaille', this)">🍗 Volaille / V. Blanche</div>
                             <div class="chip" onclick="toggleFilterMets('Poisson', this)">🐟 Poisson / Crustacés</div>
+                            <div class="chip" onclick="toggleFilterMets('Fromage', this)">🧀 Fromages</div>
                             <div class="chip" onclick="toggleFilterMets('Aperitif', this)">🫒 Apéritif</div>
                             <div class="chip" onclick="toggleFilterMets('Dessert', this)">🍰 Dessert</div>
                         </div>
@@ -192,6 +194,7 @@
                         <div class="chips-container" id="filter-profil">
                             <div class="chip" onclick="toggleFilter('profil', 'Fruité/Vif', this)">🍇 Léger / Vif</div>
                             <div class="chip" onclick="toggleFilter('profil', 'Puissant/Rond', this)">🥩 Puissant / Rond</div>
+                            <div class="chip" onclick="toggleFilter('profil', 'Moelleux/Liquoreux', this)">🍯 Moelleux / Liquoreux</div>
                         </div>
                     </div>
                 </div>
@@ -266,6 +269,7 @@
                             <select id="profil">
                                 <option value="Fruité/Vif">🍇 Léger / Fruité / Vif</option>
                                 <option value="Puissant/Rond">🥩 Puissant / Structuré / Rond</option>
+                                <option value="Moelleux/Liquoreux">🍯 Moelleux / Liquoreux / Muté</option>
                             </select>
                         </div>
                         <div class="form-group full-width">
@@ -469,7 +473,6 @@
         function exporterJSON() {
             if (wineInventory.length === 0 && wineHistory.length === 0) return alert("Cave et Archives vides !");
             
-            // Nouveau format d'export incluant l'historique
             const exportData = {
                 version: "v6",
                 date: new Date().toISOString(),
@@ -494,7 +497,6 @@
                     const importedData = JSON.parse(e.target.result);
                     
                     if (Array.isArray(importedData)) {
-                        // Rétrocompatibilité : Ancien format V5 (juste un tableau d'inventaire)
                         if(confirm(`(Format V5 détecté) Écraser la cave actuelle ? (${importedData.length} références trouvées)`)) {
                             wineInventory = importedData;
                             localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
@@ -502,7 +504,6 @@
                             location.reload(); 
                         }
                     } else if (importedData.inventory && Array.isArray(importedData.inventory)) {
-                        // Nouveau format V6
                         if(confirm(`Écraser la cave actuelle et les archives ? (${importedData.inventory.length} en cave, ${importedData.history ? importedData.history.length : 0} en archives)`)) {
                             wineInventory = importedData.inventory;
                             wineHistory = importedData.history || [];
@@ -533,10 +534,7 @@
             if (tabId === 'archives') renderArchives();
         }
 
-        // --- GESTION DES FILTRES ET ACCORDS METS & VINS ---
-
         function toggleFilterMets(metId, element) {
-            // Désactiver les filtres manuels pour éviter les conflits si on active un plat
             if (activeFilters.mets !== metId) {
                 activeFilters.couleur = null;
                 activeFilters.envergure = null;
@@ -556,7 +554,6 @@
         }
 
         function toggleFilter(category, value, element) {
-            // Si on utilise un filtre manuel, on désactive le filtre Mets
             if (activeFilters.mets !== null) {
                 activeFilters.mets = null;
                 document.querySelectorAll('#filter-mets .chip').forEach(c => c.classList.remove('mets-active'));
@@ -576,7 +573,10 @@
         function testAccordMets(wine, metType) {
             if (!metType) return true;
             
-            if (metType === 'ViandeRouge') {
+            if (metType === 'ViandeRougeLegere') {
+                return (wine.couleur === 'Rouge' && wine.profil === 'Fruité/Vif');
+            }
+            if (metType === 'Gibier') {
                 return (wine.couleur === 'Rouge' && wine.profil === 'Puissant/Rond');
             }
             if (metType === 'Volaille') {
@@ -586,13 +586,17 @@
             if (metType === 'Poisson') {
                 return (wine.couleur === 'Blanc' && wine.profil === 'Fruité/Vif');
             }
+            if (metType === 'Fromage') {
+                return (wine.couleur === 'Rouge' && wine.profil === 'Puissant/Rond');
+            }
             if (metType === 'Aperitif') {
                 return wine.couleur === 'Rosé' || 
                        (wine.couleur === 'Effervescent' && wine.eff_type === 'Brut') || 
-                       (wine.couleur === 'Blanc' && wine.profil === 'Fruité/Vif');
+                       (wine.couleur === 'Blanc' && wine.profil === 'Fruité/Vif') ||
+                       (wine.profil === 'Moelleux/Liquoreux');
             }
             if (metType === 'Dessert') {
-                return (wine.couleur === 'Effervescent' && wine.eff_type === 'Demi-sec');
+                return wine.couleur === 'Effervescent' || wine.profil === 'Moelleux/Liquoreux';
             }
             return false;
         }
@@ -619,7 +623,6 @@
                 
                 let match = true;
                 
-                // Si filtre Mets est actif, il surcharge les filtres classiques
                 if (activeFilters.mets) {
                     match = testAccordMets(wine, activeFilters.mets);
                 } else {
@@ -688,7 +691,6 @@
             return occupees;
         }
 
-        // GENERATION DES SLOTS AVEC GESTION DU VRAC INFINI
         function getOrderedSlots() {
             let slots = [];
             topologie.forEach(bloc => {
@@ -790,7 +792,6 @@
 
             if (confirm("Confirmer la sortie de cette bouteille ?\nL'emplacement sera libéré et la bouteille passera dans les Archives.")) {
                 
-                // --- AJOUT DANS L'HISTORIQUE ---
                 const archiveEntry = {
                     ...wine,
                     idArchive: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 5),
@@ -798,11 +799,10 @@
                     note: 0,
                     commentaire: ""
                 };
-                delete archiveEntry.emplacements; // L'archive n'a plus d'emplacement
+                delete archiveEntry.emplacements; 
                 
-                wineHistory.unshift(archiveEntry); // Ajout au début du tableau (le plus récent en premier)
+                wineHistory.unshift(archiveEntry); 
                 localStorage.setItem(HISTORY_KEY, JSON.stringify(wineHistory));
-                // -------------------------------
 
                 wine.emplacements = wine.emplacements.filter(e => e !== slotId);
                 
@@ -923,7 +923,6 @@
             return divBloc;
         }
 
-        // --- MOTEUR DE RECHERCHE INVENTAIRE ---
         document.getElementById('search-cave').addEventListener('input', renderMaCave);
 
         function renderMaCave() {
@@ -933,7 +932,6 @@
             
             let filteredInventory = [...wineInventory];
 
-            // Filtrage par la barre de recherche
             if (searchInput !== '') {
                 filteredInventory = filteredInventory.filter(w => {
                     const searchStr = `${w.domaine} ${w.region} ${w.millesime} ${w.couleur}`.toLowerCase();
@@ -941,10 +939,8 @@
                 });
             }
 
-            // Tri par ordre alphabétique du domaine
             filteredInventory.sort((a,b) => a.domaine.localeCompare(b.domaine));
 
-            // Mise à jour des KPI affichés
             const totalBottles = filteredInventory.reduce((sum, w) => sum + w.emplacements.length, 0);
             document.getElementById('kpi-total').innerText = totalBottles;
             document.getElementById('kpi-refs').innerText = filteredInventory.length;
@@ -981,7 +977,6 @@
             });
         }
 
-        // --- ARCHIVES & NOTES ---
         function renderArchives() {
             const list = document.getElementById('archives-list');
             list.innerHTML = '';
@@ -997,7 +992,6 @@
                 
                 const dateFormatee = new Date(archive.dateSortie).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
 
-                // Génération des étoiles
                 let starsHtml = '';
                 for (let i = 1; i <= 5; i++) {
                     let activeClass = (i <= archive.note) ? 'active' : '';
@@ -1043,12 +1037,10 @@
             if (!archive) return;
 
             if (confirm(`Voulez-vous vraiment annuler la sortie de : ${archive.domaine} ?\nCela vous redirigera vers les arrivages pour lui redonner une place.`)) {
-                // 1. Supprimer de l'historique
                 wineHistory = wineHistory.filter(a => a.idArchive !== idArchive);
                 localStorage.setItem(HISTORY_KEY, JSON.stringify(wineHistory));
                 
-                // 2. Préparer le formulaire d'arrivage
-                document.querySelectorAll('.nav-item')[1].click(); // Go to Arrivages
+                document.querySelectorAll('.nav-item')[1].click();
                 preRemplirFormulaire(archive);
                 document.getElementById('quantite').value = 1;
                 
