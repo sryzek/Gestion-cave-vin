@@ -111,7 +111,7 @@
         
         .grille-vins { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; justify-items: center; }
         
-        /* Ajout sécurité anti-sélection pour le Long Press tactile */
+        /* Protection pour le touch and slide */
         .case-grille, .pastille { 
             user-select: none; 
             -webkit-user-select: none; 
@@ -147,6 +147,25 @@
         .vin-row { padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; font-size: 14px; }
         .vin-row:active { background-color: #f1f1f1; }
         .date-maj-banner { background-color: #fff3cd; color: #856404; padding: 8px 15px; font-size: 12px; text-align: center; border-bottom: 1px solid #ffeeba; margin-bottom: 15px; border-radius: 6px; font-weight: bold; }
+
+        /* Le tooltip flottant de l'inventaire */
+        .tooltip-flottant {
+            position: fixed;
+            background: rgba(30, 39, 46, 0.95);
+            color: #fff;
+            padding: 12px 15px;
+            border-radius: 10px;
+            font-size: 13px;
+            pointer-events: none; /* Crucial pour que le doigt lise ce qu'il y a en dessous */
+            z-index: 3000;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+            transform: translate(-50%, -100%);
+            display: none;
+            width: 220px;
+            text-align: center;
+            line-height: 1.4;
+            border: 1px solid #576574;
+        }
 
         @keyframes pulseJaune { 0% { box-shadow: 0 0 0 0 rgba(241, 196, 15, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(241, 196, 15, 0); } 100% { box-shadow: 0 0 0 0 rgba(241, 196, 15, 0); } }
         @keyframes pulseBleu { 0% { box-shadow: 0 0 0 0 rgba(9, 132, 227, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(9, 132, 227, 0); } 100% { box-shadow: 0 0 0 0 rgba(9, 132, 227, 0); } }
@@ -197,7 +216,7 @@
     </div>
 
     <header>
-        <h1>🍷 Ma Cave <span style="font-size: 10px; opacity: 0.7;">v6.6.0</span></h1>
+        <h1>🍷 Ma Cave <span style="font-size: 10px; opacity: 0.7;">v6.7.0</span></h1>
         <div class="header-actions">
             <button class="header-btn" onclick="configurerIA()" title="Configuration IA (Clé API Gemini)">⚙️</button>
             <button class="header-btn" onclick="exporterJSON()" title="Sauvegarder">💾</button>
@@ -459,7 +478,10 @@
         <section id="tab-inventaire" class="tab-content">
             <div style="max-width: 800px; margin: 0 auto; text-align: center; margin-bottom: 20px;">
                 <h2 style="color: var(--primary-color); margin-bottom: 10px;">📋 Pointage Inventaire</h2>
-                <p style="font-size: 13px; color: #555;">Appui court = Valider/Vider la case.<br>Appui long = Voir les détails du vin.</p>
+                <p style="font-size: 13px; color: #555;">
+                    👆 <strong>Clic court</strong> : Action (Valider / Vider / Remplacer)<br>
+                    👆〰️ <strong>Appui maintenu + Glisser</strong> : Inspecter le contenu des cases
+                </p>
             </div>
             <div id="cave-visuelle-inventaire" class="cave-container active-placement"></div>
         </section>
@@ -474,7 +496,10 @@
         <button class="nav-item" onclick="switchTab('inventaire', this)"><span class="nav-icon">📋</span><span>Inventaire</span></button>
     </nav>
 
-    <!-- MODALES POUR L'INVENTAIRE TACTILE -->
+    <!-- TOOLTIP FLOTTANT (DRAG TO INSPECT) -->
+    <div id="tooltip-inventaire" class="tooltip-flottant"></div>
+
+    <!-- MODALES D'ACTION INVENTAIRE (CLIC COURT) -->
     <div id="modal-inventaire" class="modal-overlay" style="display: none;">
         <div class="modal-content tactile-modal">
             <h3 id="modal-inv-titre">Emplacement</h3>
@@ -498,25 +523,6 @@
         </div>
     </div>
 
-    <!-- NOUVELLE MODALE : DÉTAIL DU VIN (TOOLTIP APPUI LONG) -->
-    <div id="modal-detail-vin" class="modal-overlay" style="display: none;">
-        <div class="modal-content tactile-modal" style="text-align: left;">
-            <h3 id="detail-titre" style="margin-bottom: 5px; color: var(--primary-color); font-size: 18px;">Domaine</h3>
-            <p id="detail-region" style="font-weight: bold; color: #555; font-size: 14px; margin-bottom: 15px;">Région - Millésime</p>
-            
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; font-size: 14px; margin-bottom: 15px; border: 1px solid #eee; line-height: 1.6;">
-                <div><strong>🍷 Robe :</strong> <span id="detail-couleur"></span></div>
-                <div><strong>📅 Envergure :</strong> <span id="detail-envergure"></span></div>
-                <div><strong>👅 Profil :</strong> <span id="detail-profil"></span></div>
-                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #ddd;">
-                    <strong>📦 Stock total :</strong> <span id="detail-stock" style="font-weight:bold; color:var(--primary-color);"></span>
-                </div>
-            </div>
-            
-            <button class="btn-tactile btn-gris" onclick="fermerModal('modal-detail-vin')">Fermer</button>
-        </div>
-    </div>
-
     <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importerJSON(event)">
 
     <script>
@@ -535,10 +541,6 @@
         let wineHistory = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
         let sessionInventaire = []; 
         const CURRENT_YEAR = 2026;
-
-        // Variables pour la détection du Long Press tactile
-        let invPressTimer;
-        let invLongPressFired = false;
 
         function saveToLocalStorage(overrideDate = null) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
@@ -782,7 +784,7 @@
 
         function exporterJSON() {
             const exportDate = new Date().toISOString();
-            const exportData = { version: "v6.6.0", date: exportDate, inventory: wineInventory, history: wineHistory };
+            const exportData = { version: "v6.7.0", date: exportDate, inventory: wineInventory, history: wineHistory };
             const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
             const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
             a.download = `ma_cave_ryzek_complete_${exportDate.slice(0,10)}.json`;
@@ -982,7 +984,7 @@
                 newWine.eff_type = document.querySelector('input[name="eff_type"]:checked').value;
             }
             wineInventory.push(newWine);
-            saveToLocalStorage();
+            saveToLocalStorage(); 
             document.getElementById('wine-form').reset();
             document.getElementById('effervescent-options').style.display = 'none';
             annulerAllocation(); 
@@ -1052,22 +1054,6 @@
                 document.getElementById('modal-inv-vin').textContent = "Actuellement : Vide";
             }
             document.getElementById('modal-inventaire').style.display = 'flex';
-        }
-
-        function ouvrirModalDetailVin(vinId) {
-            const wine = wineInventory.find(w => w.id === vinId);
-            if (!wine) return;
-            
-            document.getElementById('detail-titre').textContent = wine.domaine;
-            document.getElementById('detail-region').textContent = `${wine.millesime || 'NV'} - ${wine.region || 'Région NC'}`;
-            
-            let infosSupp = (wine.couleur === 'Effervescent' && wine.eff_color) ? ` (${wine.eff_color} ${wine.eff_type})` : "";
-            document.getElementById('detail-couleur').textContent = wine.couleur + infosSupp;
-            document.getElementById('detail-envergure').textContent = wine.envergure || 'N/A';
-            document.getElementById('detail-profil').textContent = wine.profil || 'N/A';
-            document.getElementById('detail-stock').textContent = wine.emplacements.length + " btl(s)";
-            
-            document.getElementById('modal-detail-vin').style.display = 'flex';
         }
 
         function invValider() {
@@ -1154,6 +1140,116 @@
         function fermerModal(id) { document.getElementById(id).style.display = 'none'; }
 
         // ------------------------------------
+        // INITIALISATION DES ÉVÉNEMENTS TACTILES GLOBAUX POUR L'INVENTAIRE
+        // ------------------------------------
+        let invTooltipTimer;
+        let isInvInspecting = false;
+        let invStartX = 0;
+        let invStartY = 0;
+
+        function initInventoryTouchLogic() {
+            const container = document.getElementById('cave-visuelle-inventaire');
+            if(!container) return;
+
+            function updateTooltip(x, y) {
+                const elem = document.elementFromPoint(x, y);
+                if (!elem) return;
+                const target = elem.closest('.case-grille, .pastille');
+                const tooltip = document.getElementById('tooltip-inventaire');
+
+                if (target && target.hasAttribute('data-slot-id')) {
+                    const vinId = target.getAttribute('data-vin-id');
+                    const slotId = target.getAttribute('data-slot-id');
+                    const slotName = slotId.replace(/_/g, ' ').replace('pos', 'N°');
+
+                    if (vinId && vinId !== "null" && vinId !== "") {
+                        const vin = wineInventory.find(w => w.id === vinId);
+                        if(vin) {
+                            tooltip.innerHTML = `<strong style="color:#f1c40f; font-size:14px;">${vin.domaine}</strong><br><span style="font-size:12px;">${vin.millesime || 'NV'} - ${vin.couleur}</span><br><span style="font-size:11px; color:#95a5a6; margin-top:6px; display:block;">${slotName}</span>`;
+                        }
+                    } else {
+                        tooltip.innerHTML = `<strong style="color:#bdc3c7; font-size:14px;">Emplacement Vide</strong><br><span style="font-size:11px; color:#95a5a6; margin-top:6px; display:block;">${slotName}</span>`;
+                    }
+                    
+                    tooltip.style.left = x + 'px';
+                    tooltip.style.top = (y - 15) + 'px';
+                    tooltip.style.display = 'block';
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            }
+
+            // Tactile (Téléphone/Tablette)
+            container.addEventListener('touchstart', (e) => {
+                invStartX = e.touches[0].clientX;
+                invStartY = e.touches[0].clientY;
+                isInvInspecting = false;
+                
+                invTooltipTimer = setTimeout(() => {
+                    isInvInspecting = true;
+                    if (navigator.vibrate) navigator.vibrate(40);
+                    updateTooltip(e.touches[0].clientX, e.touches[0].clientY);
+                }, 300); // 300ms sans bouger déclenche l'inspection
+            }, {passive: true});
+
+            container.addEventListener('touchmove', (e) => {
+                if (isInvInspecting) {
+                    e.preventDefault(); // Coupe le scroll
+                    updateTooltip(e.touches[0].clientX, e.touches[0].clientY);
+                } else {
+                    if (Math.abs(e.touches[0].clientY - invStartY) > 10 || Math.abs(e.touches[0].clientX - invStartX) > 10) {
+                        clearTimeout(invTooltipTimer);
+                    }
+                }
+            }, {passive: false});
+
+            container.addEventListener('touchend', (e) => {
+                clearTimeout(invTooltipTimer);
+                document.getElementById('tooltip-inventaire').style.display = 'none';
+
+                if (!isInvInspecting) {
+                    const touch = e.changedTouches[0];
+                    const elem = document.elementFromPoint(touch.clientX, touch.clientY);
+                    if(elem) {
+                        const target = elem.closest('.case-grille, .pastille');
+                        if (target && target.hasAttribute('data-slot-id')) {
+                            const slotId = target.getAttribute('data-slot-id');
+                            const vinId = target.getAttribute('data-vin-id');
+                            ouvrirModalInventaire(slotId, (vinId && vinId !== "null" && vinId !== "") ? vinId : null);
+                        }
+                    }
+                }
+                isInvInspecting = false;
+            });
+
+            // Souris (PC - pour tes tests)
+            container.addEventListener('mousedown', (e) => {
+                invStartX = e.clientX; invStartY = e.clientY;
+                isInvInspecting = false;
+                invTooltipTimer = setTimeout(() => {
+                    isInvInspecting = true;
+                    updateTooltip(e.clientX, e.clientY);
+                }, 300);
+            });
+            container.addEventListener('mousemove', (e) => {
+                if (isInvInspecting) { e.preventDefault(); updateTooltip(e.clientX, e.clientY); } 
+                else if (Math.abs(e.clientY - invStartY) > 10 || Math.abs(e.clientX - invStartX) > 10) clearTimeout(invTooltipTimer);
+            });
+            container.addEventListener('mouseup', (e) => {
+                clearTimeout(invTooltipTimer);
+                document.getElementById('tooltip-inventaire').style.display = 'none';
+                if (!isInvInspecting) {
+                    const target = e.target.closest('.case-grille, .pastille');
+                    if (target && target.hasAttribute('data-slot-id')) {
+                        const vinId = target.getAttribute('data-vin-id');
+                        ouvrirModalInventaire(target.getAttribute('data-slot-id'), (vinId && vinId !== "null" && vinId !== "") ? vinId : null);
+                    }
+                }
+                isInvInspecting = false;
+            });
+        }
+
+        // ------------------------------------
         function renderCellar(containerId, mode) {
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -1232,41 +1328,10 @@
                     }
                     if(estVerifie) caseDiv.innerHTML = '✓';
                     
-                    // Bloque le menu contextuel natif (clic droit ou long press natif)
-                    caseDiv.oncontextmenu = (e) => e.preventDefault();
-
-                    const startPress = (e) => {
-                        invLongPressFired = false;
-                        invPressTimer = setTimeout(() => {
-                            invLongPressFired = true;
-                            if (navigator.vibrate) navigator.vibrate(50); // Retour haptique
-                            if (vinOccupe) {
-                                ouvrirModalDetailVin(vinOccupe.id);
-                            }
-                        }, 600); // 600ms = Appui Long
-                    };
-
-                    const endPress = (e) => {
-                        clearTimeout(invPressTimer);
-                        if (!invLongPressFired) {
-                            e.preventDefault(); // Evite le double clic si on est sur mobile
-                            ouvrirModalInventaire(slotId, vinOccupe ? vinOccupe.id : null);
-                        }
-                    };
-
-                    const cancelPress = () => {
-                        clearTimeout(invPressTimer);
-                    };
-
-                    // Events Tactiles (Smartphone / Tablette)
-                    caseDiv.ontouchstart = startPress;
-                    caseDiv.ontouchend = endPress;
-                    caseDiv.ontouchmove = cancelPress;
-                    
-                    // Events Souris (PC)
-                    caseDiv.onmousedown = startPress;
-                    caseDiv.onmouseup = endPress;
-                    caseDiv.onmouseleave = cancelPress;
+                    // On injecte les datas pour le tooltip flottant
+                    caseDiv.setAttribute('data-slot-id', slotId);
+                    caseDiv.setAttribute('data-vin-id', vinOccupe ? vinOccupe.id : '');
+                    caseDiv.oncontextmenu = (e) => e.preventDefault(); // Bloque le clic droit natif
                 }
                 
                 grille.appendChild(caseDiv);
@@ -1429,6 +1494,7 @@
             afficherDateMaj();
             renderCellar('cave-visuelle-ranger', 'arrivages');
             renderMaCave(); 
+            initInventoryTouchLogic(); // Initialisation des événements "Drag to Inspect"
         });
     </script>
 </body>
