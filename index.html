@@ -35,8 +35,8 @@
         
         header { background: var(--primary-color); color: white; padding: 15px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
         header h1 { font-size: 20px; font-weight: 600; margin: 0; }
-        .header-actions { display: flex; gap: 10px; }
-        .header-btn { background: rgba(255, 255, 255, 0.2); border: none; color: white; font-size: 16px; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
+        .header-actions { display: flex; gap: 8px; }
+        .header-btn { background: rgba(255, 255, 255, 0.2); border: none; color: white; font-size: 16px; padding: 8px 10px; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
 
         .tab-content { display: none; padding: 20px; max-width: 1200px; margin: 0 auto; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
@@ -111,7 +111,6 @@
         
         .grille-vins { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; justify-items: center; }
         
-        /* Protection pour le touch and slide */
         .case-grille, .pastille { 
             user-select: none; 
             -webkit-user-select: none; 
@@ -131,7 +130,6 @@
         .pastille.bleue { background: var(--picking-color); color: #fff; border: 2px solid #fff; animation: pulseBleu 1.5s infinite; cursor: pointer; }
         .pastille.grise { background: #bdc3c7; border: 2px solid #ecf0f1; opacity: 0.4; }
 
-        /* Styles Spécifiques Inventaire Tactile */
         .pastille.verifie { border: 2px solid #28a745; box-shadow: 0 0 8px rgba(40, 167, 69, 0.6); color: #fff; text-shadow: 0 0 2px #000; }
         .case-grille.verifie-vide { border-color: #28a745; background-color: #e9f7ef; color: #28a745; font-size: 14px; }
         
@@ -148,7 +146,6 @@
         .vin-row:active { background-color: #f1f1f1; }
         .date-maj-banner { background-color: #fff3cd; color: #856404; padding: 8px 15px; font-size: 12px; text-align: center; border-bottom: 1px solid #ffeeba; margin-bottom: 15px; border-radius: 6px; font-weight: bold; }
 
-        /* Le tooltip flottant de l'inventaire */
         .tooltip-flottant {
             position: fixed;
             background: rgba(30, 39, 46, 0.95);
@@ -156,7 +153,7 @@
             padding: 12px 15px;
             border-radius: 10px;
             font-size: 13px;
-            pointer-events: none; /* Crucial pour que le doigt lise ce qu'il y a en dessous */
+            pointer-events: none;
             z-index: 3000;
             box-shadow: 0 6px 15px rgba(0,0,0,0.4);
             transform: translate(-50%, -100%);
@@ -172,7 +169,6 @@
 
         .validation-banner { position: sticky; top: 10px; background: white; border: 2px solid var(--pending-color); border-radius: 8px; padding: 15px; display: none; align-items: center; justify-content: space-between; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; max-width: 800px; margin-left: auto; margin-right: auto; }
 
-        /* Dashboard & Graphiques CSS Pur */
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin: 0 auto 25px auto; max-width: 800px; }
         .dash-card { background: white; padding: 18px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.04); border: 1px solid var(--border-color); }
         .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -211,13 +207,14 @@
 
     <div id="loading-overlay">
         <div class="spinner"></div>
-        <h3 style="margin:0;">L'IA analyse l'étiquette...</h3>
-        <p style="font-size: 13px; color: #aaa; margin-top: 5px;">Veuillez patienter (2 à 5 sec)</p>
+        <h3 id="loading-title" style="margin:0;">L'IA analyse l'étiquette...</h3>
+        <p id="loading-sub" style="font-size: 13px; color: #aaa; margin-top: 5px;">Veuillez patienter (2 à 5 sec)</p>
     </div>
 
     <header>
         <h1>🍷 Ma Cave <span style="font-size: 10px; opacity: 0.7;">v6.7.0</span></h1>
         <div class="header-actions">
+            <button class="header-btn" onclick="configurerGitHub()" title="configurer GitHub (Sync Cloud)">☁️</button>
             <button class="header-btn" onclick="configurerIA()" title="Configuration IA (Clé API Gemini)">⚙️</button>
             <button class="header-btn" onclick="exporterJSON()" title="Sauvegarder">💾</button>
             <button class="header-btn" onclick="document.getElementById('import-file').click()" title="Restaurer">📂</button>
@@ -536,18 +533,138 @@
         const HISTORY_KEY = 'ryzek_cave_a_vin_history';
         const API_KEY_STORAGE = 'gemini_api_key';
         const DATE_MAJ_KEY = 'ryzek_cave_maj'; 
+        const GITHUB_CONFIG_KEY = 'ryzek_github_config';
         
         let wineInventory = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
         let wineHistory = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
         let sessionInventaire = []; 
         const CURRENT_YEAR = 2026;
 
-        function saveToLocalStorage(overrideDate = null) {
+        // --- CONFIGURATION GITHUB ---
+        function getGitHubConfig() {
+            return JSON.parse(localStorage.getItem(GITHUB_CONFIG_KEY)) || {
+                owner: '',      
+                repo: '',       
+                branch: 'main', 
+                path: 'cave.json', 
+                token: ''       
+            };
+        }
+
+        function configurerGitHub() {
+            let conf = getGitHubConfig();
+            let owner = prompt("Nom d'utilisateur (Owner) GitHub :", conf.owner);
+            if (owner === null) return;
+            let repo = prompt("Nom du dépôt (Repository) :", conf.repo);
+            if (repo === null) return;
+            let path = prompt("Chemin du fichier JSON dans le dépôt (ex: cave.json) :", conf.path || 'cave.json');
+            if (path === null) return;
+            let token = prompt("Personal Access Token GitHub (Classic avec droit 'repo') :", conf.token);
+            if (token === null) return;
+
+            localStorage.setItem(GITHUB_CONFIG_KEY, JSON.stringify({
+                owner: owner.trim(),
+                repo: repo.trim(),
+                branch: 'main',
+                path: path.trim(),
+                token: token.trim()
+            }));
+            alert("Configuration GitHub enregistrée ! Test de synchronisation...");
+            chargerDepuisGitHub();
+        }
+
+        async function chargerDepuisGitHub() {
+            const conf = getGitHubConfig();
+            if (!conf.token || !conf.owner || !conf.repo) {
+                console.log("GitHub non configuré, utilisation du localStorage local.");
+                return;
+            }
+
+            const url = `https://api.github.com/repos/${conf.owner}/${conf.repo}/contents/${conf.path}?ref=${conf.branch}`;
+            
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${conf.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (!response.ok) throw new Error(`Erreur GitHub HTTP ${response.status}`);
+
+                const fileData = await response.json();
+                const jsonString = decodeURIComponent(escape(atob(fileData.content.replace(/\s/g, ''))));
+                const remoteData = JSON.parse(jsonString);
+
+                if (remoteData.inventory) {
+                    wineInventory = remoteData.inventory;
+                    wineHistory = remoteData.history || [];
+                    
+                    saveToLocalStorage(remoteData.date || new Date().toISOString(), false);
+                    
+                    renderMaCave();
+                    renderCellar('cave-visuelle-ranger', 'arrivages');
+                    console.log("Synchronisation GitHub réussie !");
+                }
+            } catch (err) {
+                console.error("Échec de la synchro GitHub :", err);
+            }
+        }
+
+        async function sauvegarderSurGitHub() {
+            const conf = getGitHubConfig();
+            if (!conf.token || !conf.owner || !conf.repo) return; 
+
+            const url = `https://api.github.com/repos/${conf.owner}/${conf.repo}/contents/${conf.path}`;
+            const exportDate = new Date().toISOString();
+            const exportData = { version: "v6.7.0", date: exportDate, inventory: wineInventory, history: wineHistory };
+            
+            const jsonString = JSON.stringify(exportData, null, 2);
+            const base64Content = btoa(unescape(encodeURIComponent(jsonString)));
+
+            try {
+                const getRes = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${conf.token}`, 'Accept': 'application/vnd.github.v3+json' }
+                });
+                
+                let sha = null;
+                if (getRes.ok) {
+                    const fileInfo = await getRes.json();
+                    sha = fileInfo.sha;
+                }
+
+                const putRes = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${conf.token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `Mise à jour cave à vin - ${new Date().toLocaleString('fr-FR')}`,
+                        content: base64Content,
+                        branch: conf.branch,
+                        sha: sha 
+                    })
+                });
+
+                if (!putRes.ok) throw new Error("Erreur lors du push GitHub");
+                console.log("Données sauvegardées sur GitHub avec succès !");
+            } catch (err) {
+                console.error("Erreur de sauvegarde GitHub :", err);
+            }
+        }
+
+        function saveToLocalStorage(overrideDate = null, triggerGitHub = true) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
             localStorage.setItem(HISTORY_KEY, JSON.stringify(wineHistory));
             const dateToSave = overrideDate || new Date().toISOString();
             localStorage.setItem(DATE_MAJ_KEY, dateToSave);
             afficherDateMaj();
+
+            if (triggerGitHub) {
+                sauvegarderSurGitHub();
+            }
         }
 
         function afficherDateMaj() {
@@ -1040,7 +1157,6 @@
             }
         }
 
-        // --- FONCTIONS INVENTAIRE TACTILE ---
         function ouvrirModalInventaire(slotId, vinId) {
             document.getElementById('modal-inv-slot').value = slotId;
             document.getElementById('modal-inv-titre').textContent = "Emplacement " + slotId.replace(/_/g, ' ').replace('pos', 'N°');
@@ -1139,9 +1255,6 @@
 
         function fermerModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // ------------------------------------
-        // INITIALISATION DES ÉVÉNEMENTS TACTILES GLOBAUX POUR L'INVENTAIRE
-        // ------------------------------------
         let invTooltipTimer;
         let isInvInspecting = false;
         let invStartX = 0;
@@ -1179,7 +1292,6 @@
                 }
             }
 
-            // Tactile (Téléphone/Tablette)
             container.addEventListener('touchstart', (e) => {
                 invStartX = e.touches[0].clientX;
                 invStartY = e.touches[0].clientY;
@@ -1189,12 +1301,12 @@
                     isInvInspecting = true;
                     if (navigator.vibrate) navigator.vibrate(40);
                     updateTooltip(e.touches[0].clientX, e.touches[0].clientY);
-                }, 300); // 300ms sans bouger déclenche l'inspection
+                }, 300); 
             }, {passive: true});
 
             container.addEventListener('touchmove', (e) => {
                 if (isInvInspecting) {
-                    e.preventDefault(); // Coupe le scroll
+                    e.preventDefault(); 
                     updateTooltip(e.touches[0].clientX, e.touches[0].clientY);
                 } else {
                     if (Math.abs(e.touches[0].clientY - invStartY) > 10 || Math.abs(e.touches[0].clientX - invStartX) > 10) {
@@ -1222,7 +1334,6 @@
                 isInvInspecting = false;
             });
 
-            // Souris (PC - pour tes tests)
             container.addEventListener('mousedown', (e) => {
                 invStartX = e.clientX; invStartY = e.clientY;
                 isInvInspecting = false;
@@ -1249,7 +1360,6 @@
             });
         }
 
-        // ------------------------------------
         function renderCellar(containerId, mode) {
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -1328,10 +1438,9 @@
                     }
                     if(estVerifie) caseDiv.innerHTML = '✓';
                     
-                    // On injecte les datas pour le tooltip flottant
                     caseDiv.setAttribute('data-slot-id', slotId);
                     caseDiv.setAttribute('data-vin-id', vinOccupe ? vinOccupe.id : '');
-                    caseDiv.oncontextmenu = (e) => e.preventDefault(); // Bloque le clic droit natif
+                    caseDiv.oncontextmenu = (e) => e.preventDefault(); 
                 }
                 
                 grille.appendChild(caseDiv);
@@ -1492,9 +1601,11 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             afficherDateMaj();
-            renderCellar('cave-visuelle-ranger', 'arrivages');
-            renderMaCave(); 
-            initInventoryTouchLogic(); // Initialisation des événements "Drag to Inspect"
+            chargerDepuisGitHub().then(() => {
+                renderCellar('cave-visuelle-ranger', 'arrivages');
+                renderMaCave(); 
+            });
+            initInventoryTouchLogic(); 
         });
     </script>
 </body>
