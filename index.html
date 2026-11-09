@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ma Cave à Vin - WMS Pro</title>
+    
+    <title>Cave à Vin - WMS Pro</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#722F37">
     <style>
@@ -583,18 +584,30 @@
             const url = `https://api.github.com/repos/${conf.owner}/${conf.repo}/contents/${conf.path}?ref=${conf.branch}`;
             
             try {
+                // 1. Récupération des métadonnées pour obtenir l'URL de téléchargement direct
                 const response = await fetch(url, {
                     headers: {
                         'Authorization': `Bearer ${conf.token}`,
                         'Accept': 'application/vnd.github.v3+json'
-                    }
+                    },
+                    cache: 'no-store'
                 });
 
                 if (!response.ok) throw new Error(`Erreur GitHub HTTP ${response.status}`);
-
                 const fileData = await response.json();
-                const jsonString = decodeURIComponent(escape(atob(fileData.content.replace(/\s/g, ''))));
-                const remoteData = JSON.parse(jsonString);
+
+                if (!fileData.download_url) throw new Error("Fichier introuvable sur le dépôt.");
+
+                // 2. Fetch direct sur le fichier brut (gère l'UTF-8 nativement et sans limite de taille)
+                const rawResponse = await fetch(fileData.download_url, {
+                    headers: {
+                        'Authorization': `Bearer ${conf.token}`
+                    },
+                    cache: 'no-store'
+                });
+                
+                if (!rawResponse.ok) throw new Error(`Erreur lecture brute HTTP ${rawResponse.status}`);
+                const remoteData = await rawResponse.json();
 
                 if (remoteData.inventory) {
                     wineInventory = remoteData.inventory;
@@ -608,6 +621,7 @@
                 }
             } catch (err) {
                 console.error("Échec de la synchro GitHub :", err);
+                alert("Erreur de récupération GitHub : " + err.message);
             }
         }
 
@@ -620,11 +634,20 @@
             const exportData = { version: "v6.7.0", date: exportDate, inventory: wineInventory, history: wineHistory };
             
             const jsonString = JSON.stringify(exportData, null, 2);
-            const base64Content = btoa(unescape(encodeURIComponent(jsonString)));
+            
+            // Encodage Base64 robuste pour l'UTF-8 avec TextEncoder
+            const utf8Bytes = new TextEncoder().encode(jsonString);
+            let binaryString = '';
+            for (let i = 0; i < utf8Bytes.length; i++) {
+                binaryString += String.fromCharCode(utf8Bytes[i]);
+            }
+            const base64Content = btoa(binaryString);
 
             try {
+                // On force no-store pour être sûr d'avoir le SHA le plus récent
                 const getRes = await fetch(url, {
-                    headers: { 'Authorization': `Bearer ${conf.token}`, 'Accept': 'application/vnd.github.v3+json' }
+                    headers: { 'Authorization': `Bearer ${conf.token}`, 'Accept': 'application/vnd.github.v3+json' },
+                    cache: 'no-store'
                 });
                 
                 let sha = null;
@@ -648,10 +671,11 @@
                     })
                 });
 
-                if (!putRes.ok) throw new Error("Erreur lors du push GitHub");
+                if (!putRes.ok) throw new Error(`Code erreur ${putRes.status}`);
                 console.log("Données sauvegardées sur GitHub avec succès !");
             } catch (err) {
                 console.error("Erreur de sauvegarde GitHub :", err);
+                alert("Erreur de sauvegarde cloud : " + err.message);
             }
         }
 
