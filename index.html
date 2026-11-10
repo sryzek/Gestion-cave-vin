@@ -213,11 +213,11 @@
     </div>
 
     <header>
-        <h1>🍷 Ma Cave <span style="font-size: 10px; opacity: 0.7;">v6.8.0</span></h1>
+        <h1>🍷 Ma Cave <span style="font-size: 10px; opacity: 0.7;">v6.8.1</span></h1>
         <div class="header-actions">
-            <button class="header-btn" onclick="configurerGitHub()" title="configurer GitHub (Sync Cloud)">☁️</button>
+            <button class="header-btn" onclick="configurerGitHub()" title="Configurer GitHub (Sync Cloud)">☁️</button>
             <button class="header-btn" onclick="configurerIA()" title="Configuration IA (Clé API Gemini)">⚙️</button>
-            <button class="header-btn" onclick="exporterJSON()" title="Sauvegarder">💾</button>
+            <button class="header-btn" onclick="exporterJSON()" title="Sauvegarder en local">💾</button>
             <button class="header-btn" onclick="document.getElementById('import-file').click()" title="Restaurer">📂</button>
         </div>
     </header>
@@ -554,9 +554,9 @@
 
         function configurerGitHub() {
             let conf = getGitHubConfig();
-            let owner = prompt("Nom d'utilisateur (Owner) GitHub :", conf.owner);
+            let owner = prompt("Nom d'utilisateur (Owner) GitHub :", conf.owner || 'sryzek');
             if (owner === null) return;
-            let repo = prompt("Nom du dépôt (Repository) :", conf.repo);
+            let repo = prompt("Nom du dépôt (Repository) :", conf.repo || 'Gestion-cave-vin');
             if (repo === null) return;
             let path = prompt("Chemin du fichier JSON dans le dépôt (ex: cave.json) :", conf.path || 'cave.json');
             if (path === null) return;
@@ -567,8 +567,8 @@
                 owner: owner.trim(),
                 repo: repo.trim(),
                 branch: 'main',
-                path: path.trim(),
-                token: token.trim()
+                path: path.trim().replace(/^\/+/, ''),
+                token: token.replace(/[^a-zA-Z0-9_]/g, '')
             }));
             alert("Configuration GitHub enregistrée ! Test de synchronisation...");
             chargerDepuisGitHub();
@@ -581,38 +581,49 @@
                 return;
             }
 
-            // Nettoyage strict du token pour éviter le TypeError: Failed to fetch
-            const cleanToken = conf.token.replace(/\s+/g, '');
-            const url = `https://api.github.com/repos/${conf.owner}/${conf.repo}/contents/${conf.path}?ref=${conf.branch}`;
+            const cleanToken = conf.token.replace(/[^a-zA-Z0-9_]/g, '');
+            const cleanOwner = conf.owner.trim();
+            const cleanRepo = conf.repo.trim();
+            const cleanPath = (conf.path || 'cave.json').trim().replace(/^\/+/, '');
+            const cleanBranch = (conf.branch || 'main').trim();
+            const url = `https://api.github.com/repos/${cleanOwner}/${cleanRepo}/contents/${cleanPath}?ref=${cleanBranch}&t=${Date.now()}`;
             
             try {
                 const response = await fetch(url, {
+                    method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${cleanToken}`,
                         'Accept': 'application/vnd.github.v3+json'
-                    },
-                    cache: 'no-store'
+                    }
                 });
 
-                // Si le fichier n'existe pas encore, on le crée en forçant la sauvegarde cloud
+                // Si le fichier cave.json n'existe pas encore sur le dépôt, on le crée automatiquement
                 if (response.status === 404) {
-                    console.log("Fichier distant introuvable. Première synchronisation (création).");
+                    console.log("Fichier distant introuvable (404). Première synchronisation : création sur GitHub.");
                     await sauvegarderSurGitHub();
                     return;
                 }
 
-                if (!response.ok) throw new Error(`Erreur GitHub HTTP ${response.status}`);
+                if (!response.ok) {
+                    const errText = await response.text();
+                    throw new Error(`HTTP ${response.status} - ${errText}`);
+                }
+
                 const fileData = await response.json();
 
-                if (!fileData.download_url) throw new Error("Fichier introuvable sur le dépôt.");
+                if (!fileData.content) {
+                    throw new Error("Contenu Base64 absent de la réponse GitHub.");
+                }
 
-                const rawResponse = await fetch(fileData.download_url, {
-                    headers: { 'Authorization': `Bearer ${cleanToken}` },
-                    cache: 'no-store'
-                });
-                
-                if (!rawResponse.ok) throw new Error(`Erreur lecture brute HTTP ${rawResponse.status}`);
-                const remoteData = await rawResponse.json();
+                // Décodage direct du Base64 en UTF-8 via TextDecoder (évite le 2e fetch sur raw.githubusercontent.com bloqué par CORS)
+                const cleanBase64 = fileData.content.replace(/\s/g, '');
+                const binaryString = atob(cleanBase64);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                const jsonString = new TextDecoder('utf-8').decode(bytes);
+                const remoteData = JSON.parse(jsonString);
 
                 if (remoteData.inventory) {
                     wineInventory = remoteData.inventory;
@@ -626,7 +637,7 @@
                 }
             } catch (err) {
                 console.error("Échec de la synchro GitHub :", err);
-                alert("Erreur de récupération GitHub : " + err.message);
+                alert(`🔍 DEBUG LECTURE (v6.8.1) :\nURL: ${url}\nToken: ${cleanToken.substring(0, 4)}... (Taille: ${cleanToken.length} chars)\nOwner: [${cleanOwner}]\nRepo: [${cleanRepo}]\nErreur: ${err.message}`);
             }
         }
 
@@ -634,13 +645,17 @@
             const conf = getGitHubConfig();
             if (!conf.token || !conf.owner || !conf.repo) return; 
 
-            const cleanToken = conf.token.replace(/\s+/g, '');
-            const url = `https://api.github.com/repos/${conf.owner}/${conf.repo}/contents/${conf.path}`;
+            const cleanToken = conf.token.replace(/[^a-zA-Z0-9_]/g, '');
+            const cleanOwner = conf.owner.trim();
+            const cleanRepo = conf.repo.trim();
+            const cleanPath = (conf.path || 'cave.json').trim().replace(/^\/+/, '');
+            const cleanBranch = (conf.branch || 'main').trim();
+            const url = `https://api.github.com/repos/${cleanOwner}/${cleanRepo}/contents/${cleanPath}`;
+            
             const exportDate = new Date().toISOString();
-            const exportData = { version: "v6.8.0", date: exportDate, inventory: wineInventory, history: wineHistory };
+            const exportData = { version: "v6.8.1", date: exportDate, inventory: wineInventory, history: wineHistory };
             
             const jsonString = JSON.stringify(exportData, null, 2);
-            
             const utf8Bytes = new TextEncoder().encode(jsonString);
             let binaryString = '';
             for (let i = 0; i < utf8Bytes.length; i++) {
@@ -648,16 +663,29 @@
             }
             const base64Content = btoa(binaryString);
 
+            let sha = null;
+
             try {
-                const getRes = await fetch(url, {
-                    headers: { 'Authorization': `Bearer ${cleanToken}`, 'Accept': 'application/vnd.github.v3+json' },
-                    cache: 'no-store'
+                const getRes = await fetch(`${url}?ref=${cleanBranch}&t=${Date.now()}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${cleanToken}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
                 });
                 
-                let sha = null;
                 if (getRes.ok) {
                     const fileInfo = await getRes.json();
                     sha = fileInfo.sha;
+                }
+
+                const bodyPayload = {
+                    message: `Mise à jour cave à vin - ${new Date().toLocaleString('fr-FR')}`,
+                    content: base64Content,
+                    branch: cleanBranch
+                };
+                if (sha) {
+                    bodyPayload.sha = sha;
                 }
 
                 const putRes = await fetch(url, {
@@ -667,33 +695,31 @@
                         'Accept': 'application/vnd.github.v3+json',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        message: `Mise à jour cave à vin - ${new Date().toLocaleString('fr-FR')}`,
-                        content: base64Content,
-                        branch: conf.branch,
-                        sha: sha 
-                    })
+                    body: JSON.stringify(bodyPayload)
                 });
 
-                if (!putRes.ok) throw new Error(`Code erreur ${putRes.status}`);
+                if (!putRes.ok) {
+                    const errText = await putRes.text();
+                    throw new Error(`HTTP ${putRes.status} - ${errText}`);
+                }
                 console.log("Données sauvegardées sur GitHub avec succès !");
             } catch (err) {
                 console.error("Erreur de sauvegarde GitHub :", err);
-                alert("Erreur de sauvegarde cloud : " + err.message);
+                alert(`🔍 DEBUG ÉCRITURE (v6.8.1) :\nURL: ${url}\nToken taille: ${cleanToken.length}\nSHA existant: ${sha ? 'Oui' : 'Non'}\nErreur: ${err.message}`);
             }
         }
 
-        // Sauvegarde locale uniquement
+        // Sauvegarde locale uniquement (bouton disquette 💾)
         function exporterJSON() {
             const exportDate = new Date().toISOString();
-            const exportData = { version: "v6.8.0", date: exportDate, inventory: wineInventory, history: wineHistory };
+            const exportData = { version: "v6.8.1", date: exportDate, inventory: wineInventory, history: wineHistory };
             const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
             const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
             a.download = `ma_cave_ryzek_complete_${exportDate.slice(0,10)}.json`;
             document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
 
-        // Met à jour la mémoire du navigateur ET force l'envoi transparent sur GitHub
+        // Met à jour le localStorage ET déclenche automatiquement la sauvegarde sur GitHub
         function saveToLocalStorage(overrideDate = null, triggerGitHub = true) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
             localStorage.setItem(HISTORY_KEY, JSON.stringify(wineHistory));
