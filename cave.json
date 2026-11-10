@@ -1,6 +1,6 @@
 {
-  "version": "v6.7.0",
-  "date": "2026-11-09T20:18:51.857Z",
+  "version": "v6.8.1",
+  "date": "2026-11-10T22:09:01.496Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -531,6 +531,18 @@
       "profil": "Fruité/Vif",
       "emplacements": [
         "g_e7_d_pos_2"
+      ]
+    },
+    {
+      "id": "1794348541493",
+      "domaine": "Test",
+      "region": "Test",
+      "millesime": "",
+      "couleur": "Rouge",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "g_e10_g_pos_5"
       ]
     }
   ],
