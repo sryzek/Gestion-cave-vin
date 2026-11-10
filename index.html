@@ -581,28 +581,33 @@
                 return;
             }
 
+            // Nettoyage strict du token pour éviter le TypeError: Failed to fetch
+            const cleanToken = conf.token.replace(/\s+/g, '');
             const url = `https://api.github.com/repos/${conf.owner}/${conf.repo}/contents/${conf.path}?ref=${conf.branch}`;
             
             try {
-                // 1. Récupération des métadonnées pour obtenir l'URL de téléchargement direct
                 const response = await fetch(url, {
                     headers: {
-                        'Authorization': `Bearer ${conf.token}`,
+                        'Authorization': `Bearer ${cleanToken}`,
                         'Accept': 'application/vnd.github.v3+json'
                     },
                     cache: 'no-store'
                 });
+
+                // Si le fichier n'existe pas encore, on le crée en forçant la sauvegarde cloud
+                if (response.status === 404) {
+                    console.log("Fichier distant introuvable. Première synchronisation (création).");
+                    await sauvegarderSurGitHub();
+                    return;
+                }
 
                 if (!response.ok) throw new Error(`Erreur GitHub HTTP ${response.status}`);
                 const fileData = await response.json();
 
                 if (!fileData.download_url) throw new Error("Fichier introuvable sur le dépôt.");
 
-                // 2. Fetch direct sur le fichier brut (gère l'UTF-8 nativement et sans limite de taille)
                 const rawResponse = await fetch(fileData.download_url, {
-                    headers: {
-                        'Authorization': `Bearer ${conf.token}`
-                    },
+                    headers: { 'Authorization': `Bearer ${cleanToken}` },
                     cache: 'no-store'
                 });
                 
@@ -629,13 +634,13 @@
             const conf = getGitHubConfig();
             if (!conf.token || !conf.owner || !conf.repo) return; 
 
+            const cleanToken = conf.token.replace(/\s+/g, '');
             const url = `https://api.github.com/repos/${conf.owner}/${conf.repo}/contents/${conf.path}`;
             const exportDate = new Date().toISOString();
             const exportData = { version: "v6.7.0", date: exportDate, inventory: wineInventory, history: wineHistory };
             
             const jsonString = JSON.stringify(exportData, null, 2);
             
-            // Encodage Base64 robuste pour l'UTF-8 avec TextEncoder
             const utf8Bytes = new TextEncoder().encode(jsonString);
             let binaryString = '';
             for (let i = 0; i < utf8Bytes.length; i++) {
@@ -644,9 +649,8 @@
             const base64Content = btoa(binaryString);
 
             try {
-                // On force no-store pour être sûr d'avoir le SHA le plus récent
                 const getRes = await fetch(url, {
-                    headers: { 'Authorization': `Bearer ${conf.token}`, 'Accept': 'application/vnd.github.v3+json' },
+                    headers: { 'Authorization': `Bearer ${cleanToken}`, 'Accept': 'application/vnd.github.v3+json' },
                     cache: 'no-store'
                 });
                 
@@ -659,7 +663,7 @@
                 const putRes = await fetch(url, {
                     method: 'PUT',
                     headers: {
-                        'Authorization': `Bearer ${conf.token}`,
+                        'Authorization': `Bearer ${cleanToken}`,
                         'Accept': 'application/vnd.github.v3+json',
                         'Content-Type': 'application/json'
                     },
@@ -679,6 +683,17 @@
             }
         }
 
+        // Sauvegarde locale uniquement
+        function exporterJSON() {
+            const exportDate = new Date().toISOString();
+            const exportData = { version: "v6.7.0", date: exportDate, inventory: wineInventory, history: wineHistory };
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+            a.download = `ma_cave_ryzek_complete_${exportDate.slice(0,10)}.json`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        }
+
+        // Met à jour la mémoire du navigateur ET force l'envoi transparent sur GitHub
         function saveToLocalStorage(overrideDate = null, triggerGitHub = true) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(wineInventory));
             localStorage.setItem(HISTORY_KEY, JSON.stringify(wineHistory));
@@ -921,15 +936,6 @@
                 return { statut: 'jeune', icone: '⏳' };
             }
             return { statut: 'inconnu', icone: '' };
-        }
-
-        function exporterJSON() {
-            const exportDate = new Date().toISOString();
-            const exportData = { version: "v6.7.0", date: exportDate, inventory: wineInventory, history: wineHistory };
-            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
-            const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-            a.download = `ma_cave_ryzek_complete_${exportDate.slice(0,10)}.json`;
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
 
         function importerJSON(event) {
