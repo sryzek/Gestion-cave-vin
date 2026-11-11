@@ -1,6 +1,6 @@
 {
   "version": "v6.8.1",
-  "date": "2026-11-11T10:28:19.448Z",
+  "date": "2026-11-11T10:32:43.712Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -247,8 +247,7 @@
       "emplacements": [
         "esc_vrac_pos_13",
         "esc_vrac_pos_14",
-        "esc_vrac_pos_15",
-        "esc_vrac_pos_16"
+        "esc_vrac_pos_15"
       ]
     },
     {
@@ -562,6 +561,18 @@
     }
   ],
   "history": [
+    {
+      "id": "1792169240274",
+      "domaine": "Chateau Lagrange de Lescure",
+      "region": "Saint emilion grand cru",
+      "millesime": "2015",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "idArchive": "1794393163708_yecs2",
+      "dateSortie": "2026-11-11T10:32:43.708Z",
+      "note": 0
+    },
     {
       "id": "1791219460936",
       "domaine": "Collioure auteur de shiste",
