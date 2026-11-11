@@ -1,58 +1,562 @@
-Skip to content
-sryzek
-Gestion-cave-vin
-Repository navigation
-Code
-Issues
-Pull requests
-Agents
-Actions
-Projects
-Wiki
-Commit f1d4328
-sryzek
-sryzek
-committed
-3 hours ago
-·
-Mise à jour cave à vin - 11/11/2026 17:48:04
-main
-1 parent 
-29869d9
- commit 
-f1d4328
-1 file changed
-
-+15
--2
-Lines changed: 15 additions & 2 deletions
-File tree
-Filter files…
-cave.json
-Search within code
- 
-‎cave.json‎
-+15
--2
-Lines changed: 15 additions & 2 deletions
-Original file line number	Diff line number	Diff line change
-@@ -1,6 +1,6 @@
 {
   "version": "v6.8.1",
-  "date": "2026-11-11T10:32:43.712Z",
   "date": "2026-11-11T16:48:04.336Z",
   "inventory": [
     {
       "id": "1790788372664",
-@@ -195,7 +195,6 @@
+      "domaine": "Prosseco Mionetto",
+      "region": "Espagne",
+      "millesime": "",
+      "couleur": "Effervescent",
       "envergure": "Détente",
       "profil": "Fruité/Vif",
       "emplacements": [
-        "g_e9_d_pos_1",
+        "g_e10_g_pos_1"
+      ],
+      "eff_color": "Blanc",
+      "eff_type": "Brut"
+    },
+    {
+      "id": "1790788503513",
+      "domaine": "Sieur Gaillard ",
+      "region": "BORDEAUX ",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "g_e10_d_pos_3"
+      ],
+      "eff_color": "Blanc",
+      "eff_type": "Brut"
+    },
+    {
+      "id": "1790788614307",
+      "domaine": "Gratin & Meyer",
+      "region": "Loire",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "g_e10_d_pos_5",
+        "g_e10_g_pos_2",
+        "g_e10_g_pos_3"
+      ],
+      "eff_color": "Blanc",
+      "eff_type": "Brut"
+    },
+    {
+      "id": "1791218281170",
+      "domaine": "Cocteaux",
+      "region": "Loire",
+      "millesime": "2026",
+      "couleur": "Blanc",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "g_e8_d_pos_1",
+        "g_e8_d_pos_2"
+      ]
+    },
+    {
+      "id": "1791218537072",
+      "domaine": "Closerie les alisiers petit chablis",
+      "region": "Bourgogne ",
+      "millesime": "2025",
+      "couleur": "Blanc",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "emplacements": [
+        "g_e8_d_pos_4"
+      ]
+    },
+    {
+      "id": "1791218633200",
+      "domaine": "Cocteaux",
+      "region": "Loire",
+      "millesime": "2025",
+      "couleur": "Rosé",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "g_e7_d_pos_1"
+      ]
+    },
+    {
+      "id": "1791218719766",
+      "domaine": "Rosé piscines ",
+      "region": "Bordeaux ",
+      "millesime": "",
+      "couleur": "Rosé",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "g_e7_g_pos_1"
+      ]
+    },
+    {
+      "id": "1791218790646",
+      "domaine": "Terrasous réserve ",
+      "region": "Roussillon",
+      "millesime": "2025",
+      "couleur": "Rosé",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "emplacements": [
+        "g_e7_g_pos_2"
+      ]
+    },
+    {
+      "id": "1791218992826",
+      "domaine": "Clairet cave de quinsac",
+      "region": "Bordeaux ",
+      "millesime": "2025",
+      "couleur": "Rosé",
+      "envergure": "Dégustation",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "g_e7_g_pos_3"
+      ]
+    },
+    {
+      "id": "1791219086733",
+      "domaine": "Terrassous château Mosset",
+      "region": "Roussillon",
+      "millesime": "",
+      "couleur": "Rosé",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "emplacements": [
+        "g_e6_d_pos_1",
+        "g_e6_d_pos_2",
+        "g_e6_d_pos_3"
+      ]
+    },
+    {
+      "id": "1791219176173",
+      "domaine": "Cocteaux ",
+      "region": "Touraine ",
+      "millesime": "",
+      "couleur": "Rouge",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "g_e4_g_pos_2"
+      ]
+    },
+    {
+      "id": "1791219517112",
+      "domaine": "Terrasous réserve ",
+      "region": "Roussillon",
+      "millesime": "2023",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "emplacements": [
+        "g_e1_d_pos_1"
+      ]
+    },
+    {
+      "id": "1791219587930",
+      "domaine": "Terrassous Villare Juliani",
+      "region": "Roussillon",
+      "millesime": "2024",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "emplacements": [
+        "g_e1_d_pos_2",
+        "g_e1_d_pos_3",
+        "g_e1_d_pos_4",
+        "g_e1_d_pos_5"
+      ]
+    },
+    {
+      "id": "1791219698606",
+      "domaine": "L'éternel tardif",
+      "region": "Roussillon ",
+      "millesime": "2024",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "emplacements": [
+        "g_e1_g_pos_1",
+        "g_e1_g_pos_2",
+        "g_e1_g_pos_3"
+      ]
+    },
+    {
+      "id": "1791548935207",
+      "domaine": "Secret de chaix",
+      "region": "Loire",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
         "g_e9_d_pos_2",
         "g_e9_d_pos_3",
         "g_e9_d_pos_4"
-@@ -561,6 +560,20 @@
+      ],
+      "eff_color": "Rosé",
+      "eff_type": "Brut"
+    },
+    {
+      "id": "1792169076072",
+      "domaine": "Chateau Fernon",
+      "region": "Graves",
+      "millesime": "2019",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "emplacements": [
+        "esc_vrac_pos_2",
+        "esc_vrac_pos_3",
+        "esc_vrac_pos_4",
+        "esc_vrac_pos_5",
+        "esc_vrac_pos_6"
+      ]
+    },
+    {
+      "id": "1792169142360",
+      "domaine": "Courtet Laperre",
+      "region": "Madiran ",
+      "millesime": "2016",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "emplacements": [
+        "esc_vrac_pos_7",
+        "esc_vrac_pos_8",
+        "esc_vrac_pos_9",
+        "esc_vrac_pos_10",
+        "esc_vrac_pos_11",
+        "esc_vrac_pos_12"
+      ]
+    },
+    {
+      "id": "1792169240274",
+      "domaine": "Chateau Lagrange de Lescure",
+      "region": "Saint emilion grand cru",
+      "millesime": "2015",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "emplacements": [
+        "esc_vrac_pos_13",
+        "esc_vrac_pos_14",
+        "esc_vrac_pos_15"
+      ]
+    },
+    {
+      "id": "1792169337135",
+      "domaine": "Le closVoyen",
+      "region": " Bourgogne ",
+      "millesime": "2018",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "emplacements": [
+        "esc_vrac_pos_17"
+      ]
+    },
+    {
+      "id": "1792169578282",
+      "domaine": "Allouchery perseval",
+      "region": "Champagne",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "g_e9_g_pos_2",
+        "g_e9_g_pos_3"
+      ],
+      "eff_color": "Rosé",
+      "eff_type": "Brut"
+    },
+    {
+      "id": "1792169673227",
+      "domaine": "Courtet laperre ",
+      "region": "Madiran ",
+      "millesime": "2014",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "emplacements": [
+        "esc_vrac_pos_21"
+      ]
+    },
+    {
+      "id": "1792170247048",
+      "domaine": "Allouchery perseval le rosé ",
+      "region": "Champagne",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "esc_casier_pos_1",
+        "esc_casier_pos_2",
+        "esc_casier_pos_3"
+      ],
+      "eff_color": "Rosé",
+      "eff_type": "Brut"
+    },
+    {
+      "id": "1792170364213",
+      "domaine": "P.  ADMET & FILS",
+      "region": "Champagne",
+      "millesime": "",
+      "couleur": "Rosé",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "esc_casier_pos_4",
+        "esc_casier_pos_5",
+        "esc_casier_pos_6",
+        "esc_casier_pos_7"
+      ]
+    },
+    {
+      "id": "1792170458788",
+      "domaine": "Allouchery perseval la reserve",
+      "region": "Champagne",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "emplacements": [
+        "esc_casier_pos_8",
+        "esc_casier_pos_9",
+        "esc_casier_pos_10",
+        "esc_casier_pos_11",
+        "esc_casier_pos_12"
+      ],
+      "eff_color": "Blanc",
+      "eff_type": "Brut"
+    },
+    {
+      "id": "1792176925018",
+      "domaine": "Courtet Laperre",
+      "region": "Madiran ",
+      "millesime": "2014",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "emplacements": [
+        "esc_vrac_pos_22",
+        "esc_vrac_pos_23",
+        "esc_vrac_pos_24",
+        "esc_vrac_pos_25"
+      ]
+    },
+    {
+      "id": "1792176989777",
+      "domaine": " Courtet laperre ",
+      "region": "Madiran ",
+      "millesime": "2020",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "emplacements": [
+        "esc_vrac_pos_26",
+        "esc_vrac_pos_27",
+        "esc_vrac_pos_28",
+        "esc_vrac_pos_29",
+        "esc_vrac_pos_30",
+        "esc_vrac_pos_31"
+      ]
+    },
+    {
+      "id": "1792340497465",
+      "domaine": "Château Montaudon",
+      "region": "Champagne ",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "esc_vrac_pos_39",
+        "esc_vrac_pos_40",
+        "esc_vrac_pos_41",
+        "esc_vrac_pos_42",
+        "esc_vrac_pos_43"
+      ],
+      "eff_color": "Blanc",
+      "eff_type": "Brut"
+    },
+    {
+      "id": "1793629107672",
+      "domaine": "Domaine de Foujoin",
+      "region": "Vouvray",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "g_e10_d_pos_1",
+        "g_e10_d_pos_2",
+        "g_e10_d_pos_4",
+        "g_e10_g_pos_4",
+        "g_e9_g_pos_1"
+      ],
+      "eff_color": "Blanc",
+      "eff_type": "Brut"
+    },
+    {
+      "id": "1793629369463",
+      "domaine": "Cocteaux",
+      "region": "Loire",
+      "millesime": "2026",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "g_e9_g_pos_4",
+        "g_e8_d_pos_3",
+        "g_e8_d_pos_5",
+        "g_e8_g_pos_1",
+        "g_e8_g_pos_2"
+      ],
+      "eff_color": "Rosé",
+      "eff_type": "Brut"
+    },
+    {
+      "id": "1793629609586",
+      "domaine": "Cocteaux",
+      "region": "Loire",
+      "millesime": "2026",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "g_e8_g_pos_3",
+        "g_e8_g_pos_4",
+        "g_e8_g_pos_5",
+        "g_e7_d_pos_5",
+        "g_e7_g_pos_4",
+        "g_e7_g_pos_5"
+      ],
+      "eff_color": "Blanc",
+      "eff_type": "Brut"
+    },
+    {
+      "id": "1793629764141",
+      "domaine": "Cocteaux",
+      "region": "Loire",
+      "millesime": "2026",
+      "couleur": "Blanc",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "g_e6_d_pos_4",
+        "g_e6_d_pos_5",
+        "g_e6_g_pos_1",
+        "g_e6_g_pos_2",
+        "g_e6_g_pos_3",
+        "g_e6_g_pos_4"
+      ]
+    },
+    {
+      "id": "1793629916803",
+      "domaine": "Cocteaux Effervescent rouge",
+      "region": "Loire",
+      "millesime": "2026",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "g_e6_g_pos_5",
+        "g_e5_d_pos_1",
+        "g_e5_d_pos_2",
+        "g_e5_d_pos_3",
+        "g_e5_d_pos_4",
+        "g_e5_d_pos_5"
+      ],
+      "eff_color": "Blanc",
+      "eff_type": "Brut"
+    },
+    {
+      "id": "1793630013578",
+      "domaine": "Cocteaux",
+      "region": "Loire",
+      "millesime": "2026",
+      "couleur": "Rosé",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "g_e5_g_pos_1",
+        "g_e5_g_pos_2",
+        "g_e5_g_pos_3",
+        "g_e5_g_pos_4",
+        "g_e5_g_pos_5",
+        "g_e4_d_pos_1"
+      ]
+    },
+    {
+      "id": "1793630189310",
+      "domaine": "Cocteaux parcelle 22",
+      "region": "Loire",
+      "millesime": "2026",
+      "couleur": "Rouge",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "g_e4_g_pos_1",
+        "g_e4_g_pos_3",
+        "g_e4_g_pos_4",
+        "g_e4_g_pos_5",
+        "g_e3_d_pos_1",
+        "g_e3_d_pos_2",
+        "g_e3_d_pos_3",
+        "g_e3_d_pos_4",
+        "g_e3_d_pos_5",
+        "g_e3_g_pos_2",
+        "g_e3_g_pos_3",
+        "g_e3_g_pos_4"
+      ]
+    },
+    {
+      "id": "1794049332540",
+      "domaine": "Cocteaux",
+      "region": "Loire",
+      "millesime": "2025",
+      "couleur": "Rosé",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "g_e7_d_pos_2"
+      ]
+    },
+    {
+      "id": "1794392841493",
+      "domaine": "Château Montaudon",
+      "region": "Champagne ",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "emplacements": [
+        "g_e10_g_pos_5",
+        "g_e9_d_pos_5",
+        "g_e9_g_pos_5"
+      ],
+      "eff_color": "Blanc",
+      "eff_type": "Brut"
+    },
+    {
+      "id": "1794392899447",
+      "domaine": "Cocteaux",
+      "region": "Loire",
+      "millesime": "2025",
+      "couleur": "Rosé",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "g_e7_d_pos_3"
+      ]
     }
   ],
   "history": [
@@ -73,10 +577,429 @@ Original file line number	Diff line number	Diff line change
     {
       "id": "1792169240274",
       "domaine": "Chateau Lagrange de Lescure",
-0 commit comments
-Comments
-0
- (0)
-Comment
-You're not receiving notifications from this thread.
-
+      "region": "Saint emilion grand cru",
+      "millesime": "2015",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "idArchive": "1794393163708_yecs2",
+      "dateSortie": "2026-11-11T10:32:43.708Z",
+      "note": 0
+    },
+    {
+      "id": "1791219460936",
+      "domaine": "Collioure auteur de shiste",
+      "region": "Roussillon",
+      "millesime": "",
+      "couleur": "Rouge",
+      "envergure": "Détente",
+      "profil": "Puissant/Rond",
+      "idArchive": "1794173033450_srykb",
+      "dateSortie": "2026-11-08T21:23:53.450Z",
+      "note": 0
+    },
+    {
+      "id": "1792169673227",
+      "domaine": "Courtet laperre ",
+      "region": "Madiran ",
+      "millesime": "2014",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "idArchive": "1794049503407_gea23",
+      "dateSortie": "2026-11-07T11:05:03.407Z",
+      "note": 0
+    },
+    {
+      "id": "1792169673227",
+      "domaine": "Courtet laperre ",
+      "region": "Madiran ",
+      "millesime": "2014",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "idArchive": "1794049501944_ckalv",
+      "dateSortie": "2026-11-07T11:05:01.944Z",
+      "note": 0
+    },
+    {
+      "id": "1792169673227",
+      "domaine": "Courtet laperre ",
+      "region": "Madiran ",
+      "millesime": "2014",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "idArchive": "1794049500380_juac0",
+      "dateSortie": "2026-11-07T11:05:00.380Z",
+      "note": 0
+    },
+    {
+      "id": "1791218633200",
+      "domaine": "Cocteaux",
+      "region": "Loire",
+      "millesime": "2025",
+      "couleur": "Rosé",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "idArchive": "1794049240412_9mdnj",
+      "dateSortie": "2026-11-07T11:00:40.412Z",
+      "note": 0
+    },
+    {
+      "id": "1792340497465",
+      "domaine": "Château Montaudon",
+      "region": "Champagne ",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "eff_color": "Blanc",
+      "eff_type": "Brut",
+      "idArchive": "1794049190812_6m6t9",
+      "dateSortie": "2026-11-07T10:59:50.812Z",
+      "note": 0
+    },
+    {
+      "id": "1792340497465",
+      "domaine": "Château Montaudon",
+      "region": "Champagne ",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "eff_color": "Blanc",
+      "eff_type": "Brut",
+      "idArchive": "1794049188110_t5nen",
+      "dateSortie": "2026-11-07T10:59:48.110Z",
+      "note": 0
+    },
+    {
+      "id": "1792340497465",
+      "domaine": "Château Montaudon",
+      "region": "Champagne ",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "eff_color": "Blanc",
+      "eff_type": "Brut",
+      "idArchive": "1794049186530_cum4z",
+      "dateSortie": "2026-11-07T10:59:46.530Z",
+      "note": 0
+    },
+    {
+      "id": "1792340497465",
+      "domaine": "Château Montaudon",
+      "region": "Champagne ",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "eff_color": "Blanc",
+      "eff_type": "Brut",
+      "idArchive": "1794049182098_s5efy",
+      "dateSortie": "2026-11-07T10:59:42.098Z",
+      "note": 0
+    },
+    {
+      "id": "1792340497465",
+      "domaine": "Château Montaudon",
+      "region": "Champagne ",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "eff_color": "Blanc",
+      "eff_type": "Brut",
+      "idArchive": "1794049180731_cn60y",
+      "dateSortie": "2026-11-07T10:59:40.731Z",
+      "note": 0
+    },
+    {
+      "id": "1792340497465",
+      "domaine": "Château Montaudon",
+      "region": "Champagne ",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "eff_color": "Blanc",
+      "eff_type": "Brut",
+      "idArchive": "1794049178415_z0962",
+      "dateSortie": "2026-11-07T10:59:38.415Z",
+      "note": 0
+    },
+    {
+      "id": "1792340497465",
+      "domaine": "Château Montaudon",
+      "region": "Champagne ",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "eff_color": "Blanc",
+      "eff_type": "Brut",
+      "idArchive": "1794049176884_2uujb",
+      "dateSortie": "2026-11-07T10:59:36.884Z",
+      "note": 0
+    },
+    {
+      "id": "1791219335170",
+      "domaine": "Le duo domaine de Vezians",
+      "region": "Roussillon ",
+      "millesime": "2022",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "idArchive": "1794049019167_5jy0h",
+      "dateSortie": "2026-11-07T10:56:59.167Z",
+      "note": 0
+    },
+    {
+      "id": "1791219335170",
+      "domaine": "Le duo domaine de Vezians",
+      "region": "Roussillon ",
+      "millesime": "2022",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "idArchive": "1794049017688_ax7wp",
+      "dateSortie": "2026-11-07T10:56:57.688Z",
+      "note": 0
+    },
+    {
+      "id": "1791219335170",
+      "domaine": "Le duo domaine de Vezians",
+      "region": "Roussillon ",
+      "millesime": "2022",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "idArchive": "1794049015153_4yj2r",
+      "dateSortie": "2026-11-07T10:56:55.153Z",
+      "note": 0
+    },
+    {
+      "id": "1791548935207",
+      "domaine": "Secret de chaix",
+      "region": "Loire",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "eff_color": "Rosé",
+      "eff_type": "Brut",
+      "idArchive": "1793982682541_74d1p",
+      "dateSortie": "2026-11-06T16:31:22.541Z",
+      "note": 0
+    },
+    {
+      "id": "1791219335170",
+      "domaine": "Le duo domaine de Vezians",
+      "region": "Roussillon ",
+      "millesime": "2022",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "idArchive": "1793909851160_1dnc6",
+      "dateSortie": "2026-11-05T20:17:31.160Z",
+      "note": 0
+    },
+    {
+      "id": "1793629107672",
+      "domaine": "Domaine de Foujoin",
+      "region": "Vouvray",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "eff_color": "Blanc",
+      "eff_type": "Brut",
+      "idArchive": "1793902975641_5tcjt",
+      "dateSortie": "2026-11-05T18:22:55.641Z",
+      "note": 0
+    },
+    {
+      "id": "1791219698606",
+      "domaine": "L'éternel tardif",
+      "region": "Roussillon ",
+      "millesime": "2024",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "idArchive": "1793902915315_govds",
+      "dateSortie": "2026-11-05T18:21:55.315Z",
+      "note": 0
+    },
+    {
+      "id": "1791219698606",
+      "domaine": "L'éternel tardif",
+      "region": "Roussillon ",
+      "millesime": "2024",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "idArchive": "1793902912633_s9buc",
+      "dateSortie": "2026-11-05T18:21:52.633Z",
+      "note": 0
+    },
+    {
+      "id": "1791218633200",
+      "domaine": "Cocteaux",
+      "region": "Loire",
+      "millesime": "2025",
+      "couleur": "Rosé",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "idArchive": "1793730027633_12w8u",
+      "dateSortie": "2026-11-03T18:20:27.637Z",
+      "note": 0
+    },
+    {
+      "id": "1791219460936",
+      "domaine": "Collioure auteur de shiste",
+      "region": "Roussillon",
+      "millesime": "",
+      "couleur": "Rouge",
+      "envergure": "Détente",
+      "profil": "Puissant/Rond",
+      "idArchive": "1793620047653_0m2h6",
+      "dateSortie": "2026-11-02T11:47:27.653Z",
+      "note": 0
+    },
+    {
+      "id": "1791219460936",
+      "domaine": "Collioure auteur de shiste",
+      "region": "Roussillon",
+      "millesime": "",
+      "couleur": "Rouge",
+      "envergure": "Détente",
+      "profil": "Puissant/Rond",
+      "idArchive": "1793620043175_c3wvy",
+      "dateSortie": "2026-11-02T11:47:23.176Z",
+      "note": 0
+    },
+    {
+      "id": "1791219176173",
+      "domaine": "Cocteaux ",
+      "region": "Touraine ",
+      "millesime": "",
+      "couleur": "Rouge",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "idArchive": "1793126455548_uzzwe",
+      "dateSortie": "2026-10-27T18:40:55.548Z",
+      "note": 0,
+      "commentaire": ""
+    },
+    {
+      "id": "1790788614307",
+      "domaine": "Gratin & Meyer",
+      "region": "Loire",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "eff_color": "Blanc",
+      "eff_type": "Brut",
+      "idArchive": "1793126431896_1hjsz",
+      "dateSortie": "2026-10-27T18:40:31.896Z",
+      "note": 0,
+      "commentaire": ""
+    },
+    {
+      "id": "1791219086733",
+      "domaine": "Terrassous château Mosset",
+      "region": "Roussillon",
+      "millesime": "",
+      "couleur": "Rosé",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "idArchive": "1793126393009_h3yen",
+      "dateSortie": "2026-10-27T18:39:53.016Z",
+      "note": 0,
+      "commentaire": ""
+    },
+    {
+      "id": "1792169076072",
+      "domaine": "Chateau Fernon",
+      "region": "Graves",
+      "millesime": "2019",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "idArchive": "1792842523248_lribf",
+      "dateSortie": "2026-10-24T11:48:43.248Z",
+      "note": 0,
+      "commentaire": ""
+    },
+    {
+      "id": "1791217990841",
+      "domaine": "Wolfberger",
+      "region": "Alsace ",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "eff_color": "Blanc",
+      "eff_type": "Brut",
+      "idArchive": "1792785270501_asejk",
+      "dateSortie": "2026-10-23T19:54:30.501Z",
+      "note": 0,
+      "commentaire": ""
+    },
+    {
+      "id": "1791219460936",
+      "domaine": "Collioure auteur de shiste",
+      "region": "Roussillon",
+      "millesime": "",
+      "couleur": "Rouge",
+      "envergure": "Détente",
+      "profil": "Puissant/Rond",
+      "idArchive": "1792775496257_p73oy",
+      "dateSortie": "2026-10-23T17:11:36.258Z",
+      "note": 0,
+      "commentaire": ""
+    },
+    {
+      "id": "1791218537072",
+      "domaine": "Closerie les alisiers petit chablis",
+      "region": "Bourgogne ",
+      "millesime": "2025",
+      "couleur": "Blanc",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "idArchive": "1792737163734_4s6k1",
+      "dateSortie": "2026-10-23T06:32:43.735Z",
+      "note": 0,
+      "commentaire": ""
+    },
+    {
+      "id": "1791218992826",
+      "domaine": "Clairet cave de quinsac",
+      "region": "Bordeaux ",
+      "millesime": "2025",
+      "couleur": "Rosé",
+      "envergure": "Dégustation",
+      "profil": "Fruité/Vif",
+      "idArchive": "1792737107493_dct5q",
+      "dateSortie": "2026-10-23T06:31:47.493Z",
+      "note": 0,
+      "commentaire": ""
+    },
+    {
+      "id": "1791219176173",
+      "domaine": "Cocteaux ",
+      "region": "Touraine ",
+      "millesime": "",
+      "couleur": "Rouge",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "idArchive": "1792737078452_kahs4",
+      "dateSortie": "2026-10-23T06:31:18.452Z",
+      "note": 0,
+      "commentaire": ""
+    }
+  ]
+}
