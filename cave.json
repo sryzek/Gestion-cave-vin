@@ -1,6 +1,6 @@
 {
   "version": "v6.8.1",
-  "date": "2026-11-11T10:27:21.493Z",
+  "date": "2026-11-11T10:28:19.448Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -547,6 +547,18 @@
       ],
       "eff_color": "Blanc",
       "eff_type": "Brut"
+    },
+    {
+      "id": "1794392899447",
+      "domaine": "Cocteaux",
+      "region": "Loire",
+      "millesime": "2025",
+      "couleur": "Rosé",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "g_e7_d_pos_3"
+      ]
     }
   ],
   "history": [
