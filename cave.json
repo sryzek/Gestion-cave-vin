@@ -1,6 +1,6 @@
 {
   "version": "v6.8.1",
-  "date": "2026-11-11T10:26:01.694Z",
+  "date": "2026-11-11T10:27:21.493Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -531,6 +531,22 @@
       "emplacements": [
         "g_e7_d_pos_2"
       ]
+    },
+    {
+      "id": "1794392841493",
+      "domaine": "Château Montaudon",
+      "region": "Champagne ",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "emplacements": [
+        "g_e10_g_pos_5",
+        "g_e9_d_pos_5",
+        "g_e9_g_pos_5"
+      ],
+      "eff_color": "Blanc",
+      "eff_type": "Brut"
     }
   ],
   "history": [
