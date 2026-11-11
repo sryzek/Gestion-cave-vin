@@ -1,6 +1,6 @@
 {
   "version": "v6.8.1",
-  "date": "2026-11-11T10:32:43.712Z",
+  "date": "2026-11-11T16:48:04.336Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -195,7 +195,6 @@
       "envergure": "Détente",
       "profil": "Fruité/Vif",
       "emplacements": [
-        "g_e9_d_pos_1",
         "g_e9_d_pos_2",
         "g_e9_d_pos_3",
         "g_e9_d_pos_4"
@@ -561,6 +560,20 @@
     }
   ],
   "history": [
+    {
+      "id": "1791548935207",
+      "domaine": "Secret de chaix",
+      "region": "Loire",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "eff_color": "Rosé",
+      "eff_type": "Brut",
+      "idArchive": "1794415684328_1ng7l",
+      "dateSortie": "2026-11-11T16:48:04.329Z",
+      "note": 0
+    },
     {
       "id": "1792169240274",
       "domaine": "Chateau Lagrange de Lescure",
