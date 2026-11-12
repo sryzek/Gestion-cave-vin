@@ -1,6 +1,6 @@
 {
   "version": "v6.9.0",
-  "date": "2026-11-12T20:47:24.428Z",
+  "date": "2026-11-12T20:48:04.299Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -556,6 +556,20 @@
       "profil": "Fruité/Vif",
       "emplacements": [
         "g_e9_d_pos_1"
+      ],
+      "eff_color": "Blanc",
+      "eff_type": "Brut"
+    },
+    {
+      "id": "1794516484297",
+      "domaine": "Prosseco Mionetto",
+      "region": "Espagne",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "g_e7_d_pos_4"
       ],
       "eff_color": "Blanc",
       "eff_type": "Brut"
