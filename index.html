@@ -637,7 +637,7 @@
                 }
             } catch (err) {
                 console.error("Échec de la synchro GitHub :", err);
-                alert(`🔍 DEBUG LECTURE (v6.8.1) :\nURL: ${url}\nToken: ${cleanToken.substring(0, 4)}... (Taille: ${cleanToken.length} chars)\nOwner: [${cleanOwner}]\nRepo: [${cleanRepo}]\nErreur: ${err.message}`);
+                alert(`🔍 DEBUG LECTURE (v6.9.0) :\nURL: ${url}\nToken: ${cleanToken.substring(0, 4)}... (Taille: ${cleanToken.length} chars)\nOwner: [${cleanOwner}]\nRepo: [${cleanRepo}]\nErreur: ${err.message}`);
             }
         }
 
@@ -653,7 +653,7 @@
             const url = `https://api.github.com/repos/${cleanOwner}/${cleanRepo}/contents/${cleanPath}`;
             
             const exportDate = new Date().toISOString();
-            const exportData = { version: "v6.8.1", date: exportDate, inventory: wineInventory, history: wineHistory };
+            const exportData = { version: "v6.9.0", date: exportDate, inventory: wineInventory, history: wineHistory };
             
             const jsonString = JSON.stringify(exportData, null, 2);
             const utf8Bytes = new TextEncoder().encode(jsonString);
@@ -705,14 +705,14 @@
                 console.log("Données sauvegardées sur GitHub avec succès !");
             } catch (err) {
                 console.error("Erreur de sauvegarde GitHub :", err);
-                alert(`🔍 DEBUG ÉCRITURE (v6.8.1) :\nURL: ${url}\nToken taille: ${cleanToken.length}\nSHA existant: ${sha ? 'Oui' : 'Non'}\nErreur: ${err.message}`);
+                alert(`🔍 DEBUG ÉCRITURE (v6.9.0) :\nURL: ${url}\nToken taille: ${cleanToken.length}\nSHA existant: ${sha ? 'Oui' : 'Non'}\nErreur: ${err.message}`);
             }
         }
 
         // Sauvegarde locale uniquement (bouton disquette 💾)
         function exporterJSON() {
             const exportDate = new Date().toISOString();
-            const exportData = { version: "v6.8.1", date: exportDate, inventory: wineInventory, history: wineHistory };
+            const exportData = { version: "v6.9.0", date: exportDate, inventory: wineInventory, history: wineHistory };
             const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
             const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
             a.download = `ma_cave_ryzek_complete_${exportDate.slice(0,10)}.json`;
@@ -1139,24 +1139,75 @@
             renderCellar('cave-visuelle-ranger', 'arrivages');
         }
 
+        // --- GESTION DES DOUBLONS ---
+        
+        function findVinExistant(domaineStr, millesimeStr) {
+            if (!domaineStr) return null;
+            const cleanDomaine = domaineStr.trim().toLowerCase();
+            const cleanMillesime = (millesimeStr || "").toString().trim();
+
+            return wineInventory.find(w => 
+                w.domaine.trim().toLowerCase() === cleanDomaine && 
+                (w.millesime || "").toString().trim() === cleanMillesime
+            );
+        }
+
         function validerAllocation() {
             if (pendingSlots.length === 0) return;
+            
+            const domaineSaisi = document.getElementById('domaine').value;
+            const regionSaisie = document.getElementById('region').value;
+            const millesimeSaisi = document.getElementById('millesime').value;
             const couleur = document.getElementById('couleur').value;
+            
+            // 1. Recherche du doublon
+            const vinExistant = findVinExistant(domaineSaisi, millesimeSaisi);
+
+            if (vinExistant) {
+                // 2A. Cas du doublon détecté -> Demande de confirmation
+                const msg = `Le vin "${vinExistant.domaine}" (${vinExistant.millesime || 'NV'}) existe déjà dans votre cave (actuellement ${vinExistant.emplacements.length} bouteille(s)).\n\nVoulez-vous fusionner ce nouvel arrivage avec la fiche existante ?\n\n(OK = Fusionner / Annuler = Créer une nouvelle fiche distincte)`;
+                
+                if (confirm(msg)) {
+                    // Fusion : on ajoute les nouveaux slots à l'existant
+                    vinExistant.emplacements.push(...pendingSlots);
+                    
+                    // On met à jour les autres champs au cas où
+                    vinExistant.region = regionSaisie; 
+                    vinExistant.envergure = document.getElementById('envergure').value;
+                    vinExistant.profil = document.getElementById('profil').value;
+                    
+                    if (couleur === 'Effervescent') {
+                        vinExistant.eff_color = document.querySelector('input[name="eff_color"]:checked').value;
+                        vinExistant.eff_type = document.querySelector('input[name="eff_type"]:checked').value;
+                    }
+                    
+                    finaliserAllocation();
+                    return;
+                }
+            }
+            
+            // 2B. Cas normal (Création) OU Forçage de création suite au "Annuler" du confirm()
             const newWine = {
                 id: Date.now().toString(),
-                domaine: document.getElementById('domaine').value,
-                region: document.getElementById('region').value,
-                millesime: document.getElementById('millesime').value,
+                domaine: domaineSaisi,
+                region: regionSaisie,
+                millesime: millesimeSaisi,
                 couleur: couleur,
                 envergure: document.getElementById('envergure').value,
                 profil: document.getElementById('profil').value,
                 emplacements: [...pendingSlots]
             };
+            
             if (couleur === 'Effervescent') {
                 newWine.eff_color = document.querySelector('input[name="eff_color"]:checked').value;
                 newWine.eff_type = document.querySelector('input[name="eff_type"]:checked').value;
             }
+            
             wineInventory.push(newWine);
+            finaliserAllocation();
+        }
+        
+        function finaliserAllocation() {
             saveToLocalStorage(); 
             document.getElementById('wine-form').reset();
             document.getElementById('effervescent-options').style.display = 'none';
