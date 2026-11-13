@@ -1,6 +1,6 @@
 {
   "version": "v6.9.0",
-  "date": "2026-11-12T21:03:24.109Z",
+  "date": "2026-11-13T12:17:47.659Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -12,20 +12,6 @@
       "profil": "Fruité/Vif",
       "emplacements": [
         "g_e10_g_pos_1"
-      ],
-      "eff_color": "Blanc",
-      "eff_type": "Brut"
-    },
-    {
-      "id": "1790788503513",
-      "domaine": "Sieur Gaillard ",
-      "region": "BORDEAUX ",
-      "millesime": "",
-      "couleur": "Effervescent",
-      "envergure": "Détente",
-      "profil": "Fruité/Vif",
-      "emplacements": [
-        "g_e10_d_pos_3"
       ],
       "eff_color": "Blanc",
       "eff_type": "Brut"
@@ -548,6 +534,20 @@
     }
   ],
   "history": [
+    {
+      "id": "1790788503513",
+      "domaine": "Sieur Gaillard ",
+      "region": "BORDEAUX ",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "eff_color": "Blanc",
+      "eff_type": "Brut",
+      "idArchive": "1794572267656_9no5q",
+      "dateSortie": "2026-11-13T12:17:47.656Z",
+      "note": 0
+    },
     {
       "id": "1791219517112",
       "domaine": "Terrasous réserve ",
