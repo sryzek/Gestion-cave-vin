@@ -1,6 +1,6 @@
 {
   "version": "v6.9.0",
-  "date": "2026-11-14T12:52:22.103Z",
+  "date": "2026-11-14T12:54:28.143Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -547,6 +547,23 @@
         "g_e4_d_pos_3",
         "g_e4_d_pos_4",
         "g_e4_d_pos_5"
+      ]
+    },
+    {
+      "id": "1794660868141",
+      "domaine": "Michel Edelzwicker",
+      "region": "Alsace ",
+      "millesime": "2025",
+      "couleur": "Blanc",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "g_e2_d_pos_5",
+        "g_e2_g_pos_1",
+        "g_e2_g_pos_2",
+        "g_e2_g_pos_3",
+        "g_e2_g_pos_4",
+        "g_e2_g_pos_5"
       ]
     }
   ],
