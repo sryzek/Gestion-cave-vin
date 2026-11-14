@@ -1,6 +1,6 @@
 {
   "version": "v6.9.0",
-  "date": "2026-11-14T12:54:28.143Z",
+  "date": "2026-11-14T18:07:46.318Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -565,6 +565,24 @@
         "g_e2_g_pos_4",
         "g_e2_g_pos_5"
       ]
+    },
+    {
+      "id": "1794679666312",
+      "domaine": "Michel Crémant ",
+      "region": "Alsace ",
+      "millesime": "2025",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "emplacements": [
+        "esc_vrac_pos_64",
+        "esc_vrac_pos_65",
+        "esc_vrac_pos_66",
+        "esc_vrac_pos_67",
+        "esc_vrac_pos_68"
+      ],
+      "eff_color": "Blanc",
+      "eff_type": "Brut"
     }
   ],
   "history": [
