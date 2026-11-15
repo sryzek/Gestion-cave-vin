@@ -1,6 +1,6 @@
 {
   "version": "v6.9.0",
-  "date": "2026-11-14T18:07:46.318Z",
+  "date": "2026-11-15T11:29:46.488Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -201,7 +201,6 @@
       "envergure": "Dégustation",
       "profil": "Puissant/Rond",
       "emplacements": [
-        "esc_vrac_pos_7",
         "esc_vrac_pos_8",
         "esc_vrac_pos_9",
         "esc_vrac_pos_10",
@@ -586,6 +585,18 @@
     }
   ],
   "history": [
+    {
+      "id": "1792169142360",
+      "domaine": "Courtet Laperre",
+      "region": "Madiran ",
+      "millesime": "2016",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "idArchive": "1794742186485_ovy3n",
+      "dateSortie": "2026-11-15T11:29:46.485Z",
+      "note": 0
+    },
     {
       "id": "1790788503513",
       "domaine": "Sieur Gaillard ",
