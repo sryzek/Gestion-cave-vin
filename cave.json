@@ -1,6 +1,6 @@
 {
   "version": "v6.9.0",
-  "date": "2026-11-17T20:06:31.237Z",
+  "date": "2026-11-17T20:07:19.740Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -54,18 +54,6 @@
       "profil": "Puissant/Rond",
       "emplacements": [
         "g_e8_d_pos_4"
-      ]
-    },
-    {
-      "id": "1791218633200",
-      "domaine": "Cocteaux",
-      "region": "Loire",
-      "millesime": "2025",
-      "couleur": "Rosé",
-      "envergure": "Détente",
-      "profil": "Fruité/Vif",
-      "emplacements": [
-        "g_e7_d_pos_1"
       ]
     },
     {
@@ -584,6 +572,18 @@
     }
   ],
   "history": [
+    {
+      "id": "1791218633200",
+      "domaine": "Cocteaux",
+      "region": "Loire",
+      "millesime": "2025",
+      "couleur": "Rosé",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "idArchive": "1794946039739_olbe6",
+      "dateSortie": "2026-11-17T20:07:19.739Z",
+      "note": 0
+    },
     {
       "id": "1790788614307",
       "domaine": "Gratin & Meyer",
