@@ -1,6 +1,6 @@
 {
   "version": "v6.9.0",
-  "date": "2026-11-15T11:29:46.488Z",
+  "date": "2026-11-17T20:06:31.237Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -25,7 +25,6 @@
       "envergure": "Détente",
       "profil": "Fruité/Vif",
       "emplacements": [
-        "g_e10_d_pos_5",
         "g_e10_g_pos_2",
         "g_e10_g_pos_3"
       ],
@@ -585,6 +584,20 @@
     }
   ],
   "history": [
+    {
+      "id": "1790788614307",
+      "domaine": "Gratin & Meyer",
+      "region": "Loire",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "eff_color": "Blanc",
+      "eff_type": "Brut",
+      "idArchive": "1794945991219_ibpeh",
+      "dateSortie": "2026-11-17T20:06:31.220Z",
+      "note": 0
+    },
     {
       "id": "1792169142360",
       "domaine": "Courtet Laperre",
