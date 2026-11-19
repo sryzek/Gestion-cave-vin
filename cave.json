@@ -1,6 +1,6 @@
 {
   "version": "v6.9.0",
-  "date": "2026-11-17T20:07:19.740Z",
+  "date": "2026-11-19T18:40:44.224Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -569,6 +569,18 @@
       ],
       "eff_color": "Blanc",
       "eff_type": "Brut"
+    },
+    {
+      "id": "1795113644217",
+      "domaine": "Wolfberger",
+      "region": "Alsace",
+      "millesime": "2024",
+      "couleur": "Blanc",
+      "envergure": "Dégustation",
+      "profil": "Moelleux/Liquoreux",
+      "emplacements": [
+        "g_e10_d_pos_3"
+      ]
     }
   ],
   "history": [
