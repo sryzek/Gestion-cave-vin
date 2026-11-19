@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Gouvernance — Portefeuille projets (PPM V2.6)</title>
+  <style>
+    :root{
+      --lille-red:#C10F1A;
+      --lille-red-2:#a50d16;
+      --ink:#0f172a;
+      --muted:#64748b;
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --border:#e5e7eb;
+      --shadow:0 10px 24px rgba(15,23,42,.08);
+      --r:16px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--ink);
+      background:var(--bg);
+    }
+
+    @page{ size:A4 landscape; margin:10mm; }
+    @media print{
+      *{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+      body{background:#fff !important;}
+      .topbar{position:static; box-shadow:none;}
+      .ppm-nav, .split-entries, .filter-bar, .actions, .actions-th, .actions-td, .toast, .modal-backdrop{display:none !important;}
+      .main{max-width:100%; margin:0; padding:0;}
+      .panel{box-shadow:none; border:none;}
+      table{min-width:0 !important;}
+    }
+
+    /* Top bar */
+    .topbar{
+      position:sticky; top:0; z-index:50;
+      background:var(--lille-red);
+      color:#fff;
+      padding:12px 16px;
+      box-shadow:0 6px 18px rgba(0,0,0,.18);
+    }
+    .topbar-row{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      max-width:1380px; margin:0 auto;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px; min-width:0;
+    }
+    .brand .badge{
+      width:38px; height:38px; border-radius:10px;
+      background:rgba(255,255,255,.14);
+      display:flex; align-items:center; justify-content:center;
+      font-weight:800;
+    }
+    .brand .titles{min-width:0}
+    .brand .h1{
+      font-weight:800; letter-spacing:.2px;
+      font-size:16px; line-height:1.15;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .brand .sub{
+      font-size:12px; opacity:.92;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .actions{
+      display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end;
+    }
+    .btn{
+      border:1px solid rgba(255,255,255,.35);
+      background:transparent;
+      color:#fff;
+      padding:8px 12px;
+      border-radius:999px;
+      font-weight:700;
+      font-size:12px;
+      cursor:pointer;
+      display:inline-flex; align-items:center; gap:6px;
+      transition:all .15s ease;
+      user-select:none;
+    }
+    .btn:hover{background:rgba(255,255,255,.10)}
+    .btn:active{transform:translateY(1px)}
+    .btn.primary{
+      background:#fff;
+      color:var(--lille-red);
+      border-color:#fff;
+    }
+    .btn.primary:hover{background:#f1f5f9; border-color:#f1f5f9}
+
+    /* Navigation inter-supports PPM */
+    .ppm-nav{
+      background:#fff;
+      border-bottom:1px solid var(--border);
+      padding:8px 16px;
+    }
+    .ppm-nav-row{
+      max-width:1380px;
+      margin:0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .ppm-links{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .ppm-link{
+      text-decoration:none;
+      padding:6px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      color:var(--ink);
+      background:#f1f5f9;
+      border:1px solid var(--border);
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .ppm-link:hover{background:#e2e8f0}
+    .ppm-link.active{
+      background:rgba(193,15,26,.10);
+      color:var(--lille-red);
+      border-color:rgba(193,15,26,.30);
+    }
+
+    .main{
+      max-width:1380px;
+      margin:14px auto 24px;
+      padding:0 14px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+    }
+
+    /* LES 2 ENTREES */
+    .split-entries{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:16px;
+    }
+    @media (max-width: 900px){
+      .split-entries{grid-template-columns: 1fr;}
+    }
+    .entry-card{
+      border-radius:20px;
+      padding:20px;
+      border:1px solid var(--border);
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      position:relative;
+      overflow:hidden;
+      box-shadow:var(--shadow);
+    }
+    .entry-card h2{
+      margin:0 0 6px 0;
+      font-size:18px;
+      font-weight:900;
+      position:relative;
+      z-index:2;
+    }
+    .entry-card p{
+      margin:0 0 18px 0;
+      font-size:12.5px;
+      color:var(--muted);
+      line-height:1.4;
+      position:relative;
+      z-index:2;
+    }
+    .entry-btn{
+      padding:14px 20px;
+      border-radius:12px;
+      border:none;
+      font-size:14px;
+      font-weight:900;
+      cursor:pointer;
+      text-align:center;
+      transition:transform 0.1s;
+      position:relative;
+      z-index:2;
+      box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    }
+    .entry-btn:active{transform:scale(0.98);}
+
+    .entry-idee{
+      background:linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+      border-color:#d1d5db;
+    }
+    .entry-idee h2{color:#0f172a;}
+    .entry-idee .entry-btn{background:#0f172a; color:#fff;}
+    .entry-idee .entry-btn:hover{background:#1e293b;}
+    .entry-icon-1{
+      position:absolute; right:-10px; top:-20px; font-size:120px; opacity:0.04; z-index:1; transform:rotate(15deg);
+    }
+
+    .entry-douane{
+      background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      border-color:#bbf7d0;
+    }
+    .entry-douane h2{color:#14532d;}
+    .entry-douane p{color:#166534;}
+    .entry-douane .entry-btn{background:#16a34a; color:#fff;}
+    .entry-douane .entry-btn:hover{background:#15803d;}
+    .entry-icon-2{
+      position:absolute; right:10px; top:-10px; font-size:100px; opacity:0.06; z-index:1;
+    }
+
+    .entry-kpis{
+      display:flex; gap:12px; margin-bottom:14px; position:relative; z-index:2;
+    }
+    .ekpi{
+      background:rgba(255,255,255,0.75);
+      padding:8px 12px;
+      border-radius:10px;
+      border:1px solid rgba(0,0,0,0.05);
+      flex:1;
+    }
+    .ekpi .val{font-size:20px; font-weight:900;}
+    .ekpi .lab{font-size:11px; font-weight:800; text-transform:uppercase; color:var(--muted); margin-top:2px;}
+
+    /* Table Panel */
+    .panel{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      min-width:0;
+    }
+    .panel-head{
+      padding:12px 14px;
+      border-bottom:1px solid var(--border);
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+      background:linear-gradient(180deg, rgba(193,15,26,.05), rgba(255,255,255,0));
+    }
+    .panel-title{font-weight:900}
+    .panel-sub{color:var(--muted); font-size:12px; margin-top:2px}
+    .chip{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 10px; border-radius:999px;
+      border:1px solid var(--border);
+      background:#fff;
+      font-size:12px; font-weight:800;
+      white-space:nowrap;
+    }
+    .panel-body{padding:12px 14px}
+
+    /* Filter Bar PPM */
+    .filter-bar{
+      display:grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1.2fr 1fr auto;
+      gap:8px;
+      margin-bottom:12px;
+      background:#f8fafc;
+      padding:10px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      align-items:center;
+    }
+    @media (max-width: 1050px){
+      .filter-bar{grid-template-columns: 1fr 1fr;}
+    }
+
+    /* Table */
+    .table-wrap{overflow:auto; border:1px solid var(--border); border-radius:12px;}
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width: 1320px;
+      table-layout: fixed;
+    }
+    th, td{
+      padding:10px 8px;
+      border-bottom:1px solid var(--border);
+      vertical-align:middle;
+      font-size:12.5px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    th{
+      position:sticky; top:0;
+      background:#f8fafc;
+      z-index:1;
+      font-size:11px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.5px;
+      font-weight:800;
+      border-bottom:2px solid var(--border);
+      text-align:left;
+    }
+    tr:hover td{background:#f8fafc;}
+    td.wrap{white-space:normal;}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace}
+    .small{font-size:11.5px; color:var(--muted)}
+
+    .badge{
+      display:inline-flex; align-items:center;
+      padding:3px 8px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#fff;
+      font-weight:800;
+      font-size:11px;
+      gap:4px;
+      max-width:100%;
+    }
+    .b-qualif{border-color:#cbd5e1; background:#f1f5f9; color:#0f172a}
+    .b-precad{border-color:#bae6fd; background:#f0f9ff; color:#0369a1}
+    .b-pivot{border-color:#bbf7d0; background:#f0fdf4; color:#166534}
+    .b-orphan{border-color:#fdba74; background:#fff7ed; color:#9a3412}
+
+    /* Priorités */
+    .b-prio1{border-color:#fca5a5; background:#fef2f2; color:#b91c1c;}
+    .b-prio2{border-color:#fdba74; background:#fff7ed; color:#c2410c;}
+    .b-prio3{border-color:#93c5fd; background:#eff6ff; color:#1d4ed8;}
+    .b-prio4{border-color:#cbd5e1; background:#f8fafc; color:#475569;}
+
+    /* Status Dot (Fraîcheur) */
+    .status-dot{
+      display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:4px;
+    }
+    .st-ok{background:#22c55e; box-shadow:0 0 4px rgba(34,197,94,.5);}
+    .st-warn{background:#f59e0b; box-shadow:0 0 4px rgba(245,158,11,.5);}
+    .st-bad{background:#ef4444; box-shadow:0 0 4px rgba(239,68,68,.5);}
+
+    .actions-col{
+      display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end;
+    }
+    .iconbtn{
+      border:1px solid var(--border);
+      background:#fff;
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:800;
+      cursor:pointer;
+      font-size:11.5px;
+      display:inline-flex; gap:5px; align-items:center;
+      white-space:nowrap;
+      transition:background .15s;
+    }
+    .iconbtn:hover{background:#f8fafc}
+    .iconbtn.primary{background:var(--lille-red); color:#fff; border-color:var(--lille-red)}
+    .iconbtn.primary:hover{background:var(--lille-red-2)}
+    .iconbtn.action{background:#0f172a; color:#fff; border-color:#0f172a}
+    .iconbtn.action:hover{background:#1e293b}
+    .iconbtn.danger{border-color:#fecaca; background:#fff1f2; color:#991b1b}
+
+    .toast{
+      position:fixed; left:14px; bottom:14px; background:#111827; color:#fff;
+      padding:10px 16px; border-radius:999px; font-size:13px; z-index:9999;
+      box-shadow:0 10px 18px rgba(0,0,0,.18);
+    }
+
+    /* Modals */
+    .modal-backdrop{
+      position:fixed; inset:0; background:rgba(15,23,42,.6);
+      display:none; align-items:center; justify-content:center;
+      padding:14px; z-index:10000;
+    }
+    .modal{
+      width:min(780px, 100%); max-height:92vh; overflow:auto;
+      background:#fff; border-radius:18px; border:1px solid var(--border);
+      box-shadow:var(--shadow);
+    }
+    .modal-head{
+      padding:16px 20px;
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+      border-bottom:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(193,15,26,.04), rgba(255,255,255,0));
+    }
+    .modal-title{font-weight:950; font-size:16px; margin-bottom:4px;}
+    .modal-body{padding:20px}
+    .form{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    @media (max-width: 700px){ .form{grid-template-columns:1fr} }
+    label{font-size:12.5px; color:var(--muted); font-weight:800; display:block; margin-bottom:6px;}
+    input, select, textarea{
+      width:100%; padding:10px; border:1px solid var(--border); border-radius:10px;
+      font-size:13px; outline:none; background:#fff; font-family:inherit;
+    }
+    textarea{min-height:70px; resize:vertical; line-height:1.4;}
+    input:focus, select:focus, textarea:focus{border-color:#cbd5e1; box-shadow:0 0 0 3px rgba(148,163,184,.15)}
+    .modal-foot{
+      padding:16px 20px; border-top:1px solid var(--border);
+      display:flex; gap:10px; justify-content:flex-end; background:#f8fafc;
+    }
+    .btn2{
+      border:1px solid var(--border); background:#fff; padding:10px 18px;
+      border-radius:999px; font-weight:900; cursor:pointer; font-size:13px;
+    }
+    .btn2.primary{background:var(--lille-red); color:#fff; border-color:var(--lille-red)}
+    .btn2.ghost{background:transparent; border-color:transparent;}
+
+    .section-title{
+      grid-column:1/-1; font-weight:900; font-size:14px;
+      padding-bottom:8px; border-bottom:1px solid var(--border);
+      margin-top:8px; margin-bottom:4px;
+    }
+
+    .report-list{
+      margin-top:6px;
+      font-size:12.5px;
+      background:#f8fafc;
+      border:1px solid var(--border);
+      border-radius:10px;
+      padding:12px;
+      max-height:220px;
+      overflow-y:auto;
+    }
+    .report-item{
+      margin-bottom:8px;
+      padding-bottom:8px;
+      border-bottom:1px solid rgba(17,24,39,.05);
+    }
+    .report-item:last-child{border-bottom:none; margin-bottom:0; padding-bottom:0;}
+
+    /* Largeurs de colonnes PPM (9 colonnes alignées) */
+    th.col-id, td.col-id{ width:110px; }
+    th.col-proj, td.col-proj{ width:260px; }
+    th.col-dir, td.col-dir{ width:130px; }
+    th.col-cdp, td.col-cdp{ width:145px; }
+    th.col-stat, td.col-stat{ width:110px; }
+    th.col-prio, td.col-prio{ width:75px; text-align:center; }
+    th.col-bud, td.col-bud{ width:110px; }
+    th.charge-th, td.charge-td{ width:125px; }
+    th.actions-th, td.actions-td{ width:215px; text-align:right; }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar-row">
+      <div class="brand">
+        <div class="badge">DNSI</div>
+        <div class="titles">
+          <div class="h1">Portefeuille projets — PPM V2.6</div>
+          <div class="sub" id="govName">Gouvernance ➔ Programme ➔ Projet / Idée</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="btnRefresh">🔄 Réactualiser</button>
+        <button class="btn" id="btnPdf">🧾 PDF</button>
+        <button class="btn" id="btnSaveToGov" style="background:rgba(0,0,0,.25); border-color:transparent;">💾 Enregistrer localement</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation 5 Piliers (0. Synthèse en maître) -->
+  <nav class="ppm-nav">
+    <div class="ppm-nav-row">
+      <div class="ppm-links">
+        <a class="ppm-link" href="Gouvernance - 0. Synthese.html">📊 0. Synthèse CODIR</a>
+        <a class="ppm-link" href="Gouvernance - 1. Programmes.html">🎯 1. Programmes</a>
+        <a class="ppm-link active" href="Gouvernance - 2. Portefeuille.html">📚 2. Portefeuille Projets</a>
+        <a class="ppm-link" href="Gouvernance - 3. Capacite.html">⚙️ 3. Capacité DNSI</a>
+        <a class="ppm-link" href="Gouvernance - 4. Strategie.html">🧠 4. Stratégie & Arbitrage</a>
+      </div>
+      <div class="small">
+        <span class="chip" id="chipSync" style="padding:2px 8px; font-size:11px;">—</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main">
+
+    <div class="split-entries">
+      <!-- CAPTER DEMANDE (Temps 1) -->
+      <div class="entry-card entry-idee">
+        <div class="entry-icon-1">💡</div>
+        <div>
+          <h2>Capter une Demande / Idée</h2>
+          <p>Collecte des besoins métiers. Saisie ultra-rapide des intentions sans chiffrage initial.</p>
+        </div>
+        <div class="entry-kpis">
+          <div class="ekpi">
+            <div class="val" id="kpiIdees" style="color:#0f172a">0</div>
+            <div class="lab">À qualifier / Pré-cadrages</div>
+          </div>
+          <div class="ekpi">
+            <div class="val" id="kpiOrphans" style="color:#c2410c">0</div>
+            <div class="lab">Hors programme</div>
+          </div>
+        </div>
+        <button class="entry-btn" id="btnOpenDemande">➕ Nouvelle Demande</button>
+      </div>
+
+      <!-- SUIVI PROJETS LANCES (JSON CP) -->
+      <div class="entry-card entry-douane">
+        <div class="entry-icon-2">🛂</div>
+        <div>
+          <h2>Suivi des Projets Lancés</h2>
+          <p>Mise à jour du portefeuille via les JSON des CDP. Contrôle automatique de fraîcheur.</p>
+        </div>
+        <div class="entry-kpis">
+          <div class="ekpi">
+            <div class="val" id="kpiPivots" style="color:#166534">0</div>
+            <div class="lab">Projets pilotés (JSON)</div>
+          </div>
+        </div>
+        <button class="entry-btn" id="btnLoadPivots">⬆️ Auditer & Charger JSON</button>
+      </div>
+    </div>
+
+    <!-- REFERENTIEL PORTEFEUILLE -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">Référentiel des Demandes et Projets</div>
+          <div class="panel-sub">Workflow : Idée ➔ Qualification PMO (Programme + Chiffrage) ➔ Pré-Cadrage ➔ Projet Lancé</div>
+        </div>
+        <div class="chip" id="chipCount" style="background:#f1f5f9; border:none;">—</div>
+      </div>
+
+      <div class="panel-body">
+        <div class="filter-bar">
+          <input type="text" id="fltSearch" placeholder="🔍 Rechercher (ID, Projet, CDP, Programme...)" />
+          <select id="fltDir">
+            <option value="">🏢 Toutes les directions</option>
+          </select>
+          <select id="fltPrio">
+            <option value="">🎯 Toutes priorités</option>
+            <option value="P1">🔴 P1 (Prioritaire)</option>
+            <option value="P2">🟠 P2 (Haute)</option>
+            <option value="P3">🔵 P3 (Normale)</option>
+            <option value="P4">⚪ P4 (Basse)</option>
+          </select>
+
+          <!-- FILTRE DYNAMIQUE DES PROGRAMMES + HORS PROGRAMME -->
+          <select id="fltProg">
+            <option value="">🎯 Tous les programmes</option>
+          </select>
+
+          <select id="fltPivot">
+            <option value="">📂 Tous statuts</option>
+            <option value="with">✅ Projets Lancés (Pivot)</option>
+            <option value="without">💡 Idées & Pré-Cadrages</option>
+          </select>
+          <button class="btn2 ghost" id="btnResetFilters" style="padding:6px; font-size:16px;" title="Effacer les filtres">✖</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="col-id">ID</th>
+                <th class="col-proj">Demande / Projet & Programme</th>
+                <th class="col-dir">Direction</th>
+                <th class="col-cdp">CDP & Fraîcheur</th>
+                <th class="col-stat">Statut Cycle</th>
+                <th class="col-prio">Prio.</th>
+                <th class="col-bud">Budget</th>
+                <th class="charge-th">Charges</th>
+                <th class="actions-th">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <div style="text-align:center; color:var(--muted); font-size:12px; margin-top:12px;">Portefeuille projets — PPM V2.6 (Rattachement Programmes & Détection Hors Programme)</div>
+      </div>
+    </section>
+  </main>
+
+  <input type="file" id="filePivots" accept="application/json,.json" multiple style="display:none"/>
+
+  <!-- MODAL TEMPS 1 : Expression du Besoin -->
+  <div class="modal-backdrop" id="modalIdee" role="dialog" aria-modal="true">
+    <div class="modal" style="max-width:680px;">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">➕ Temps 1 : Expression du Besoin (Métier)</div>
+          <div class="small">Déclaration pure de l'intention et de la douleur. Zéro chiffrage.</div>
+        </div>
+        <button class="btn2 ghost" onclick="el('modalIdee').style.display='none'">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form" style="grid-template-columns:1fr;">
+          <div style="display:flex; gap:16px;">
+            <div style="flex:1;">
+              <label>ID projet *</label>
+              <input id="iId" placeholder="ex : FIN-2027-01"/>
+            </div>
+            <div style="flex:2;">
+              <label>Titre de la demande *</label>
+              <input id="iName" placeholder="Titre explicite de l'attente métier..."/>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:16px;">
+            <div style="flex:1;">
+              <label>Direction / Service</label>
+              <input id="iDir" placeholder="ex : Finances"/>
+            </div>
+            <div style="flex:1;">
+              <label>Sponsor / Demandeur</label>
+              <input id="iSponsor" placeholder="Nom du référent métier"/>
+            </div>
+          </div>
+
+          <div>
+            <label>Origine du besoin *</label>
+            <select id="iOrigine">
+              <option value="">-- Sélectionnez l'origine principale --</option>
+              <option value="dette">🏗️ Dette technique / Rationalisation SI</option>
+              <option value="obsolescence">🚨 Fin de vie / Obsolescence / Fin de maintenance</option>
+              <option value="marche">📜 Renouvellement de marché public</option>
+              <option value="legal">⚖️ Obligation réglementaire ou légale (RGPD, loi...)</option>
+              <option value="mandat">🏛️ Engagement du mandat / Décision DGA</option>
+              <option value="service">🚀 Création d'un nouveau service usager</option>
+              <option value="interne">📈 Gain d'efficacité interne métier</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Quel est le problème à résoudre ou l'attente ? *</label>
+            <textarea id="iDescription" placeholder="Décrivez la douleur métier actuelle ou l'objectif attendu. Ne décrivez pas une solution technique."></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn2 ghost" onclick="el('modalIdee').style.display='none'">Annuler</button>
+        <button class="btn2 primary" id="btnCreateIdee">Capter la demande</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL TEMPS 2 : Qualification PMO -->
+  <div class="modal-backdrop" id="modalQualif" role="dialog" aria-modal="true">
+    <div class="modal" style="max-width:800px;">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">🎯 Temps 2 : Qualification PMO & Rattachement Programme</div>
+          <div class="small">Challenger la demande, la rattacher à un Programme, définir la Priorité et le Macro-chiffrage.</div>
+        </div>
+        <button class="btn2 ghost" onclick="el('modalQualif').style.display='none'">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="qIdProj" />
+
+        <div style="background:#f8fafc; padding:12px; border-radius:12px; border:1px solid var(--border); margin-bottom:16px;">
+          <div style="font-size:12px; color:var(--muted); font-weight:800; margin-bottom:4px;">Demande originelle</div>
+          <div style="font-weight:900; font-size:14px; margin-bottom:8px;" id="qDisplayTitle">—</div>
+          <div style="font-size:12px; color:#334155; font-style:italic;" id="qDisplayDesc">—</div>
+          <div style="margin-top:8px; font-size:12px; font-weight:800; color:var(--lille-red);">Origine : <span id="qDisplayOrigine">—</span></div>
+        </div>
+
+        <div class="form">
+          <div class="section-title">1. Rattachement Programme & Priorisation</div>
+
+          <div>
+            <label>Programme de rattachement</label>
+            <select id="qProg">
+              <!-- Rempli dynamiquement depuis GOV.programmes -->
+            </select>
+          </div>
+          <div>
+            <label>Priorité évaluée</label>
+            <select id="qPrio">
+              <option value="P1">🔴 P1 (Vitale / Absolue)</option>
+              <option value="P2">🟠 P2 (Haute)</option>
+              <option value="P3">🔵 P3 (Normale / De confort)</option>
+              <option value="P4">⚪ P4 (Basse / Optionnelle)</option>
+            </select>
+          </div>
+
+          <div class="section-title">2. Macro-chiffrage « À dire d'expert »</div>
+
+          <div style="grid-column:1/-1;">
+            <label>Taille du projet (Pré-remplissage rapide)</label>
+            <select id="qTShirt" onchange="applyTShirtSizing()" style="border-color:#0f172a; width:50%;">
+              <option value="">-- Choisir un T-Shirt Sizing --</option>
+              <option value="S">Taille S (~15j)</option>
+              <option value="M">Taille M (~40j)</option>
+              <option value="L">Taille L (~80j)</option>
+              <option value="XL">Taille XL (~150j+)</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Charge CDP / Études (Jours)</label>
+            <input id="qChargeCDP" type="number" min="0" step="1" value="0"/>
+          </div>
+          <div>
+            <label>Charge MCO / Infra (Jours)</label>
+            <input id="qChargeMCO" type="number" min="0" step="1" value="0"/>
+          </div>
+          <div>
+            <label>Budget Investissement (k€)</label>
+            <input id="qBudgetK" type="number" min="0" step="1" value="0"/>
+          </div>
+          <div>
+            <label>Budget Fonctionnement (k€/an)</label>
+            <input id="qBudgetFonctK" type="number" min="0" step="1" value="0"/>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn2 ghost" onclick="el('modalQualif').style.display='none'">Annuler</button>
+        <button class="btn2 primary" id="btnSaveQualif" style="background:#0f172a; border-color:#0f172a;">Valider la Qualification</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL RAPPORT D'AUDIT & INTEGRATION JSON -->
+  <div class="modal-backdrop" id="modalIntegration" role="dialog" aria-modal="true">
+    <div class="modal" style="width:min(720px, 100%);">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">🛂 Rapport d'Audit & Chargement JSON</div>
+          <div class="small">Bilan de l'intégration des fichiers JSON de vos chefs de projets</div>
+        </div>
+        <button class="btn2 ghost" onclick="el('modalIntegration').style.display='none'">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="font-weight:900; font-size:14px; color:#166534; margin-bottom:6px;">
+          ✅ Projets chargés / mis à jour (<span id="intUpdatedCount">0</span>)
+        </div>
+        <div class="report-list" id="listUpdated"></div>
+
+        <div style="font-weight:900; font-size:14px; color:#991b1b; margin-top:18px; margin-bottom:6px;">
+          ⚠️ Projets pilotés absents de ce lot (<span id="intMissingCount">0</span>)
+        </div>
+        <div class="small" style="margin-bottom:8px;">
+          Ces projets sont marqués comme lancés dans la gouvernance mais n'étaient pas présents dans votre sélection.
+        </div>
+        <div class="report-list" id="listMissing"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn2 primary" style="background:#16a34a; border-color:#16a34a;" onclick="el('modalIntegration').style.display='none'">Fermer le rapport</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const APP_VERSION = "V2.6";
+    const SUPPORT_PROJECT_URL = "https://sryzek.github.io/Support-Projets/";
+    const STORAGE_KEY = "GOUVERNANCE_JSON";
+
+    function nowISO(){ return new Date().toISOString(); }
+    function el(id){ return document.getElementById(id); }
+    function safeJsonParse(t){ try{ return JSON.parse(t); }catch(e){ return null; } }
+
+    function diffDays(isoString, nowObj) {
+      if(!isoString) return 999;
+      const d = new Date(isoString);
+      if(isNaN(d.getTime())) return 999;
+      return Math.floor(Math.abs(nowObj - d) / (1000 * 60 * 60 * 24));
+    }
+
+    function escapeHtml(s){
+      return String(s||"").replace(/[&<>"']/g, m => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
+
+    function toast(msg){
+      const d = document.createElement("div");
+      d.className = "toast";
+      d.textContent = msg;
+      document.body.appendChild(d);
+      setTimeout(()=>d.remove(), 2600);
+    }
+
+    function applyTShirtSizing(){
+      const val = el("qTShirt").value;
+      if(val === "S") { el("qChargeCDP").value = 10; el("qChargeMCO").value = 5; }
+      else if(val === "M") { el("qChargeCDP").value = 30; el("qChargeMCO").value = 10; }
+      else if(val === "L") { el("qChargeCDP").value = 60; el("qChargeMCO").value = 20; }
+      else if(val === "XL") { el("qChargeCDP").value = 110; el("qChargeMCO").value = 40; }
+    }
+
+    function normalizePriorityValue(v){
+      let s = (v===null || v===undefined) ? "" : String(v);
+      s = s.trim().toUpperCase();
+      if(!s) return "P2";
+      let m = s.match(/P\s*0*([1-4])/);
+      if(m) return "P"+m[1];
+      m = s.match(/^\s*([1-4])\s*$/);
+      if(m) return "P"+m[1];
+      return "P2";
+    }
+
+    /* =============================
+       Normalisation Gouvernance & Programmes
+    ============================== */
+    function getProgrammesList(g){
+      if(Array.isArray(g?.programmes) && g.programmes.length > 0) return g.programmes;
+      if(Array.isArray(g?.politiques) && g.politiques.length > 0) return g.politiques;
+      return [];
+    }
+
+    function normalizeProjectRecord(p){
+      if(!p || typeof p !== "object") return null;
+      const id = String(p.id || p.code || "").trim();
+      const nom = String(p.nom || p.name || id).trim();
+      const priorite = normalizePriorityValue(p.priorite ?? p.prio ?? "P2");
+      const has_pivot = !!(p.has_pivot ?? p.hasPivot);
+
+      let cdp = Number(p?.charges?.cdp ?? 0);
+      let mco = Number(p?.charges?.mco ?? 0);
+      let tot = Number(p?.charges?.total ?? p.charge_estimee_jours ?? p.charge ?? 0);
+      if(tot > 0 && cdp === 0 && mco === 0){
+        cdp = Math.round(tot * 0.7);
+        mco = Math.max(0, tot - cdp);
+      } else if(cdp > 0 || mco > 0){
+        tot = cdp + mco;
+      }
+
+      const invK = Number(p?.budget?.investK ?? p?.budget?.amountK ?? p?.budget?.k ?? 0);
+      const fonctK = Number(p?.budget?.fonctK ?? 0);
+
+      // Unification programme_id / axe_strategique
+      const progId = String(p.programme_id ?? p.axe_strategique ?? "").trim();
+
+      return {
+        ...p,
+        id, nom, name: nom,
+        direction: String(p.direction || p.domain || "").trim(),
+        has_pivot, hasPivot: has_pivot,
+        status: p.status || (has_pivot ? "cadrage_valide" : "idee"),
+        phase: p.phase || "",
+        programme_id: progId,
+        axe_strategique: progId,
+        origine_besoin: p.origine_besoin || "",
+        description_besoin: p.description_besoin || "",
+        priorite, prio: priorite,
+        cdp_nom: String(p.cdp_nom || p.manager || p.chef_de_projet || "").trim(),
+        budget: { year: Number(p?.budget?.year ?? 2026), amountK: invK, investK: invK, fonctK },
+        charges: { unite: "jours", cdp, mco, total: tot },
+        charge_estimee_jours: tot,
+        _last_pivot_update_at: p._last_pivot_update_at || p.updatedAt || p._created_at || nowISO()
+      };
+    }
+
+    function normalizeGovernance(j){
+      if(!j || typeof j !== "object") return null;
+      const g = JSON.parse(JSON.stringify(j));
+      g.meta = g.meta || { schema: "gouvernance-dnsi", version: "3.2", nom: "Gouvernance DNSI" };
+      g.portefeuille = g.portefeuille || {};
+      const rawProjs = Array.isArray(g.portefeuille.projets) ? g.portefeuille.projets : [];
+      g.portefeuille.projets = rawProjs.map(normalizeProjectRecord).filter(Boolean);
+      g.programmes = Array.isArray(g.programmes) ? g.programmes : (Array.isArray(g.politiques) ? g.politiques : []);
+      return g;
+    }
+
+    function loadGov(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw) return normalizeGovernance(safeJsonParse(raw));
+      return normalizeGovernance({ portefeuille: { projets: [] }, programmes: [] });
+    }
+
+    function notifyUpdate(){
+      try{
+        const bc = new BroadcastChannel("dnsi-gouvernance");
+        bc.postMessage({ type: "GOUVERNANCE_UPDATED", source: "portefeuille" });
+        bc.close();
+      }catch(e){}
+    }
+
+    function saveGov(g){
+      g.meta.lastUpdatedAt = nowISO();
+      g.meta.dernier_enregistrement = g.meta.lastUpdatedAt;
+      g.portefeuille.projets = (g.portefeuille.projets || []).map(normalizeProjectRecord);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(g));
+      localStorage.setItem("dnsigov.portfolio", JSON.stringify({
+        projects: g.portefeuille.projets.map(p => ({
+          ...p, hasPivot: p.has_pivot, pivotStatus: p.has_pivot ? "avec" : "sans"
+        }))
+      }));
+      notifyUpdate();
+    }
+
+    let GOV = loadGov();
+
+    /* =============================
+       Badges & Filtres Programmes
+    ============================== */
+    function resolveProgramme(progId){
+      if(!progId) return null;
+      const list = getProgrammesList(GOV);
+      return list.find(p => String(p.id) === String(progId)) || null;
+    }
+
+    function programmeBadge(proj){
+      const prg = resolveProgramme(proj.programme_id);
+      if(prg){
+        const col = prg.couleur || "#5b21b6";
+        const label = prg.code ? `${prg.code} · ${prg.titre}` : prg.titre;
+        return `<span class="badge" style="background:${escapeHtml(col)}16; border-color:${escapeHtml(col)}55; color:${escapeHtml(col)};" title="${escapeHtml(prg.id)} — ${escapeHtml(prg.titre)}">
+          ${escapeHtml(prg.icone || "🎯")} ${escapeHtml(label)}
+        </span>`;
+      }
+      return `<span class="badge b-orphan" title="Non rattaché à un programme">⚠️ Hors programme</span>`;
+    }
+
+    function statusBadge(hasPivot, status) {
+      if(hasPivot) return `<span class="badge b-pivot">✅ Lancé</span>`;
+      if(status === "pre_cadrage") return `<span class="badge b-precad">🔍 Pré-cadrage</span>`;
+      return `<span class="badge b-qualif">💡 À qualifier</span>`;
+    }
+
+    function prioBadge(p){
+      const v = normalizePriorityValue(p.priorite);
+      let cls = "b-prio2";
+      if(v==="P1") cls="b-prio1";
+      else if(v==="P2") cls="b-prio2";
+      else if(v==="P3") cls="b-prio3";
+      else if(v==="P4") cls="b-prio4";
+      return `<span class="badge ${cls}" style="font-size:11.5px; padding:3px 8px;">${v}</span>`;
+    }
+
+    function getFilteredProjects(projects){
+      const q = (el("fltSearch")?.value || "").toLowerCase().trim();
+      const d = el("fltDir")?.value || "";
+      const pr = el("fltPrio")?.value || "";
+      const pg = el("fltProg")?.value || "";
+      const pv = el("fltPivot")?.value || "";
+
+      return projects.filter(p => {
+        const prgObj = resolveProgramme(p.programme_id);
+        const prgSearch = prgObj ? `${prgObj.id} ${prgObj.code || ""} ${prgObj.titre}` : "hors programme";
+        if(q && !`${p.id} ${p.nom} ${p.cdp_nom} ${p.direction} ${prgSearch}`.toLowerCase().includes(q)) return false;
+        if(d && (p.direction || "").trim() !== d) return false;
+        if(pr && normalizePriorityValue(p.priorite) !== pr) return false;
+        if(pg === "__NONE__" && prgObj) return false;
+        if(pg && pg !== "__NONE__" && String(p.programme_id) !== pg) return false;
+        if(pv === "with" && !p.has_pivot) return false;
+        if(pv === "without" && p.has_pivot) return false;
+        return true;
+      });
+    }
+
+    function render(){
+      const allProjects = GOV.portefeuille.projets || [];
+      const programmes = getProgrammesList(GOV);
+
+      const last = GOV?.meta?.lastUpdatedAt ? new Date(GOV.meta.lastUpdatedAt) : null;
+      el("chipSync").textContent = last ? ("Dernière MAJ : " + last.toLocaleTimeString("fr-FR", {hour:'2-digit', minute:'2-digit'})) : "—";
+
+      // Filtre Directions
+      const dirs = [...new Set(allProjects.map(p => (p.direction || "").trim()).filter(Boolean))].sort();
+      const selDir = el("fltDir");
+      const currentDir = selDir.value;
+      selDir.innerHTML = `<option value="">🏢 Toutes les directions</option>` + dirs.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join("");
+      if(dirs.includes(currentDir)) selDir.value = currentDir;
+
+      // Filtre Programmes + Hors programme
+      const selProg = el("fltProg");
+      const currentProg = selProg.value;
+      selProg.innerHTML =
+        `<option value="">🎯 Tous les programmes</option>` +
+        `<option value="__NONE__">⚠️ Hors programme (non rattachés)</option>` +
+        programmes.map(p => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.icone || "🎯")} ${escapeHtml(p.id)} — ${escapeHtml(p.titre)}</option>`).join("");
+      selProg.value = currentProg;
+
+      const projects = getFilteredProjects(allProjects);
+      el("chipCount").textContent = `${projects.length} / ${allProjects.length} demande(s)`;
+
+      // KPIs
+      let nbIdees = 0, nbPivots = 0, nbOrphans = 0;
+      for(const p of allProjects){
+        if(p.has_pivot) nbPivots++; else nbIdees++;
+        if(!resolveProgramme(p.programme_id)) nbOrphans++;
+      }
+      el("kpiIdees").textContent = nbIdees;
+      el("kpiPivots").textContent = nbPivots;
+      el("kpiOrphans").textContent = nbOrphans;
+      el("kpiOrphans").style.color = nbOrphans > 0 ? "#c2410c" : "#16a34a";
+
+      const tb = el("tbody");
+      tb.innerHTML = "";
+      const now = new Date();
+
+      if(projects.length === 0){
+        tb.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:28px; color:var(--muted);">Aucun projet ou demande ne correspond aux filtres.</td></tr>`;
+        return;
+      }
+
+      for(const p of projects){
+        const tr = document.createElement("tr");
+        const bInv = Number(p?.budget?.investK ?? 0);
+        const bFct = Number(p?.budget?.fonctK ?? 0);
+        const cdpVal = Number(p?.charges?.cdp ?? 0);
+        const mcoVal = Number(p?.charges?.mco ?? 0);
+        const totVal = cdpVal + mcoVal;
+        const statusVal = String(p.status || "idee");
+
+        let freshnessHtml = `<span class="small" style="color:#94a3b8">À affecter</span>`;
+        if (p.has_pivot) {
+          const days = diffDays(p._last_pivot_update_at, now);
+          let statusDot = "st-ok"; let msg = `${days}j`;
+          if (days > 30) { statusDot = "st-bad"; msg = "> 1 mois"; } else if (days > 15) { statusDot = "st-warn"; }
+          const cdpName = p.cdp_nom || "Non assigné";
+          freshnessHtml = `<div style="font-weight:800; font-size:12.5px;">${escapeHtml(cdpName)}</div><div class="small"><span class="status-dot ${statusDot}"></span> JSON : ${msg}</div>`;
+        } else if (p.cdp_nom) {
+          freshnessHtml = `<div style="font-weight:800; font-size:12.5px; color:#64748b">${escapeHtml(p.cdp_nom)}</div><div class="small">Sponsor / Référent</div>`;
+        }
+
+        let actHtml = "";
+        if(p.has_pivot) {
+          actHtml = `<button class="iconbtn action" data-act="open" data-id="${encodeURIComponent(p.id)}">🚀 Ouvrir</button>
+                     <button class="iconbtn" data-act="qualify" data-id="${encodeURIComponent(p.id)}" title="Modifier programme / priorité">🎯</button>`;
+        } else if(statusVal === "idee") {
+          actHtml = `<button class="iconbtn primary" data-act="qualify" data-id="${encodeURIComponent(p.id)}">🎯 Qualifier PMO</button>`;
+        } else if(statusVal === "pre_cadrage") {
+          actHtml = `<button class="iconbtn" data-act="init" data-id="${encodeURIComponent(p.id)}" style="background:#16a34a; color:#fff; border-color:#16a34a;">🛠️ JSON</button>
+                     <button class="iconbtn" data-act="qualify" data-id="${encodeURIComponent(p.id)}">✏️ Éditer</button>`;
+        }
+        actHtml += `<button class="iconbtn danger" data-act="remove" data-id="${encodeURIComponent(p.id)}" title="Supprimer">✕</button>`;
+
+        let budgetHtml = "—";
+        let chargeHtml = "—";
+        if(statusVal === "pre_cadrage" || p.has_pivot) {
+          budgetHtml = `<div><b>Inv: ${bInv}k</b></div><div class="small">Fct: ${bFct}k/an</div>`;
+          chargeHtml = `<div><b>Tot: ${totVal} j</b></div><div class="small">CDP:${cdpVal} MCO:${mcoVal}</div>`;
+        }
+
+        tr.innerHTML = `
+          <td class="col-id mono" style="font-weight:900; color:var(--lille-red);">${escapeHtml(p.id || "")}</td>
+          <td class="col-proj wrap">
+            <b style="font-size:13px;">${escapeHtml(p.nom || "")}</b>
+            <div style="display:flex; gap:5px; flex-wrap:wrap; margin-top:5px;">
+              ${statusBadge(p.has_pivot, statusVal)}
+              ${programmeBadge(p)}
+            </div>
+          </td>
+          <td class="col-dir">${escapeHtml(p.direction) || "—"}</td>
+          <td class="col-cdp">${freshnessHtml}</td>
+          <td class="col-stat">${p.has_pivot ? `<b>${escapeHtml(p.phase || "Lancé")}</b>` : (statusVal==="idee" ? "Intention métier" : "Pré-Cadré")}</td>
+          <td class="col-prio">${(statusVal!=="idee" || p.has_pivot) ? prioBadge(p) : "—"}</td>
+          <td class="col-bud">${budgetHtml}</td>
+          <td class="charge-td">${chargeHtml}</td>
+          <td class="actions-td"><div class="actions-col">${actHtml}</div></td>
+        `;
+        tb.appendChild(tr);
+      }
+
+      tb.querySelectorAll("button[data-act]").forEach(b=>{
+        b.addEventListener("click", ()=>{
+          const act = b.getAttribute("data-act");
+          const id = decodeURIComponent(b.getAttribute("data-id"));
+
+          if(act === "remove") {
+            if(confirm(`Supprimer définitivement la demande ${id} ?`)){
+              GOV.portefeuille.projets = GOV.portefeuille.projets.filter(x => String(x.id) !== id);
+              saveGov(GOV); render(); toast("Supprimé.");
+            }
+          }
+          else if(act === "open") window.open(`${SUPPORT_PROJECT_URL}?id=${encodeURIComponent(id)}`, '_blank');
+          else if(act === "init") initializeProjectJson(id);
+          else if(act === "qualify") openModalQualif(id);
+        });
+      });
+    }
+
+    /* =============================
+       TEMPS 1 : CAPTER DEMANDE
+    ============================== */
+    function openModalIdee(){
+      el("iId").value=""; el("iName").value=""; el("iDir").value="";
+      el("iSponsor").value=""; el("iDescription").value=""; el("iOrigine").value="";
+      el("modalIdee").style.display = "flex";
+    }
+
+    el("btnCreateIdee").onclick = () => {
+      const id = String(el("iId").value||"").trim();
+      const name = String(el("iName").value||"").trim();
+      const desc = String(el("iDescription").value||"").trim();
+      const origine = String(el("iOrigine").value||"").trim();
+
+      if(!id || !name || !origine){
+        alert("L'ID, le Titre et l'Origine sont obligatoires pour la traçabilité.");
+        return;
+      }
+      if(GOV.portefeuille.projets.some(p => String(p.id) === id)){
+        alert("Cet ID de projet existe déjà.");
+        return;
+      }
+
+      GOV.portefeuille.projets.push(normalizeProjectRecord({
+        id, nom: name,
+        direction: el("iDir").value,
+        status: "idee",
+        has_pivot: false,
+        programme_id: "",
+        axe_strategique: "",
+        cdp_nom: el("iSponsor").value,
+        origine_besoin: origine,
+        description_besoin: desc
+      }));
+      saveGov(GOV); render(); el('modalIdee').style.display='none';
+      toast(`Demande ${id} captée avec succès.`);
+    };
+
+    /* =============================
+       TEMPS 2 : QUALIFICATION PMO & PROGRAMME
+    ============================== */
+    function openModalQualif(projectId) {
+      const proj = GOV.portefeuille.projets.find(p => String(p.id) === String(projectId));
+      if (!proj) return;
+
+      el("qIdProj").value = proj.id;
+      el("qDisplayTitle").textContent = `${proj.id} — ${proj.nom}`;
+      el("qDisplayDesc").textContent = proj.description_besoin || "Aucune description fournie par le métier.";
+
+      const originesLabels = {
+        dette: "Dette technique / Rationalisation",
+        obsolescence: "Fin de vie / Obsolescence",
+        marche: "Renouvellement de marché",
+        legal: "Obligation légale/réglementaire",
+        mandat: "Mandat / Décision DGA",
+        service: "Nouveau service usager",
+        interne: "Gain d'efficacité interne"
+      };
+      el("qDisplayOrigine").textContent = originesLabels[proj.origine_besoin] || proj.origine_besoin || "Non défini";
+
+      // Population dynamique des Programmes (+ Hors programme)
+      const programmes = getProgrammesList(GOV).filter(p => p.statut !== "cloture" && p.statut !== "inactif");
+      const selectProg = el("qProg");
+      selectProg.innerHTML =
+        `<option value="">⚠️ Hors programme (Socle / Isolé)</option>` +
+        programmes.map(p => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.icone || "🎯")} ${escapeHtml(p.id)}${p.code ? " · " + escapeHtml(p.code) : ""} — ${escapeHtml(p.titre)}</option>`).join("");
+
+      const currentPrg = resolveProgramme(proj.programme_id);
+      selectProg.value = currentPrg ? currentPrg.id : "";
+
+      el("qPrio").value = normalizePriorityValue(proj.priorite);
+      el("qTShirt").value = "";
+
+      el("qChargeCDP").value = proj.charges?.cdp || 0;
+      el("qChargeMCO").value = proj.charges?.mco || 0;
+      el("qBudgetK").value = proj.budget?.investK || 0;
+      el("qBudgetFonctK").value = proj.budget?.fonctK || 0;
+
+      el("modalQualif").style.display = "flex";
+    }
+
+    el("btnSaveQualif").onclick = () => {
+      const id = el("qIdProj").value;
+      const proj = GOV.portefeuille.projets.find(p => String(p.id) === id);
+      if(!proj) return;
+
+      if(!proj.has_pivot) proj.status = "pre_cadrage";
+      const chosenProg = el("qProg").value;
+      proj.programme_id = chosenProg;
+      proj.axe_strategique = chosenProg;
+      proj.priorite = el("qPrio").value;
+
+      const cdpVal = Number(el("qChargeCDP").value) || 0;
+      const mcoVal = Number(el("qChargeMCO").value) || 0;
+      proj.charges = { unite: "jours", cdp: cdpVal, mco: mcoVal, total: cdpVal + mcoVal };
+
+      const invK = Number(el("qBudgetK").value) || 0;
+      const fctK = Number(el("qBudgetFonctK").value) || 0;
+      proj.budget = { year: proj.budget?.year||2026, amountK: invK, investK: invK, fonctK: fctK };
+
+      saveGov(GOV); render(); el("modalQualif").style.display="none";
+      toast(`Projet ${id} qualifié ✅`);
+    };
+
+    /* =============================
+       Action 3 : Génération du JSON Projet
+    ============================== */
+    function initializeProjectJson(projectId) {
+      const proj = GOV.portefeuille.projets.find(p => String(p.id) === String(projectId));
+      if (!proj) return;
+
+      const prg = resolveProgramme(proj.programme_id);
+      const descInit = proj.description_besoin ? `Besoin métier : ${proj.description_besoin}` : "Projet initialisé par le PMO.";
+
+      const pivotTemplate = {
+        project: {
+          id: proj.id,
+          title: proj.nom,
+          domain: proj.direction,
+          programmeId: prg ? prg.id : "",
+          programmeTitle: prg ? prg.titre : "Hors programme",
+          phaseCourante: "Cadrage",
+          priority: proj.priorite,
+          owner: "",
+          description: descInit,
+          actors: { directeurProjet: "", expertMetier: proj.cdp_nom || "", moe: "", prestataire: "" },
+          progress: { percent: 0, label: "Initialisation" },
+          updatedAt: nowISO()
+        },
+        budget: {
+          year: proj.budget?.year || 2027, currency: "EUR",
+          amountK: proj.budget?.investK || 0, fonctK: proj.budget?.fonctK || 0,
+          comment: "Budget évalué en phase de qualification PMO"
+        },
+        chargesProjet: {
+          unit: "jours",
+          totalEstimated: proj.charges?.total || 0,
+          assumption: "Chiffrage macro initial PMO",
+          teams: [
+            { code: "CDP", label: "Chefs de Projet / Études", estimated: proj.charges?.cdp || 0 },
+            { code: "MCO", label: "Infrastructures / MCO", estimated: proj.charges?.mco || 0 }
+          ]
+        },
+        meteo: {
+          situation: "soleil_nuages", tendance: "stable", color: "orange",
+          resume: descInit,
+          actionsRealisees: ["Qualification stratégique PMO validée"],
+          actionsEnCours: ["Cadrage détaillé et lancement du projet"],
+          pointsAttention: []
+        },
+        phases: [],
+        config: { sentinelleActive: false }
+      };
+
+      const jsonStr = JSON.stringify(pivotTemplate, null, 2);
+      const blob = new Blob([jsonStr], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `${proj.id}.json`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+      toast(`✅ Fichier ${proj.id}.json généré. Transmettez-le au CDP !`);
+    }
+
+    /* =============================
+       Entrée 2 : Audit & Chargement JSON CDP
+    ============================== */
+    async function handlePivots(files){
+      const arr = Array.from(files || []);
+      if(!arr.length) return;
+      const projects = GOV.portefeuille.projets;
+      const seen = new Set();
+      const report = { updated: [], created: [], missing: [] };
+
+      for(const f of arr){
+        try{
+          const txt = await f.text();
+          const j = safeJsonParse(txt);
+          if(!j) continue;
+
+          const proj = j.project || j;
+          const id = String(proj.id || proj.code || "").trim();
+          if(!id) continue;
+
+          seen.add(id);
+          const name = proj.title || proj.nom || proj.name || f.name;
+          const cdp = proj.manager || proj.chef_de_projet || proj.cdp || proj.owner || proj.actors?.directeurProjet || "";
+          const pDate = proj.updatedAt || proj.date || nowISO();
+          const progFromPivot = String(proj.programmeId || "").trim();
+
+          let cdpJ=0, mcoJ=0;
+          const cpObj = j.chargesProjet || proj.chargesProjet;
+          if(cpObj && Array.isArray(cpObj.teams)){
+            const tCdp = cpObj.teams.find(t=>t.code==="CDP" || t.code==="ETUDES");
+            const tMco = cpObj.teams.find(t=>t.code==="MCO" || t.code==="INFRA" || t.code==="TIRS");
+            if(tCdp) cdpJ = Number(tCdp.estimated||0);
+            if(tMco) mcoJ = Number(tMco.estimated||0);
+          } else {
+            cdpJ = Number(proj.charge || proj.charge_estimee_jours || 0);
+          }
+
+          const bObj = j.budget || proj.budget || {};
+          const bInv = Number(bObj.investK ?? bObj.amountK ?? 0);
+          const bFct = Number(bObj.fonctK ?? 0);
+
+          const existing = projects.find(x => String(x.id) === id);
+          if(existing){
+            existing.nom = name;
+            existing.cdp_nom = cdp || existing.cdp_nom;
+            existing.has_pivot = true;
+            existing.phase = proj.phaseCourante || existing.phase;
+            existing._last_pivot_update_at = pDate;
+            if(progFromPivot && !existing.programme_id){
+              existing.programme_id = progFromPivot;
+              existing.axe_strategique = progFromPivot;
+            }
+            existing.charges = { unite:"jours", cdp:cdpJ, mco:mcoJ, total:cdpJ+mcoJ };
+            existing.budget = { year: bObj.year || existing.budget?.year || 2026, investK: bInv, fonctK: bFct, amountK: bInv };
+            report.updated.push(existing);
+          }else{
+            const newP = normalizeProjectRecord({
+              id, nom: name, cdp_nom: cdp, has_pivot: true, phase: proj.phaseCourante || "Lancé",
+              direction: proj.domain || "",
+              programme_id: progFromPivot,
+              _last_pivot_update_at: pDate, charges: { cdp:cdpJ, mco:mcoJ },
+              budget: { investK: bInv, fonctK: bFct }
+            });
+            projects.push(newP);
+            report.created.push(newP);
+          }
+        }catch(e){ console.error(e); }
+      }
+
+      for(const p of projects){
+        if(p.has_pivot && !seen.has(p.id)) report.missing.push(p);
+      }
+
+      saveGov(GOV); render(); showIntegrationReport(report);
+    }
+
+    function showIntegrationReport(rep){
+      const lUp = el("listUpdated"); const lMis = el("listMissing"); const now = new Date();
+
+      const allGood = [...rep.created, ...rep.updated];
+      el("intUpdatedCount").textContent = allGood.length;
+      lUp.innerHTML = allGood.map(p => {
+        const days = diffDays(p._last_pivot_update_at, now);
+        let warnStr = "";
+        if(days > 30) warnStr = `<span style="color:#ef4444; font-weight:800;">(⚠️ Périmé : ${days}j)</span>`;
+        else if (p.charges.total === 0) warnStr = `<span style="color:#f59e0b; font-weight:800;">(⚠️ Charge à 0)</span>`;
+        return `<div class="report-item"><b>${escapeHtml(p.id)}</b> - ${escapeHtml(p.nom)} <br/><span class="small">CDP : <b>${escapeHtml(p.cdp_nom||"Non Renseigné")}</b> • Maj ${new Date(p._last_pivot_update_at).toLocaleDateString('fr-FR')} ${warnStr}</span></div>`;
+      }).join("") || "<div class='small'>Aucun fichier traité.</div>";
+
+      el("intMissingCount").textContent = rep.missing.length;
+      lMis.innerHTML = rep.missing.map(p => `<div class="report-item" style="color:#991b1b"><b>${escapeHtml(p.id)}</b> - ${escapeHtml(p.nom)} <br/><span class="small">Dernière trace : ${new Date(p._last_pivot_update_at).toLocaleDateString('fr-FR')}</span></div>`).join("") || "<div class='small' style='color:#166534; font-weight:800;'>Aucun oubli ! ✅</div>";
+
+      el("modalIntegration").style.display = "flex";
+    }
+
+    /* =============================
+       Wiring & Synchro Temps Réel
+    ============================== */
+    el("btnOpenDemande").onclick = openModalIdee;
+    el("btnLoadPivots").onclick = () => { el("filePivots").value = ""; el("filePivots").click(); };
+    el("filePivots").onchange = (e) => handlePivots(e.target.files);
+    el("btnPdf").onclick = () => window.print();
+    el("btnRefresh").onclick = () => { GOV = loadGov(); render(); toast("Portefeuille réactualisé 🔄"); };
+    el("btnSaveToGov").onclick = () => { saveGov(GOV); toast("Gouvernance locale sauvegardée ✅"); };
+
+    ["fltSearch","fltDir","fltPrio","fltProg","fltPivot"].forEach(id=>{
+      el(id).addEventListener("input", render);
+      el(id).addEventListener("change", render);
+    });
+    el("btnResetFilters").onclick = () => {
+      ["fltSearch","fltDir","fltPrio","fltProg","fltPivot"].forEach(id=>el(id).value="");
+      render();
+    };
+
+    ["modalIdee", "modalQualif", "modalIntegration"].forEach(id => {
+      el(id).addEventListener("click", e => {
+        if(e.target === el(id)) el(id).style.display = "none";
+      });
+    });
+
+    window.addEventListener("storage", ev => {
+      if(ev.key === STORAGE_KEY){ GOV = loadGov(); render(); }
+    });
+    try{
+      const bc = new BroadcastChannel("dnsi-gouvernance");
+      bc.onmessage = ev => {
+        if(ev?.data?.type === "GOUVERNANCE_UPDATED" && ev?.data?.source !== "portefeuille"){
+          GOV = loadGov();
+          render();
+        }
+      };
+    }catch(e){}
+
+    render();
+  </script>
+</body>
+</html>

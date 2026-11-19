@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cockpit CODIR — Synthèse Gouvernance (V2.6)</title>
+<style>
+:root{
+  --brand:#C10F1A;
+  --brand-light:rgba(193,15,26,0.08);
+  --text:#0f172a;
+  --muted:#64748b;
+  --bg:#f6f7fb;
+  --card:#ffffff;
+  --border:#e2e8f0;
+
+  --ok:#16a34a;
+  --warn:#f59e0b;
+  --bad:#ef4444;
+
+  --potBlue:#3b82f6;
+  --hpOrange:#f59e0b;
+  --remGreen:#10b981;
+}
+
+*{box-sizing:border-box;}
+
+html,body{
+  margin:0; padding:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color:var(--text);
+  background:var(--bg);
+  font-size:13px;
+}
+
+/* Impression A3 Paysage CODIR */
+@page{ size:A3 landscape; margin:12mm; }
+@media print{
+  *{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  html, body{background:#fff !important;}
+  .wrap{max-width:100%; padding:0; margin:0;}
+  .topbar{box-shadow:none; position:static; margin-bottom:10px;}
+  .toolbar, .ppm-nav, .no-print, .toast{display:none !important;}
+  .grid-2x2{gap:12px; padding:0;}
+  .panel{break-inside:avoid; page-break-inside:avoid; box-shadow:none; border:1px solid #cbd5e1;}
+}
+
+.wrap{
+  max-width:1400px;
+  margin:0 auto;
+  padding:0 0 28px;
+}
+
+/* Top bar */
+.topbar{
+  position:sticky; top:0; z-index:50;
+  background:var(--brand);
+  color:#fff;
+  padding:12px 20px;
+  box-shadow:0 6px 18px rgba(0,0,0,.16);
+}
+.topbar-row{
+  display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  max-width:1360px; margin:0 auto;
+}
+.brand-ui{
+  display:flex; align-items:center; gap:14px;
+}
+.brand-ui .badge{
+  width:40px; height:40px; border-radius:11px;
+  background:rgba(255,255,255,.16);
+  display:flex; align-items:center; justify-content:center;
+  font-weight:900; font-size:13px;
+  color:#fff; border:none;
+}
+.brand-ui .h1{font-weight:900; font-size:17px; letter-spacing:.2px;}
+.brand-ui .sub{font-size:12px; opacity:.92;}
+
+.toolbar{
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+}
+.btn{
+  border:1px solid rgba(255,255,255,.32);
+  background:transparent; color:#fff;
+  padding:7px 13px; border-radius:999px;
+  font-weight:800; font-size:12px; cursor:pointer;
+  transition:all .15s ease;
+  display:inline-flex; align-items:center; gap:6px;
+}
+.btn:hover{background:rgba(255,255,255,.14);}
+.btn.action{background:#0f172a; border-color:#0f172a; color:#fff;}
+.btn.action:hover{background:#1e293b;}
+
+/* Navigation 5 Piliers */
+.ppm-nav{
+  background:#fff;
+  border-bottom:1px solid var(--border);
+  padding:8px 20px;
+  margin-bottom:16px;
+}
+.ppm-nav-row{
+  max-width:1360px; margin:0 auto;
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
+}
+.ppm-links{display:flex; gap:8px; flex-wrap:wrap;}
+.ppm-link{
+  text-decoration:none; padding:6px 12px; border-radius:999px;
+  font-size:12px; font-weight:800; color:var(--text);
+  background:#f1f5f9; border:1px solid var(--border);
+  display:inline-flex; align-items:center; gap:6px;
+}
+.ppm-link.active{
+  background:var(--brand-light);
+  color:var(--brand);
+  border-color:rgba(193,15,26,.28);
+}
+.ppm-link:hover:not(.active){background:#e2e8f0;}
+.chip-sync{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:4px 10px; border-radius:999px;
+  background:#f8fafc; border:1px solid var(--border);
+  font-size:11px; font-weight:800; color:var(--muted);
+}
+
+/* Grille 4 Quadrants */
+.grid-2x2{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:16px;
+  padding:0 20px;
+}
+@media (max-width: 1024px){ .grid-2x2{grid-template-columns: 1fr;} }
+
+.panel{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  box-shadow:0 8px 24px rgba(15,23,42,.04);
+  display:flex; flex-direction:column;
+}
+.panel-head{
+  padding:15px 20px;
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+  background:linear-gradient(180deg, #fff, #f8fafc);
+  border-radius:18px 18px 0 0;
+}
+.panel-title{
+  font-weight:900; font-size:15px; color:var(--text);
+  display:flex; align-items:center; gap:8px;
+}
+.panel-sub{font-size:12px; color:var(--muted); margin-top:3px; font-weight:500;}
+.panel-link{
+  text-decoration:none;
+  font-size:11.5px; font-weight:800; color:var(--brand);
+  padding:4px 10px; border-radius:999px;
+  background:var(--brand-light); white-space:nowrap;
+}
+.panel-link:hover{background:rgba(193,15,26,.14);}
+.panel-body{padding:18px 20px; flex:1;}
+
+/* KPIs */
+.kpi-grid{
+  display:grid; grid-template-columns:repeat(4, 1fr); gap:10px;
+}
+@media (max-width: 680px){ .kpi-grid{grid-template-columns:repeat(2, 1fr);} }
+.kpi-card{
+  border:1px solid var(--border); border-radius:12px; padding:11px 12px; background:#fff;
+  box-shadow:0 2px 8px rgba(0,0,0,.02);
+}
+.kpi-label{font-size:10.5px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.4px;}
+.kpi-val{font-size:22px; font-weight:900; color:var(--text); margin-top:6px; line-height:1;}
+.kpi-sub{font-size:11px; color:var(--muted); margin-top:5px;}
+
+/* Jauges Programmes */
+.axe-row{margin-bottom:13px;}
+.axe-row:last-child{margin-bottom:0;}
+.axe-head{
+  display:flex; justify-content:space-between; align-items:baseline; gap:8px;
+  font-size:13px; font-weight:800; margin-bottom:5px;
+}
+.axe-name{display:flex; align-items:center; gap:6px; min-width:0;}
+.axe-code{font-size:11px; color:var(--muted); font-weight:800;}
+.axe-val{font-weight:900; white-space:nowrap;}
+.axe-track{height:10px; background:#e2e8f0; border-radius:999px; overflow:hidden;}
+.axe-fill{height:100%; border-radius:999px; transition:width .3s ease;}
+
+/* Camembert Capacité */
+.cap-layout{
+  display:grid; grid-template-columns: 220px 1fr; gap:18px; align-items:center;
+}
+@media (max-width: 600px){ .cap-layout{grid-template-columns: 1fr;} }
+.pie-container{
+  display:flex; align-items:center; justify-content:center;
+  background:#f8fafc; border-radius:50%; border:1px solid var(--border);
+  padding:8px; box-shadow:inset 0 4px 12px rgba(0,0,0,.04);
+  width:210px; height:210px; margin:0 auto;
+}
+.cap-legend{display:flex; flex-direction:column; gap:10px;}
+.cap-item{
+  border:1px solid var(--border); border-radius:12px; padding:11px 13px;
+  display:flex; justify-content:space-between; align-items:center; background:#fff;
+}
+
+/* Stratégie / Arbitrage */
+.strat-box{
+  border:1px solid var(--border); border-radius:14px; padding:15px; margin-bottom:14px;
+  background:#f8fafc;
+}
+.strat-ok{background:#f0fdf4; border-color:#bbf7d0;}
+.strat-warn{background:#fffbeb; border-color:#fde68a;}
+.strat-bad{background:#fef2f2; border-color:#fecaca;}
+.strat-title{font-weight:900; font-size:15.5px; display:flex; align-items:center; gap:8px;}
+
+/* Table Projets Synthèse */
+table{width:100%; border-collapse:collapse; margin-top:8px;}
+th{
+  text-align:left; font-size:10.5px; color:var(--muted);
+  text-transform:uppercase; padding-bottom:8px; border-bottom:1px solid var(--border);
+}
+td{
+  padding:9px 4px; border-bottom:1px solid #f1f5f9;
+  font-size:12.5px; vertical-align:middle;
+}
+.mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size:11.5px;}
+
+.badge{
+  display:inline-flex; align-items:center; gap:4px;
+  padding:3px 8px; border-radius:999px;
+  font-size:11px; font-weight:800;
+  border:1px solid var(--border); background:#fff;
+}
+.b-orphan{border-color:#fdba74; background:#fff7ed; color:#9a3412;}
+.b-prio1{border-color:#fca5a5; background:#fef2f2; color:#b91c1c;}
+.b-prio2{border-color:#fdba74; background:#fff7ed; color:#c2410c;}
+.b-prio3{border-color:#93c5fd; background:#eff6ff; color:#1d4ed8;}
+.b-prio4{border-color:#cbd5e1; background:#f8fafc; color:#475569;}
+
+.empty-note{
+  padding:16px; border-radius:12px; background:#f8fafc;
+  border:1px dashed #cbd5e1; color:var(--muted);
+  font-size:12.5px; text-align:center; line-height:1.45;
+}
+
+.toast{
+  position:fixed; left:16px; bottom:16px;
+  background:#0f172a; color:#fff;
+  padding:10px 16px; border-radius:999px;
+  font-size:12.5px; font-weight:800;
+  z-index:99999; box-shadow:0 10px 24px rgba(0,0,0,.22);
+}
+
+.footer-ver{
+  text-align:center; color:var(--muted); font-size:11.5px; margin-top:16px;
+}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="printRoot">
+  <!-- Bandeau Top -->
+  <header class="topbar">
+    <div class="topbar-row">
+      <div class="brand-ui">
+        <div class="badge">PMO</div>
+        <div>
+          <div class="h1">Cockpit CODIR — Synthèse Gouvernance (V2.6)</div>
+          <div class="sub" id="subDate">Gouvernance DNSI • Programmes ➔ Portefeuille ➔ Capacité ➔ Stratégie</div>
+        </div>
+      </div>
+      <div class="toolbar no-print">
+        <button class="btn" id="btnRefresh">🔄 Réactualiser</button>
+        <button class="btn" id="btnImport">📥 Importer (.json)</button>
+        <button class="btn" id="btnSaveJson">💾 Sauvegarder (.json)</button>
+        <button class="btn action" id="btnPdf">🖨️ Exporter PDF (A3)</button>
+        <input type="file" id="fileInput" accept="application/json,.json" style="display:none"/>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation 5 Piliers (0. Synthèse en maître) -->
+  <nav class="ppm-nav no-print">
+    <div class="ppm-nav-row">
+      <div class="ppm-links">
+        <a class="ppm-link active" href="Gouvernance - 0. Synthese.html">📊 0. Synthèse CODIR</a>
+        <a class="ppm-link" href="Gouvernance - 1. Programmes.html">🎯 1. Programmes</a>
+        <a class="ppm-link" href="Gouvernance - 2. Portefeuille.html">📚 2. Portefeuille Projets</a>
+        <a class="ppm-link" href="Gouvernance - 3. Capacite.html">⚙️ 3. Capacité DNSI</a>
+        <a class="ppm-link" href="Gouvernance - 4. Strategie.html">🧠 4. Stratégie & Arbitrage</a>
+      </div>
+      <span class="chip-sync" id="chipSync">Source : Gouvernance.json</span>
+    </div>
+  </nav>
+
+  <!-- GRILLE CODIR (4 Quadrants) -->
+  <div class="grid-2x2">
+
+    <!-- QUADRANT 1 : PROGRAMMES & ALIGNEMENT -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">🎯 1. Programmes & Alignement Stratégique</div>
+          <div class="panel-sub" id="progSub">Répartition de la charge engagée (scénario actif) par Programme</div>
+        </div>
+        <a class="panel-link no-print" href="Gouvernance - 1. Programmes.html">Gérer ➔</a>
+      </div>
+      <div class="panel-body" id="dynamicProgrammesContainer">
+        <!-- Rempli dynamiquement -->
+      </div>
+    </section>
+
+    <!-- QUADRANT 2 : PORTEFEUILLE (LA DEMANDE) -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">📚 2. Portefeuille (La Demande)</div>
+          <div class="panel-sub">Entonnoir des demandes métiers, projets actifs et couverture Programme</div>
+        </div>
+        <a class="panel-link no-print" href="Gouvernance - 2. Portefeuille.html">Ouvrir ➔</a>
+      </div>
+      <div class="panel-body">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Volume Total</div>
+            <div class="kpi-val" id="pfTotal">0</div>
+            <div class="kpi-sub">idées + projets</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Idées / Pré-cad.</div>
+            <div class="kpi-val" id="pfIdees" style="color:#f59e0b">0</div>
+            <div class="kpi-sub">en instruction</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Projets Lancés</div>
+            <div class="kpi-val" id="pfPivots" style="color:#16a34a">0</div>
+            <div class="kpi-sub">avec JSON CP</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Couverture Pgm</div>
+            <div class="kpi-val" id="pfCoverage">—</div>
+            <div class="kpi-sub" id="pfOrphansSub">0 hors programme</div>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;">
+          <div class="kpi-label" style="margin-bottom:8px;">Répartition par priorité (portefeuille global)</div>
+          <div style="display:flex; height:12px; border-radius:999px; overflow:hidden; background:#e2e8f0;" id="prioBar"></div>
+          <div style="display:flex; justify-content:space-between; margin-top:7px; font-size:11.5px; font-weight:800;" id="prioLabels"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUADRANT 3 : CAPACITÉ DNSI (LES MOYENS) -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">⚙️ 3. Capacité DNSI (Les Moyens)</div>
+          <div class="panel-sub">Potentiel global, maintenance incompressible (MCO/RUN) et réserve projets</div>
+        </div>
+        <a class="panel-link no-print" href="Gouvernance - 3. Capacite.html">Ajuster ➔</a>
+      </div>
+      <div class="panel-body">
+        <div class="cap-layout">
+          <div class="pie-container">
+            <canvas id="pieCapacite" width="190" height="190"></canvas>
+          </div>
+          <div class="cap-legend">
+            <div class="cap-item" style="border-left:4px solid var(--potBlue);">
+              <div>
+                <div style="font-weight:900; font-size:13.5px;">Potentiel Total</div>
+                <div style="font-size:11.5px; color:var(--muted); margin-top:2px;">Capacité humaine brute DNSI</div>
+              </div>
+              <div style="font-size:17px; font-weight:900;" class="mono" id="legPot">0 j</div>
+            </div>
+            <div class="cap-item" style="border-left:4px solid var(--hpOrange);">
+              <div>
+                <div style="font-weight:900; font-size:13.5px;">Hors-projet (MCO / RUN)</div>
+                <div style="font-size:11.5px; color:var(--muted); margin-top:2px;">Maintenance & charges incompressibles</div>
+              </div>
+              <div style="font-size:17px; font-weight:900;" class="mono" id="legHP">0 j</div>
+            </div>
+            <div class="cap-item" style="border-left:4px solid var(--remGreen);">
+              <div>
+                <div style="font-weight:900; font-size:13.5px;">Réserve Projets</div>
+                <div style="font-size:11.5px; color:var(--muted); margin-top:2px;">Capacité mobilisable pour arbitrer</div>
+              </div>
+              <div style="font-size:17px; font-weight:900; color:var(--ok);" class="mono" id="legRem">0 j</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUADRANT 4 : STRATÉGIE & ARBITRAGE (L'ÉQUILIBRE) -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">🧠 4. Stratégie & Arbitrage (L'Équilibre)</div>
+          <div class="panel-sub">Scénario soumis au CODIR : <span id="stratName" style="font-weight:800; color:var(--text);">—</span></div>
+        </div>
+        <a class="panel-link no-print" href="Gouvernance - 4. Strategie.html">Simuler ➔</a>
+      </div>
+      <div class="panel-body">
+
+        <div class="strat-box" id="stratAlert">
+          <div class="strat-title" id="stratVerdictTitle">⚖️ Analyse en cours...</div>
+          <div style="font-size:12.5px; margin-top:5px; color:var(--muted);" id="stratVerdictSub">Vérification de la balance charge / capacité.</div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:12px; border-top:1px solid rgba(0,0,0,.06);">
+            <div>
+              <div style="font-size:10.5px; font-weight:800; color:var(--muted); text-transform:uppercase;">Réserve Projets</div>
+              <div style="font-size:16px; font-weight:900;" class="mono" id="stCap">0 j</div>
+            </div>
+            <div style="font-size:18px; color:var(--muted);">−</div>
+            <div>
+              <div style="font-size:10.5px; font-weight:800; color:var(--muted); text-transform:uppercase;">Charge Engagée</div>
+              <div style="font-size:16px; font-weight:900;" class="mono" id="stLoad">0 j</div>
+            </div>
+            <div style="font-size:18px; color:var(--muted);">=</div>
+            <div style="text-align:right;">
+              <div style="font-size:10.5px; font-weight:800; color:var(--muted); text-transform:uppercase;">Écart (Marge)</div>
+              <div style="font-size:18px; font-weight:900;" class="mono" id="stRest">0 j</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-weight:900; font-size:13px; margin-bottom:6px;">Projets phares du scénario (⭐ Sélection PDF)</div>
+        <table>
+          <thead>
+            <tr>
+              <th style="width:44%">Nom du Projet</th>
+              <th style="width:26%">Programme</th>
+              <th style="width:12%">Prio.</th>
+              <th style="width:18%; text-align:right;">Reste à faire</th>
+            </tr>
+          </thead>
+          <tbody id="stratTableBody">
+            <tr><td colspan="4" style="text-align:center; color:var(--muted); padding:14px;">Aucun projet mis en avant.</td></tr>
+          </tbody>
+        </table>
+        <div style="font-size:11.5px; color:var(--muted); margin-top:10px; text-align:right;">
+          Total des projets engagés dans ce scénario : <b id="stratCount">0</b>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="footer-ver">Gouvernance DNSI — Support 0 : Synthèse CODIR (V2.6) • Source : <span class="mono">GOUVERNANCE_JSON</span></div>
+</div>
+
+<script>
+const APP_VERSION = "V2.6";
+const STORAGE_KEY = "GOUVERNANCE_JSON";
+const FALLBACK_COLORS = ["#8b5cf6", "#f59e0b", "#2563eb", "#10b981", "#ef4444", "#0891b2", "#475569"];
+
+const $ = id => document.getElementById(id);
+const safeNum = n => (Number.isFinite(Number(n)) ? Number(n) : 0);
+
+function escapeHtml(s){
+  return String(s ?? "").replace(/[&<>"']/g, m => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[m]));
+}
+
+function toast(msg){
+  const d = document.createElement("div");
+  d.className = "toast";
+  d.textContent = msg;
+  document.body.appendChild(d);
+  setTimeout(() => d.remove(), 2500);
+}
+
+function normalizePriority(v){
+  let s = String(v||"").toUpperCase().replace(/\s+/g,"");
+  let m = s.match(/P0*([1-4])/);
+  if(m) return "P"+m[1];
+  m = s.match(/^[1-4]$/);
+  return m ? "P"+m[1] : "P2";
+}
+
+function loadGov(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return null;
+}
+
+function getProgrammesList(gov){
+  if(Array.isArray(gov?.programmes) && gov.programmes.length > 0) return gov.programmes;
+  if(Array.isArray(gov?.politiques) && gov.politiques.length > 0) return gov.politiques;
+  return [];
+}
+
+function getProjectProgId(proj, validIds){
+  const direct = String(proj.programme_id || proj.axe_strategique || "").trim();
+  return (direct && validIds.has(direct)) ? direct : "";
+}
+
+function getProjectRAF(p){
+  const av = Math.max(0, Math.min(100, safeNum(p.avancement ?? p.avancement_pct ?? p.progress?.percent ?? 0)));
+  const chargeTot = safeNum(p.charges?.total ?? p.charge_estimee_jours ?? p.charge ?? 0);
+  return Math.max(0, Math.round(chargeTot * (1 - av/100)));
+}
+
+function renderAll(){
+  const GOV = loadGov();
+  $("subDate").textContent = `Gouvernance DNSI • Édition du ${new Date().toLocaleDateString("fr-FR")}`;
+
+  if(!GOV){
+    $("chipSync").textContent = "Aucune donnée locale";
+    $("dynamicProgrammesContainer").innerHTML = `<div class="empty-note">Aucune gouvernance chargée en mémoire.<br/>Ouvre <b>1. Programmes</b> ou importe un fichier <b>Gouvernance.json</b>.</div>`;
+    return;
+  }
+
+  const last = GOV?.meta?.lastUpdatedAt || GOV?.meta?.dernier_enregistrement;
+  $("chipSync").textContent = last
+    ? `Dernière MAJ : ${new Date(last).toLocaleTimeString("fr-FR", {hour:"2-digit", minute:"2-digit"})}`
+    : "Source : Gouvernance.json";
+
+  const projets = Array.isArray(GOV.portefeuille?.projets) ? GOV.portefeuille.projets : [];
+  const programmes = getProgrammesList(GOV);
+  const validProgIds = new Set(programmes.map(p => String(p.id)));
+  const strat = GOV.strategie_courante || {};
+  const cap = GOV.capacite || {};
+  const selectionIds = new Set((strat.selection?.projets_lances || []).map(String));
+  const pdfIds = new Set((strat.selection?.projets_synthese || []).map(String));
+
+  /* =========================================================
+     QUADRANT 1 : PROGRAMMES & ALIGNEMENT STRATÉGIQUE
+  ========================================================= */
+  const progLoads = {};
+  programmes.forEach(p => { progLoads[String(p.id)] = 0; });
+
+  let totalEngagedDays = 0;
+  let orphanEngagedDays = 0;
+  const engagedProjects = [];
+
+  for(const p of projets){
+    if(selectionIds.has(String(p.id))){
+      engagedProjects.push(p);
+      const raf = getProjectRAF(p);
+      const pid = getProjectProgId(p, validProgIds);
+      if(pid && progLoads[pid] !== undefined) progLoads[pid] += raf;
+      else orphanEngagedDays += raf;
+      totalEngagedDays += raf;
+    }
+  }
+
+  const activeProgs = programmes.filter(p => p.statut !== "cloture" && p.statut !== "inactif");
+  const container = $("dynamicProgrammesContainer");
+
+  if(activeProgs.length === 0){
+    container.innerHTML = `<div class="empty-note">Aucun programme actif défini dans le Support <b>1. Programmes</b>.</div>`;
+  } else {
+    let html = activeProgs.map((prg, idx) => {
+      const load = progLoads[String(prg.id)] || 0;
+      const pct = totalEngagedDays > 0 ? Math.round((load / totalEngagedDays) * 100) : 0;
+      const color = prg.couleur || FALLBACK_COLORS[idx % FALLBACK_COLORS.length];
+      const codeStr = prg.code ? `${prg.id} · ${prg.code}` : prg.id;
+
+      return `
+        <div class="axe-row">
+          <div class="axe-head">
+            <span class="axe-name">
+              <span>${escapeHtml(prg.icone || "🎯")}</span>
+              <span>${escapeHtml(prg.titre)}</span>
+              <span class="axe-code mono">${escapeHtml(codeStr)}</span>
+            </span>
+            <span class="axe-val mono">${load.toLocaleString("fr-FR")} j (${pct}%)</span>
+          </div>
+          <div class="axe-track">
+            <div class="axe-fill" style="width:${pct}%; background-color:${escapeHtml(color)};"></div>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    if(orphanEngagedDays > 0){
+      const pctOrph = totalEngagedDays > 0 ? Math.round((orphanEngagedDays / totalEngagedDays) * 100) : 0;
+      html += `
+        <div class="axe-row" style="margin-top:14px; padding-top:10px; border-top:1px dashed #fdba74;">
+          <div class="axe-head" style="color:#9a3412;">
+            <span class="axe-name"><span>⚠️</span><span>Hors programme (projets engagés non rattachés)</span></span>
+            <span class="axe-val mono">${orphanEngagedDays.toLocaleString("fr-FR")} j (${pctOrph}%)</span>
+          </div>
+          <div class="axe-track">
+            <div class="axe-fill" style="width:${pctOrph}%; background-color:#f97316;"></div>
+          </div>
+        </div>
+      `;
+    }
+
+    if(engagedProjects.length === 0){
+      html += `<div style="margin-top:12px; font-size:11.5px; color:var(--muted); font-style:italic;">
+        ℹ️ Aucun projet engagé dans le scénario actif (Support 4) — les jauges se rempliront dès la sélection de projets.
+      </div>`;
+    }
+
+    container.innerHTML = html;
+  }
+
+  /* =========================================================
+     QUADRANT 2 : PORTEFEUILLE (LA DEMANDE)
+  ========================================================= */
+  $("pfTotal").textContent = projets.length;
+  let nbIdees = 0, nbPivots = 0, nbOrphans = 0;
+  const prioCount = {P1:0, P2:0, P3:0, P4:0};
+
+  for(const p of projets){
+    if(p.has_pivot || p.hasPivot) nbPivots++; else nbIdees++;
+    if(!getProjectProgId(p, validProgIds)) nbOrphans++;
+    const pr = normalizePriority(p.priorite ?? p.prio);
+    if(prioCount[pr] !== undefined) prioCount[pr]++;
+  }
+  $("pfIdees").textContent = nbIdees;
+  $("pfPivots").textContent = nbPivots;
+
+  if(projets.length === 0){
+    $("pfCoverage").textContent = "—";
+    $("pfCoverage").style.color = "var(--muted)";
+    $("pfOrphansSub").textContent = "portefeuille vide";
+  } else {
+    const covPct = Math.round(((projets.length - nbOrphans) / projets.length) * 100);
+    $("pfCoverage").textContent = `${covPct}%`;
+    $("pfCoverage").style.color = nbOrphans === 0 ? "var(--ok)" : "#c2410c";
+    $("pfOrphansSub").textContent = `${nbOrphans} hors programme`;
+  }
+
+  const totPrio = projets.length || 1;
+  $("prioBar").innerHTML = `
+    <div style="width:${(prioCount.P1/totPrio)*100}%; background:#ef4444;" title="P1 : ${prioCount.P1}"></div>
+    <div style="width:${(prioCount.P2/totPrio)*100}%; background:#f97316;" title="P2 : ${prioCount.P2}"></div>
+    <div style="width:${(prioCount.P3/totPrio)*100}%; background:#3b82f6;" title="P3 : ${prioCount.P3}"></div>
+    <div style="width:${(prioCount.P4/totPrio)*100}%; background:#94a3b8;" title="P4 : ${prioCount.P4}"></div>
+  `;
+  $("prioLabels").innerHTML = `
+    <span style="color:#ef4444">P1 : ${prioCount.P1}</span>
+    <span style="color:#f97316">P2 : ${prioCount.P2}</span>
+    <span style="color:#3b82f6">P3 : ${prioCount.P3}</span>
+    <span style="color:#64748b">P4 : ${prioCount.P4}</span>
+  `;
+
+  /* =========================================================
+     QUADRANT 3 : CAPACITÉ DNSI (LES MOYENS)
+  ========================================================= */
+  const cPot = safeNum(cap.total_jours);
+  const cHP = safeNum(cap.run_hors_projet_jours);
+  const cProj = Math.max(0, cPot - cHP);
+
+  $("legPot").textContent = `${cPot.toLocaleString("fr-FR")} j`;
+  $("legHP").textContent = `${cHP.toLocaleString("fr-FR")} j`;
+  $("legRem").textContent = `${cProj.toLocaleString("fr-FR")} j`;
+
+  const canvas = $("pieCapacite");
+  if(canvas){
+    const ctx = canvas.getContext("2d");
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+    const cx = w/2, cy = h/2, radius = Math.min(w,h)*0.44;
+
+    ctx.beginPath(); ctx.arc(cx,cy,radius,0,Math.PI*2);
+    ctx.fillStyle = "rgba(59,130,246,0.12)"; ctx.fill();
+
+    let start = -Math.PI/2;
+    const parts = [ {v: cHP, c: "#f59e0b"}, {v: cProj, c: "#10b981"} ];
+    const totalPie = cPot > 0 ? cPot : 1;
+    for(const p of parts){
+      const angle = (p.v/totalPie) * Math.PI*2;
+      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,radius,start,start+angle);
+      ctx.fillStyle = p.c; ctx.fill(); start += angle;
+    }
+
+    ctx.beginPath(); ctx.arc(cx,cy,radius*0.60,0,Math.PI*2);
+    ctx.fillStyle = "#f8fafc"; ctx.fill();
+
+    ctx.fillStyle = "#0f172a";
+    ctx.textAlign = "center";
+    ctx.font = "800 11px system-ui, sans-serif";
+    ctx.fillText("Réserve", cx, cy - 5);
+    ctx.fillStyle = "#16a34a";
+    ctx.font = "900 15px ui-monospace, monospace";
+    ctx.fillText(`${cProj.toLocaleString("fr-FR")} j`, cx, cy + 14);
+  }
+
+  /* =========================================================
+     QUADRANT 4 : STRATÉGIE & ARBITRAGE (L'ÉQUILIBRE)
+  ========================================================= */
+  $("stratName").textContent = strat.nom || "Scénario par défaut";
+  const restFinal = cProj - totalEngagedDays;
+  $("stCap").textContent = `${cProj.toLocaleString("fr-FR")} j`;
+  $("stLoad").textContent = `${totalEngagedDays.toLocaleString("fr-FR")} j`;
+
+  const box = $("stratAlert"), bTitle = $("stratVerdictTitle"), bSub = $("stratVerdictSub"), vRest = $("stRest");
+  box.className = "strat-box";
+  if(selectionIds.size === 0){
+    bTitle.innerHTML = "🟣 Brouillon";
+    bSub.innerHTML = "Aucun projet n'est encore engagé dans le scénario.";
+    vRest.textContent = "—";
+    vRest.style.color = "var(--muted)";
+  } else if (restFinal >= 0){
+    box.classList.add("strat-ok");
+    bTitle.innerHTML = "🟢 Scénario Compatible";
+    bSub.innerHTML = "La charge des projets engagés respecte la réserve capacitaire DNSI.";
+    vRest.textContent = `+ ${restFinal.toLocaleString("fr-FR")} j`;
+    vRest.style.color = "var(--ok)";
+  } else {
+    box.classList.add("strat-bad");
+    bTitle.innerHTML = "🔴 Dépassement Capacitaire";
+    bSub.innerHTML = "La charge excède la capacité disponible : arbitrage requis (report ou renfort).";
+    vRest.textContent = `${restFinal.toLocaleString("fr-FR")} j`;
+    vRest.style.color = "var(--bad)";
+  }
+
+  const tBody = $("stratTableBody");
+  const pdfProjects = engagedProjects.filter(p => pdfIds.has(String(p.id)));
+
+  if(pdfProjects.length > 0){
+    tBody.innerHTML = pdfProjects.map(p => {
+      const raf = getProjectRAF(p);
+      const pid = getProjectProgId(p, validProgIds);
+      const prg = pid ? programmes.find(x => String(x.id) === pid) : null;
+
+      let progBadgeHtml = `<span class="badge b-orphan">⚠️ Hors pgm</span>`;
+      if(prg){
+        const col = prg.couleur || "#2563eb";
+        const lbl = prg.code || prg.titre;
+        progBadgeHtml = `<span class="badge" style="background:${escapeHtml(col)}16; border-color:${escapeHtml(col)}55; color:${escapeHtml(col)}; max-width:165px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(prg.titre)}">${escapeHtml(prg.icone || "🎯")} ${escapeHtml(lbl)}</span>`;
+      }
+
+      const pr = normalizePriority(p.priorite ?? p.prio);
+      const prCls = pr === "P1" ? "b-prio1" : pr === "P2" ? "b-prio2" : pr === "P3" ? "b-prio3" : "b-prio4";
+
+      return `
+        <tr>
+          <td>
+            <b style="font-size:12.5px;">${escapeHtml(p.nom || p.name || p.id)}</b><br/>
+            <span class="mono" style="color:var(--muted)">${escapeHtml(p.id)}</span>
+          </td>
+          <td>${progBadgeHtml}</td>
+          <td><span class="badge ${prCls}">${pr}</span></td>
+          <td style="text-align:right; font-weight:900;" class="mono">${raf.toLocaleString("fr-FR")} j</td>
+        </tr>
+      `;
+    }).join("");
+  } else {
+    tBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--muted); padding:16px;">Aucun projet mis en avant (coche ⭐ dans <b>4. Stratégie</b>).</td></tr>`;
+  }
+  $("stratCount").textContent = engagedProjects.length;
+}
+
+/* =============================
+   Import / Export JSON & Synchro
+============================== */
+function downloadGov(){
+  const GOV = loadGov();
+  if(!GOV){ alert("Aucune gouvernance en mémoire à sauvegarder."); return; }
+  const blob = new Blob([JSON.stringify(GOV, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "Gouvernance.json";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+  toast("Gouvernance.json téléchargé ✅");
+}
+
+async function importGov(file){
+  if(!file) return;
+  try{
+    const parsed = JSON.parse(await file.text());
+    if(!parsed || typeof parsed !== "object"){ alert("JSON invalide."); return; }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+    try{
+      const bc = new BroadcastChannel("dnsi-gouvernance");
+      bc.postMessage({ type: "GOUVERNANCE_UPDATED", source: "synthese" });
+      bc.close();
+    }catch(e){}
+    renderAll();
+    toast("Gouvernance importée ✅");
+  }catch(e){
+    alert("Erreur de lecture du fichier JSON.");
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  renderAll();
+
+  $("btnRefresh").addEventListener("click", () => {
+    renderAll();
+    toast("Synthèse réactualisée 🔄");
+  });
+  $("btnPdf").addEventListener("click", () => window.print());
+  $("btnSaveJson").addEventListener("click", downloadGov);
+  $("btnImport").addEventListener("click", () => { $("fileInput").value = ""; $("fileInput").click(); });
+  $("fileInput").addEventListener("change", e => importGov(e.target.files?.[0]));
+
+  window.addEventListener("storage", ev => {
+    if(ev.key === STORAGE_KEY) renderAll();
+  });
+  try{
+    const bc = new BroadcastChannel("dnsi-gouvernance");
+    bc.onmessage = ev => {
+      if(ev?.data?.type === "GOUVERNANCE_UPDATED") renderAll();
+    };
+  }catch(e){}
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,2205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Gouvernance — Programmes & Objectifs (V1.1)</title>
+  <style>
+    :root{
+      --lille-red:#C10F1A;
+      --lille-red-2:#a50d16;
+      --ink:#0f172a;
+      --muted:#64748b;
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --border:#e5e7eb;
+      --shadow:0 10px 24px rgba(15,23,42,.08);
+      --r:16px;
+      --ok:#16a34a;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --info:#2563eb;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--ink);
+      background:var(--bg);
+      font-size:13px;
+    }
+
+    /* Impression PDF */
+    @page{ size:A4 landscape; margin:10mm; }
+    @media print{
+      *{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+      body{background:#fff !important;}
+      .topbar{position:static; box-shadow:none;}
+      .no-print, .ppm-nav, .filter-bar, .actions, .card-actions, .orphan-btn, .toast, .modal-backdrop, .view-switch{display:none !important;}
+      .main{max-width:100%; margin:0; padding:8px 0;}
+      .prg-card, .kpi-box, .orphan-banner, .gantt-row{break-inside:avoid; page-break-inside:avoid; box-shadow:none;}
+      .gantt-wrap{overflow:visible !important; box-shadow:none;}
+    }
+
+    /* Top bar */
+    .topbar{
+      position:sticky; top:0; z-index:50;
+      background:var(--lille-red);
+      color:#fff;
+      padding:12px 16px;
+      box-shadow:0 6px 18px rgba(0,0,0,.18);
+    }
+    .topbar-row{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      max-width:1380px; margin:0 auto; flex-wrap:wrap;
+    }
+    .brand{display:flex; align-items:center; gap:12px; min-width:0;}
+    .brand .badge{
+      width:38px; height:38px; border-radius:10px;
+      background:rgba(255,255,255,.16);
+      display:flex; align-items:center; justify-content:center;
+      font-weight:900; font-size:13px;
+    }
+    .brand .h1{font-weight:900; font-size:16px; line-height:1.15;}
+    .brand .sub{font-size:12px; opacity:.92;}
+    .actions{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+    .btn{
+      border:1px solid rgba(255,255,255,.35);
+      background:transparent;
+      color:#fff;
+      padding:7px 12px;
+      border-radius:999px;
+      font-weight:800;
+      font-size:12px;
+      cursor:pointer;
+      display:inline-flex; align-items:center; gap:6px;
+      transition:all .15s ease;
+    }
+    .btn:hover{background:rgba(255,255,255,.12)}
+    .btn.primary{background:#fff; color:var(--lille-red); border-color:#fff;}
+    .btn.primary:hover{background:#f1f5f9;}
+    .btn.dark{background:#0f172a; border-color:#0f172a; color:#fff;}
+    .btn.dark:hover{background:#1e293b;}
+
+    /* Navigation 5 Piliers */
+    .ppm-nav{
+      background:#fff;
+      border-bottom:1px solid var(--border);
+      padding:8px 16px;
+    }
+    .ppm-nav-row{
+      max-width:1380px; margin:0 auto;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px; flex-wrap:wrap;
+    }
+    .ppm-links{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+    .ppm-link{
+      text-decoration:none;
+      padding:6px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      color:var(--ink);
+      background:#f1f5f9;
+      border:1px solid var(--border);
+      display:inline-flex; align-items:center; gap:6px;
+    }
+    .ppm-link:hover{background:#e2e8f0}
+    .ppm-link.active{
+      background:rgba(193,15,26,.10);
+      color:var(--lille-red);
+      border-color:rgba(193,15,26,.30);
+    }
+    .chip{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:4px 10px; border-radius:999px;
+      border:1px solid var(--border); background:#f8fafc;
+      font-size:11px; font-weight:800; color:var(--muted);
+    }
+
+    /* Main Layout */
+    .main{
+      max-width:1380px;
+      margin:16px auto 32px;
+      padding:0 14px;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+
+    /* Hero */
+    .hero{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:18px 22px;
+      box-shadow:var(--shadow);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+    .hero-text h2{margin:0 0 6px 0; font-size:20px; font-weight:900;}
+    .hero-text p{margin:0; color:var(--muted); font-size:13px; line-height:1.45; max-width:780px;}
+    .btn-create{
+      background:#0f172a; color:#fff; border:none;
+      padding:13px 20px; border-radius:12px;
+      font-weight:900; font-size:14px; cursor:pointer;
+      box-shadow:0 4px 14px rgba(15,23,42,.20);
+      display:inline-flex; align-items:center; gap:8px;
+      transition:transform .1s ease, background .15s ease;
+    }
+    .btn-create:hover{background:#1e293b;}
+    .btn-create:active{transform:scale(0.98);}
+
+    /* KPIs Globaux */
+    .kpi-strip{
+      display:grid;
+      grid-template-columns:repeat(4, 1fr);
+      gap:12px;
+    }
+    @media (max-width: 900px){ .kpi-strip{grid-template-columns:repeat(2, 1fr);} }
+    @media (max-width: 520px){ .kpi-strip{grid-template-columns:1fr;} }
+    .kpi-box{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px 16px;
+      box-shadow:0 4px 12px rgba(15,23,42,.04);
+    }
+    .kpi-label{font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.5px; color:var(--muted);}
+    .kpi-val{font-size:24px; font-weight:900; margin-top:6px; line-height:1.1;}
+    .kpi-val.to-estimate{font-size:18px; color:var(--muted); font-style:italic;}
+    .kpi-sub{font-size:11.5px; color:var(--muted); margin-top:5px;}
+
+    /* Radar Hors Programme */
+    .orphan-banner{
+      border-radius:16px;
+      padding:14px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+      border:1px solid var(--border);
+    }
+    .orphan-banner.ok{background:#f0fdf4; border-color:#bbf7d0; color:#166534;}
+    .orphan-banner.warn{background:#fff7ed; border-color:#fdba74; color:#9a3412;}
+    .orphan-title{font-weight:900; font-size:14px; display:flex; align-items:center; gap:8px;}
+    .orphan-sub{font-size:12.5px; margin-top:3px; opacity:.92;}
+    .orphan-btn{
+      border:1px solid rgba(154,52,18,.35);
+      background:#fff;
+      color:#9a3412;
+      padding:8px 14px;
+      border-radius:999px;
+      font-weight:900;
+      font-size:12px;
+      cursor:pointer;
+      display:inline-flex; align-items:center; gap:6px;
+    }
+    .orphan-btn:hover{background:#ffedd5;}
+
+    /* Barre de filtres + Switch Vue */
+    .filter-bar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:10px 14px;
+    }
+    .filter-left{display:flex; align-items:center; gap:10px; flex-wrap:wrap; flex:1;}
+    .filter-right{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+    .filter-bar input, .filter-bar select{
+      padding:8px 12px;
+      border:1px solid var(--border);
+      border-radius:10px;
+      font-size:12.5px;
+      outline:none;
+      background:#f8fafc;
+      font-family:inherit;
+    }
+    .filter-bar input{min-width:220px; flex:1; max-width:340px;}
+    .filter-bar input:focus, .filter-bar select:focus{border-color:#94a3b8; background:#fff;}
+
+    .view-switch{
+      display:inline-flex;
+      background:#f1f5f9;
+      padding:3px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      gap:2px;
+    }
+    .view-btn{
+      border:none;
+      background:transparent;
+      color:var(--muted);
+      padding:6px 14px;
+      border-radius:999px;
+      font-weight:800;
+      font-size:12px;
+      cursor:pointer;
+      display:inline-flex; align-items:center; gap:6px;
+      transition:all .15s ease;
+    }
+    .view-btn.active{
+      background:#0f172a;
+      color:#fff;
+      box-shadow:0 2px 6px rgba(15,23,42,.20);
+    }
+
+    /* =============================
+       VUE GANTT PLURI-ANNUEL
+    ============================== */
+    .gantt-wrap{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      overflow-x:auto;
+    }
+    .gantt-inner{
+      min-width:1050px;
+    }
+    .gantt-head{
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      background:#f8fafc;
+      border-bottom:2px solid var(--border);
+    }
+    .gantt-head-left{
+      padding:12px 16px;
+      font-size:11px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+      color:var(--muted);
+      border-right:1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .gantt-timeline-head{
+      display:flex;
+      flex-direction:column;
+    }
+    .gantt-years-row{
+      display:grid;
+      border-bottom:1px solid var(--border);
+    }
+    .gantt-year-cell{
+      text-align:center;
+      font-weight:900;
+      font-size:12px;
+      padding:5px 4px;
+      border-right:1px solid var(--border);
+      background:#f1f5f9;
+      color:var(--ink);
+    }
+    .gantt-year-cell:last-child{border-right:none;}
+    .gantt-quarters-row{
+      display:grid;
+    }
+    .gantt-q-cell{
+      text-align:center;
+      font-size:10.5px;
+      font-weight:800;
+      color:var(--muted);
+      padding:5px 2px;
+      border-right:1px solid rgba(15,23,42,.06);
+    }
+    .gantt-q-cell.year-end{border-right:1px solid var(--border);}
+    .gantt-q-cell:last-child{border-right:none;}
+
+    .gantt-row{
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      border-bottom:1px solid var(--border);
+      transition:background .12s ease;
+    }
+    .gantt-row:last-child{border-bottom:none;}
+    .gantt-row:hover{background:#fafbff;}
+
+    .gantt-left{
+      padding:12px 14px;
+      border-right:1px solid var(--border);
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:0;
+    }
+    .gantt-left-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:8px;
+    }
+    .gantt-ident{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      min-width:0;
+      cursor:pointer;
+    }
+    .gantt-ico{
+      width:30px; height:30px; border-radius:8px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:16px; flex-shrink:0;
+      border:1px solid rgba(15,23,42,.08);
+    }
+    .gantt-name{
+      font-weight:900; font-size:13px; line-height:1.2;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .gantt-code-line{
+      font-size:10.5px; color:var(--muted); font-weight:800;
+      display:flex; align-items:center; gap:6px;
+    }
+    .gantt-counters{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      align-items:center;
+    }
+    .g-pill{
+      display:inline-flex; align-items:center; gap:4px;
+      font-size:11px; font-weight:800;
+      padding:2px 8px; border-radius:999px;
+      background:#f1f5f9; color:#334155;
+      border:1px solid rgba(15,23,42,.06);
+    }
+    .g-pill.est{background:#f8fafc; color:var(--muted); font-style:italic; font-weight:700;}
+    .g-pill.over{background:#fef2f2; color:#b91c1c; border-color:#fecaca;}
+    .g-pill.warn{background:#fff7ed; color:#9a3412; border-color:#fed7aa;}
+
+    .gantt-track{
+      position:relative;
+      display:flex;
+      align-items:center;
+      padding:12px 0;
+      min-height:68px;
+    }
+    .gantt-grid-bg{
+      position:absolute;
+      inset:0;
+      display:grid;
+      pointer-events:none;
+    }
+    .gantt-bg-col{
+      border-right:1px solid rgba(15,23,42,.05);
+    }
+    .gantt-bg-col.year-end{
+      border-right:1px solid rgba(15,23,42,.13);
+    }
+    .gantt-bg-col:last-child{border-right:none;}
+
+    .gantt-bar{
+      position:relative;
+      z-index:2;
+      height:34px;
+      border-radius:10px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      overflow:hidden;
+      box-shadow:0 3px 10px rgba(15,23,42,.12);
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+    .gantt-bar:hover{
+      transform:translateY(-1px);
+      box-shadow:0 6px 14px rgba(15,23,42,.18);
+    }
+    .gantt-bar-progress{
+      position:absolute;
+      left:0; top:0; bottom:0;
+      background:rgba(255,255,255,.28);
+      border-right:2px solid rgba(255,255,255,.65);
+      pointer-events:none;
+    }
+    .gantt-bar-label{
+      position:relative;
+      z-index:3;
+      padding:0 10px;
+      font-size:11.5px;
+      font-weight:900;
+      color:#fff;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      text-shadow:0 1px 2px rgba(0,0,0,.25);
+      width:100%;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+    }
+    .gantt-bar-continu{
+      position:relative;
+      z-index:2;
+      margin:0 8px;
+      width:calc(100% - 16px);
+      height:32px;
+      border-radius:10px;
+      border:2px dashed;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 12px;
+      font-size:11.5px;
+      font-weight:900;
+    }
+    .gantt-bar-unplanned{
+      position:relative;
+      z-index:2;
+      margin:0 16px;
+      padding:6px 14px;
+      border-radius:999px;
+      background:#f1f5f9;
+      border:1px dashed #94a3b8;
+      color:var(--muted);
+      font-size:11.5px;
+      font-weight:800;
+      font-style:italic;
+      cursor:pointer;
+    }
+
+    /* =============================
+       VUE CARTES
+    ============================== */
+    .grid-programmes{
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(380px, 1fr));
+      gap:16px;
+    }
+    @media (max-width: 480px){ .grid-programmes{grid-template-columns:1fr;} }
+
+    .prg-card{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:18px;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      box-shadow:0 6px 18px rgba(15,23,42,.05);
+      transition:transform .15s ease, box-shadow .15s ease;
+    }
+    .prg-card:hover{
+      transform:translateY(-2px);
+      box-shadow:0 12px 26px rgba(15,23,42,.10);
+    }
+    .prg-accent{height:6px; width:100%;}
+    .prg-body{padding:16px 18px; display:flex; flex-direction:column; flex:1; gap:12px;}
+
+    .prg-top{display:flex; align-items:flex-start; justify-content:space-between; gap:10px;}
+    .prg-ident{display:flex; align-items:center; gap:12px; min-width:0;}
+    .prg-icon{
+      width:46px; height:46px; border-radius:12px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:24px; flex-shrink:0;
+      border:1px solid rgba(15,23,42,.08);
+    }
+    .prg-code{
+      font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size:11px; font-weight:900; color:var(--muted); letter-spacing:.4px;
+    }
+    .prg-title{font-weight:900; font-size:16px; line-height:1.2; margin-top:2px; word-break:break-word;}
+
+    .status-pill{
+      font-size:11px; font-weight:800; padding:4px 10px; border-radius:999px; white-space:nowrap;
+      border:1px solid transparent;
+    }
+    .st-actif{background:#ecfdf5; color:#166534; border-color:#a7f3d0;}
+    .st-prep{background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe;}
+    .st-cloture{background:#f1f5f9; color:#475569; border-color:#cbd5e1;}
+
+    .prg-meta{
+      display:flex; flex-wrap:wrap; gap:6px;
+      font-size:11.5px; color:var(--muted);
+    }
+    .meta-tag{
+      background:#f8fafc; border:1px solid var(--border);
+      padding:3px 9px; border-radius:999px; font-weight:700;
+    }
+
+    .prg-desc{
+      font-size:12.5px; color:#334155; line-height:1.45;
+      background:#f8fafc; border-radius:10px; padding:10px 12px;
+      border:1px solid rgba(15,23,42,.05);
+    }
+
+    .prg-stats{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:auto;
+    }
+    .stat-box{
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:10px;
+      background:#fff;
+    }
+    .stat-lbl{font-size:10.5px; font-weight:800; text-transform:uppercase; color:var(--muted);}
+    .stat-num{font-size:16px; font-weight:900; margin-top:4px;}
+    .stat-num.to-estimate{font-size:13.5px; color:var(--muted); font-style:italic;}
+    .stat-sub{font-size:11px; color:var(--muted); margin-top:2px;}
+    .gauge-track{
+      height:6px; border-radius:999px; background:#e2e8f0;
+      overflow:hidden; margin-top:6px;
+    }
+    .gauge-fill{height:100%; border-radius:999px; transition:width .3s ease;}
+    .g-ok{background:var(--ok);}
+    .g-warn{background:var(--warn);}
+    .g-bad{background:var(--bad);}
+
+    .prg-counts{
+      display:flex; align-items:center; justify-content:space-between;
+      font-size:12px; font-weight:800; color:#334155;
+      padding:8px 10px; background:#f8fafc; border-radius:10px;
+    }
+
+    .prg-footer{
+      padding:12px 18px;
+      border-top:1px solid var(--border);
+      background:#fafbfc;
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+    }
+    .card-actions{display:flex; gap:6px; align-items:center;}
+    .iconbtn{
+      border:1px solid var(--border);
+      background:#fff;
+      color:var(--ink);
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:800;
+      font-size:11.5px;
+      cursor:pointer;
+      display:inline-flex; align-items:center; gap:5px;
+    }
+    .iconbtn:hover{background:#f1f5f9;}
+    .iconbtn.primary{background:#0f172a; color:#fff; border-color:#0f172a;}
+    .iconbtn.primary:hover{background:#1e293b;}
+    .iconbtn.danger{border-color:#fecaca; background:#fff1f2; color:#991b1b;}
+    .iconbtn.danger:hover{background:#ffe4e6;}
+    .iconbtn.sm{padding:4px 8px; font-size:11px;}
+
+    /* =============================
+       MODALES & PICKERS
+    ============================== */
+    .modal-backdrop{
+      position:fixed; inset:0;
+      background:rgba(15,23,42,.58);
+      display:none; align-items:center; justify-content:center;
+      padding:14px; z-index:10000;
+    }
+    .modal{
+      width:min(820px, 100%);
+      max-height:92vh;
+      overflow:auto;
+      background:#fff;
+      border-radius:18px;
+      border:1px solid var(--border);
+      box-shadow:0 24px 60px rgba(0,0,0,.28);
+    }
+    .modal-head{
+      padding:16px 20px;
+      border-bottom:1px solid var(--border);
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+      background:linear-gradient(180deg, rgba(193,15,26,.05), #fff);
+    }
+    .modal-title{font-weight:900; font-size:16px; margin:0;}
+    .modal-sub{font-size:12px; color:var(--muted); margin-top:3px;}
+    .modal-body{padding:20px;}
+    .modal-foot{
+      padding:14px 20px;
+      border-top:1px solid var(--border);
+      background:#f8fafc;
+      display:flex; justify-content:flex-end; gap:10px;
+    }
+
+    /* Aperçu badge en direct dans la modale */
+    .preview-strip{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:12px 14px;
+      border-radius:14px;
+      background:#f8fafc;
+      border:1px solid var(--border);
+      margin-bottom:16px;
+    }
+    .preview-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:7px 14px;
+      border-radius:12px;
+      color:#fff;
+      font-weight:900;
+      font-size:13.5px;
+      box-shadow:0 4px 12px rgba(15,23,42,.15);
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+    .form-grid-3{
+      grid-column:1/-1;
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width: 680px){
+      .form-grid, .form-grid-3{grid-template-columns:1fr;}
+    }
+    .form-section{
+      grid-column:1/-1;
+      font-weight:900; font-size:12px; text-transform:uppercase; letter-spacing:.4px;
+      color:var(--ink);
+      padding-bottom:6px;
+      border-bottom:1px solid var(--border);
+      margin-top:6px;
+    }
+    .field label{display:block; font-size:12px; font-weight:800; color:var(--muted); margin-bottom:5px;}
+    .field input, .field select, .field textarea{
+      width:100%; padding:9px 11px;
+      border:1px solid var(--border); border-radius:10px;
+      font-size:13px; font-family:inherit; outline:none; background:#fff;
+    }
+    .field input[readonly]{background:#f1f5f9; color:#475569; font-weight:900; cursor:not-allowed;}
+    .field textarea{min-height:74px; resize:vertical; line-height:1.4;}
+    .field input:focus, .field select:focus, .field textarea:focus{
+      border-color:#94a3b8; box-shadow:0 0 0 3px rgba(148,163,184,.16);
+    }
+
+    /* Grille Emoji cliquable */
+    .emoji-grid{
+      display:grid;
+      grid-template-columns:repeat(10, 1fr);
+      gap:5px;
+      background:#f8fafc;
+      padding:8px;
+      border-radius:12px;
+      border:1px solid var(--border);
+    }
+    @media (max-width: 520px){ .emoji-grid{grid-template-columns:repeat(5, 1fr);} }
+    .emoji-btn{
+      border:2px solid transparent;
+      background:#fff;
+      border-radius:8px;
+      font-size:18px;
+      padding:5px 0;
+      cursor:pointer;
+      transition:transform .1s ease, border-color .1s ease;
+    }
+    .emoji-btn:hover{transform:scale(1.12); background:#f1f5f9;}
+    .emoji-btn.selected{border-color:#0f172a; background:#e2e8f0;}
+
+    /* Palette couleurs + Perso */
+    .color-palette{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+    .color-swatch{
+      width:28px; height:28px; border-radius:8px; cursor:pointer;
+      border:2px solid transparent; transition:transform .1s ease;
+    }
+    .color-swatch:hover{transform:scale(1.1);}
+    .color-swatch.selected{border-color:#0f172a; box-shadow:0 0 0 2px #fff inset;}
+    .color-custom-btn{
+      display:inline-flex; align-items:center; gap:5px;
+      padding:5px 10px; border-radius:8px;
+      border:1px solid var(--border); background:#f8fafc;
+      font-size:11.5px; font-weight:800; cursor:pointer;
+    }
+    .color-custom-btn input[type="color"]{
+      width:18px; height:18px; padding:0; border:none; background:none; cursor:pointer;
+    }
+
+    /* Horizon Trimestre + Année */
+    .period-pair{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+    .chk-continu{
+      grid-column:1/-1;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      background:#f8fafc;
+      border:1px solid var(--border);
+      padding:9px 12px;
+      border-radius:10px;
+      font-weight:800;
+      font-size:12.5px;
+      cursor:pointer;
+    }
+    .chk-continu input{width:auto; transform:scale(1.15); cursor:pointer;}
+
+    .btn2{
+      padding:9px 16px; border-radius:999px; font-weight:900; font-size:13px;
+      cursor:pointer; border:1px solid var(--border); background:#fff; color:var(--ink);
+    }
+    .btn2.primary{background:var(--lille-red); color:#fff; border-color:var(--lille-red);}
+    .btn2.primary:hover{background:var(--lille-red-2);}
+    .btn2.ghost{background:transparent; border-color:transparent;}
+
+    /* Table dans modales */
+    .mini-table{width:100%; border-collapse:collapse; margin-top:6px;}
+    .mini-table th{
+      text-align:left; font-size:11px; text-transform:uppercase; color:var(--muted);
+      padding:8px 6px; border-bottom:2px solid var(--border);
+    }
+    .mini-table td{
+      padding:9px 6px; border-bottom:1px solid #f1f5f9; font-size:12.5px; vertical-align:middle;
+    }
+    .mini-badge{
+      display:inline-flex; align-items:center; padding:2px 8px; border-radius:999px;
+      font-size:11px; font-weight:800; border:1px solid var(--border); background:#f8fafc;
+    }
+    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;}
+
+    .toast{
+      position:fixed; left:16px; bottom:16px;
+      background:#0f172a; color:#fff;
+      padding:10px 16px; border-radius:999px;
+      font-size:12.5px; font-weight:800;
+      z-index:99999; box-shadow:0 10px 24px rgba(0,0,0,.22);
+    }
+
+    .footer-ver{
+      text-align:center; color:var(--muted); font-size:11.5px; margin-top:8px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-row">
+      <div class="brand">
+        <div class="badge">DNSI</div>
+        <div>
+          <div class="h1">Programmes & Objectifs — PPM V1.1</div>
+          <div class="sub">Gouvernance ➔ Programme ➔ Projet / Idée</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="btnRefresh">🔄 Réactualiser</button>
+        <button class="btn" id="btnImport">📥 Importer (.json)</button>
+        <button class="btn" id="btnSaveJson">💾 Sauvegarder (.json)</button>
+        <button class="btn dark" id="btnPdf">🖨️ Export PDF</button>
+        <input type="file" id="fileInput" accept="application/json,.json" style="display:none"/>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVIGATION 5 PILIERS -->
+  <nav class="ppm-nav">
+    <div class="ppm-nav-row">
+      <div class="ppm-links">
+        <a class="ppm-link active" href="Gouvernance - 1. Programmes.html">🎯 1. Programmes & Objectifs</a>
+        <a class="ppm-link" href="Gouverrnance - Portofolio projet.html">📚 2. Portefeuille Projets</a>
+        <a class="ppm-link" href="Gouverrnance - Capacités DNSI.html">⚙️ 3. Capacité DNSI</a>
+        <a class="ppm-link" href="Gouvernance - Stratégies.html">🧠 4. Stratégie & Arbitrage</a>
+        <a class="ppm-link" href="Gouvernance - Fiche gouvernance.html">📊 5. Tableau de Bord (CODIR)</a>
+      </div>
+      <div>
+        <span class="chip" id="chipSync">Synchronisation : —</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-text">
+        <h2>Feuille de Route des Programmes</h2>
+        <p>
+          Structurez les grands programmes de la collectivité et suivez leur consolidation au fil de l'eau.
+          Un programme initié démarre en statut <b>« À estimer »</b> puis agrège automatiquement les charges, budgets et avancements des projets rattachés.
+        </p>
+      </div>
+      <button class="btn-create no-print" id="btnNewProgramme">➕ Créer un Programme</button>
+    </section>
+
+    <!-- KPIS GLOBAUX -->
+    <section class="kpi-strip">
+      <div class="kpi-box">
+        <div class="kpi-label">Programmes actifs</div>
+        <div class="kpi-val" id="kpiActifs">0</div>
+        <div class="kpi-sub" id="kpiTotalPrg">sur 0 programme(s)</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-label">Couverture Programme</div>
+        <div class="kpi-val" id="kpiCoverage">—</div>
+        <div class="kpi-sub" id="kpiCoverageSub">0 rattaché(s) sur 0 au portefeuille</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-label">Charge consolidée</div>
+        <div class="kpi-val mono" id="kpiCharge">À estimer</div>
+        <div class="kpi-sub" id="kpiChargeSub">aucun chiffrage saisi</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-label">Budget consolidé</div>
+        <div class="kpi-val mono" id="kpiBudget">À estimer</div>
+        <div class="kpi-sub" id="kpiBudgetSub">aucun budget saisi</div>
+      </div>
+    </section>
+
+    <!-- RADAR HORS PROGRAMME -->
+    <section class="orphan-banner ok" id="orphanBanner">
+      <div>
+        <div class="orphan-title" id="orphanTitle">✅ Couverture complète : 0 élément hors programme</div>
+        <div class="orphan-sub" id="orphanSub">Toutes les idées et tous les projets du portefeuille sont rattachés à un programme identifié.</div>
+      </div>
+      <button class="orphan-btn" id="btnShowOrphans" style="display:none;">👁️ Voir & Rattacher les orphelins</button>
+    </section>
+
+    <!-- FILTRES + SWITCH VUE -->
+    <section class="filter-bar">
+      <div class="filter-left">
+        <input type="text" id="fltSearch" placeholder="🔍 Filtrer par ID, code, nom, direction, sponsor, pilote..."/>
+        <select id="fltStatut">
+          <option value="">📌 Tous les statuts</option>
+          <option value="actif">🟢 Actif</option>
+          <option value="en_preparation">🔵 En préparation</option>
+          <option value="cloture">⚪ Clôturé</option>
+        </select>
+      </div>
+      <div class="filter-right">
+        <span class="chip" id="chipVisibleCount">0 programme</span>
+        <div class="view-switch">
+          <button class="view-btn active" id="btnViewGantt" onclick="setViewMode('gantt')">📊 Vue Gantt</button>
+          <button class="view-btn" id="btnViewCards" onclick="setViewMode('cards')">🗂️ Vue Cartes</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTENEUR VUE GANTT -->
+    <section id="viewGanttContainer" class="gantt-wrap"></section>
+
+    <!-- CONTENEUR VUE CARTES -->
+    <section id="viewCardsContainer" class="grid-programmes" style="display:none;"></section>
+
+    <div class="footer-ver">Gouvernance DNSI — Support 1 : Programmes & Objectifs (V1.1) • Source : <span class="mono">GOUVERNANCE_JSON</span></div>
+  </main>
+
+  <!-- MODALE CREATION / EDITION PROGRAMME -->
+  <div class="modal-backdrop" id="modalProgramme" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <h3 class="modal-title" id="modalPrgTitle">➕ Créer un Programme</h3>
+          <div class="modal-sub">L'identifiant unique est généré automatiquement. Les enveloppes et dates restent facultatives au démarrage.</div>
+        </div>
+        <button class="btn2 ghost" onclick="closeModalProgramme()">✕</button>
+      </div>
+      <div class="modal-body">
+        <!-- Aperçu temps réel -->
+        <div class="preview-strip">
+          <span style="font-size:12px; font-weight:800; color:var(--muted);">Aperçu du badge Programme :</span>
+          <div class="preview-badge" id="previewBadge" style="background:#2563eb;">
+            <span id="prevIcon">🎯</span>
+            <span id="prevId" class="mono" style="opacity:.88; font-size:12px;">PGM-001</span>
+            <span id="prevTitle">Nouveau programme</span>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-section">1. Identité du programme (obligatoire)</div>
+
+          <div class="field">
+            <label>Identifiant unique (auto)</label>
+            <input type="text" id="fId" readonly/>
+          </div>
+          <div class="field">
+            <label>Code court (optionnel)</label>
+            <input type="text" id="fCode" placeholder="ex : CYBER, FIN, USAGER..." maxlength="16"/>
+          </div>
+
+          <div class="field" style="grid-column:1/-1;">
+            <label>Nom du programme / objectif *</label>
+            <input type="text" id="fTitre" placeholder="ex : Programme Cybersécurité & Résilience SI"/>
+          </div>
+
+          <div class="field">
+            <label>Statut *</label>
+            <select id="fStatut">
+              <option value="actif">🟢 Actif</option>
+              <option value="en_preparation">🔵 En préparation</option>
+              <option value="cloture">⚪ Clôturé</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Couleur d'identification</label>
+            <div class="color-palette" id="colorPalette"></div>
+            <input type="hidden" id="fCouleur" value="#2563eb"/>
+          </div>
+
+          <div class="field" style="grid-column:1/-1;">
+            <label>Icône du programme (cliquer pour choisir)</label>
+            <div class="emoji-grid" id="emojiGrid"></div>
+            <input type="hidden" id="fIcone" value="🎯"/>
+          </div>
+
+          <div class="field" style="grid-column:1/-1;">
+            <label>Objectif / Finalité *</label>
+            <textarea id="fDescription" placeholder="Pourquoi ce programme existe-t-il ? Quel résultat est attendu pour la collectivité ?"></textarea>
+          </div>
+
+          <div class="form-section">2. Gouvernance & Sponsors (facultatif)</div>
+
+          <div class="form-grid-3">
+            <div class="field">
+              <label>DGA / Direction porteuse</label>
+              <input type="text" id="fDirection" placeholder="ex : DGA Ressources, DAF..."/>
+            </div>
+            <div class="field">
+              <label>Sponsor métier / Élu référent</label>
+              <input type="text" id="fSponsor" placeholder="ex : Nom Prénom"/>
+            </div>
+            <div class="field">
+              <label>Pilote de programme DNSI</label>
+              <input type="text" id="fPilote" placeholder="ex : Nom Prénom"/>
+            </div>
+          </div>
+
+          <div class="form-section">3. Horizon & Calendrier Gantt (facultatif)</div>
+
+          <label class="chk-continu">
+            <input type="checkbox" id="fContinu" onchange="toggleContinuFields()"/>
+            <span>🔄 Programme continu (Socle / MCO) — s'affiche sur toute la frise temporelle sans date de fin</span>
+          </label>
+
+          <div class="field" id="grpStart">
+            <label>Début (Trimestre & Année)</label>
+            <div class="period-pair">
+              <select id="fStartQ">
+                <option value="">-- Trimestre --</option>
+                <option value="1">T1 (Jan-Mar)</option>
+                <option value="2">T2 (Avr-Jun)</option>
+                <option value="3">T3 (Jul-Sep)</option>
+                <option value="4">T4 (Oct-Déc)</option>
+              </select>
+              <select id="fStartY"></select>
+            </div>
+          </div>
+
+          <div class="field" id="grpEnd">
+            <label>Fin cible (Trimestre & Année)</label>
+            <div class="period-pair">
+              <select id="fEndQ">
+                <option value="">-- Trimestre --</option>
+                <option value="1">T1 (Jan-Mar)</option>
+                <option value="2">T2 (Avr-Jun)</option>
+                <option value="3">T3 (Jul-Sep)</option>
+                <option value="4">T4 (Oct-Déc)</option>
+              </select>
+              <select id="fEndY"></select>
+            </div>
+          </div>
+
+          <div class="form-section">4. Enveloppes macro estimatives (facultatif — laisser vide si « À estimer »)</div>
+
+          <div class="field">
+            <label>Estimation charge macro (jours)</label>
+            <input type="number" id="fChargeCible" min="0" step="1" placeholder="Laisser vide si à estimer"/>
+          </div>
+          <div class="field">
+            <label>Estimation budget macro (k€)</label>
+            <input type="number" id="fBudgetCible" min="0" step="1" placeholder="Laisser vide si à estimer"/>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn2 ghost" onclick="closeModalProgramme()">Annuler</button>
+        <button class="btn2 primary" id="btnSaveProgramme">Enregistrer le Programme</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALE PROJETS DU PROGRAMME -->
+  <div class="modal-backdrop" id="modalProjects" role="dialog" aria-modal="true">
+    <div class="modal" style="width:min(880px, 100%);">
+      <div class="modal-head">
+        <div>
+          <h3 class="modal-title" id="modalProjTitle">Projets rattachés</h3>
+          <div class="modal-sub" id="modalProjSub">—</div>
+        </div>
+        <button class="btn2 ghost" onclick="el('modalProjects').style.display='none'">✕</button>
+      </div>
+      <div class="modal-body" id="modalProjBody"></div>
+      <div class="modal-foot">
+        <button class="btn2" id="btnEditFromProjModal">✏️ Modifier ce programme</button>
+        <button class="btn2 primary" onclick="el('modalProjects').style.display='none'">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALE RADAR HORS PROGRAMME (ORPHELINS) -->
+  <div class="modal-backdrop" id="modalOrphans" role="dialog" aria-modal="true">
+    <div class="modal" style="width:min(920px, 100%);">
+      <div class="modal-head">
+        <div>
+          <h3 class="modal-title">⚠️ Éléments Hors Programme (Orphelins)</h3>
+          <div class="modal-sub">Rattachez directement ces idées ou projets à un programme, ou assumez-les hors programme.</div>
+        </div>
+        <button class="btn2 ghost" onclick="el('modalOrphans').style.display='none'">✕</button>
+      </div>
+      <div class="modal-body" id="modalOrphansBody"></div>
+      <div class="modal-foot">
+        <button class="btn2 primary" onclick="el('modalOrphans').style.display='none'">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* =============================
+       Constantes & Utilitaires
+    ============================== */
+    const APP_VERSION = "V1.1";
+    const STORAGE_KEY = "GOUVERNANCE_JSON";
+    const SWATCHES = ["#C10F1A", "#8b5cf6", "#2563eb", "#0891b2", "#16a34a", "#f59e0b", "#ea580c", "#475569"];
+    const EMOJIS = [
+      "🏛️", "🛡️", "⚖️", "💶", "🚀", "🔧", "🌱", "🏗️", "🏫", "👥",
+      "📊", "📱", "💻", "🏥", "🎭", "🚌", "⚡", "🔐", "📁", "🎯"
+    ];
+
+    const el = id => document.getElementById(id);
+    const nowISO = () => new Date().toISOString();
+    const safeNum = n => (Number.isFinite(Number(n)) ? Number(n) : 0);
+    const safeJsonParse = t => { try{ return JSON.parse(t); }catch(e){ return null; } };
+    const escapeHtml = s => String(s ?? "").replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[m]));
+
+    let currentViewMode = "gantt"; // "gantt" | "cards"
+    let editingExistingId = null;
+
+    function toast(msg){
+      const d = document.createElement("div");
+      d.className = "toast";
+      d.textContent = msg;
+      document.body.appendChild(d);
+      setTimeout(() => d.remove(), 2600);
+    }
+
+    function generateNextProgramId(programmes){
+      let maxN = 0;
+      (programmes || []).forEach(p => {
+        const m = String(p.id || "").match(/^PGM-(\d+)$/i);
+        if(m){
+          const n = parseInt(m[1], 10);
+          if(n > maxN) maxN = n;
+        }
+      });
+      return "PGM-" + String(maxN + 1).padStart(3, "0");
+    }
+
+    /* =============================
+       Modèle de données & Migration
+    ============================== */
+    function defaultProgrammes(){
+      const y = new Date().getFullYear();
+      return [
+        {
+          id: "PGM-001",
+          code: "MANDAT",
+          icone: "🏛️",
+          couleur: "#8b5cf6",
+          titre: "Projet de Mandat & DGA",
+          description: "Engagements politiques majeurs et projets structurants portés par la Direction Générale.",
+          statut: "actif",
+          direction_porteuse: "Direction Générale",
+          sponsor_metier: "",
+          pilote_dnsi: "",
+          continu: false,
+          debut_q: 1, debut_y: y,
+          fin_q: 4, fin_y: y + 2,
+          budget_cible_k: 0,
+          charge_cible_j: 0
+        },
+        {
+          id: "PGM-002",
+          code: "CONFORM",
+          icone: "🛡️",
+          couleur: "#f59e0b",
+          titre: "Conformité, Légal & Cyber",
+          description: "Obligations réglementaires, cybersécurité, RGPD et continuité d'activité.",
+          statut: "actif",
+          direction_porteuse: "DNSI / DGS",
+          sponsor_metier: "",
+          pilote_dnsi: "",
+          continu: false,
+          debut_q: 1, debut_y: y,
+          fin_q: 4, fin_y: y + 1,
+          budget_cible_k: 0,
+          charge_cible_j: 0
+        },
+        {
+          id: "PGM-003",
+          code: "USAGER",
+          icone: "🚀",
+          couleur: "#2563eb",
+          titre: "Service Usagers & Performance",
+          description: "Dématérialisation, nouveaux services aux citoyens et modernisation des outils métiers.",
+          statut: "actif",
+          direction_porteuse: "Directions Métiers",
+          sponsor_metier: "",
+          pilote_dnsi: "",
+          continu: false,
+          debut_q: 2, debut_y: y,
+          fin_q: 4, fin_y: y + 1,
+          budget_cible_k: 0,
+          charge_cible_j: 0
+        },
+        {
+          id: "PGM-004",
+          code: "SOCLE",
+          icone: "🔧",
+          couleur: "#475569",
+          titre: "Socle Technique, Dette & MCO",
+          description: "Modernisation des infrastructures, résorption de la dette technique et maintien en condition opérationnelle.",
+          statut: "actif",
+          direction_porteuse: "DNSI",
+          sponsor_metier: "",
+          pilote_dnsi: "",
+          continu: true,
+          debut_q: null, debut_y: null,
+          fin_q: null, fin_y: null,
+          budget_cible_k: 0,
+          charge_cible_j: 0
+        }
+      ];
+    }
+
+    function normalizeProgramme(p, idx, assignedId){
+      const rawStat = String(p.statut || "actif").toLowerCase();
+      let statut = "actif";
+      if(rawStat === "en_preparation" || rawStat === "prep") statut = "en_preparation";
+      else if(rawStat === "cloture" || rawStat === "inactif") statut = "cloture";
+
+      const continu = !!p.continu || String(p.horizon || "").toLowerCase().includes("continu");
+      const dq = p.debut_q ? Number(p.debut_q) : null;
+      const dy = p.debut_y ? Number(p.debut_y) : null;
+      const fq = p.fin_q ? Number(p.fin_q) : null;
+      const fy = p.fin_y ? Number(p.fin_y) : null;
+
+      return {
+        id: assignedId || String(p.id || "").trim(),
+        code: String(p.code || "").replace(/^PRG-/i, "").trim().toUpperCase(),
+        icone: String(p.icone || "🎯").trim(),
+        couleur: String(p.couleur || SWATCHES[idx % SWATCHES.length]),
+        titre: String(p.titre || p.nom || assignedId || "Programme").trim(),
+        description: String(p.description || "").trim(),
+        statut,
+        direction_porteuse: String(p.direction_porteuse || p.sponsor || "").trim(),
+        sponsor_metier: String(p.sponsor_metier || "").trim(),
+        pilote_dnsi: String(p.pilote_dnsi || "").trim(),
+        continu,
+        debut_q: continu ? null : dq,
+        debut_y: continu ? null : dy,
+        fin_q: continu ? null : fq,
+        fin_y: continu ? null : fy,
+        budget_cible_k: Math.max(0, safeNum(p.budget_cible_k)),
+        charge_cible_j: Math.max(0, safeNum(p.charge_cible_j))
+      };
+    }
+
+    function normalizeGovernance(raw){
+      const g = (raw && typeof raw === "object") ? JSON.parse(JSON.stringify(raw)) : {};
+      g.meta = g.meta || { schema: "gouvernance-dnsi", version: "3.2", nom: "Gouvernance DNSI" };
+      g.portefeuille = g.portefeuille || { projets: [] };
+      if(!Array.isArray(g.portefeuille.projets)) g.portefeuille.projets = [];
+
+      const idMigrationMap = {
+        mandat: "PGM-001",
+        reglementaire: "PGM-002",
+        metier: "PGM-003",
+        socle: "PGM-004"
+      };
+
+      let sourceList = [];
+      if(Array.isArray(g.programmes) && g.programmes.length > 0){
+        sourceList = g.programmes;
+      } else if(Array.isArray(g.politiques) && g.politiques.length > 0){
+        sourceList = g.politiques;
+      }
+
+      if(sourceList.length === 0){
+        g.programmes = defaultProgrammes();
+      } else {
+        const normalized = [];
+        sourceList.forEach((p, i) => {
+          const oldId = String(p.id || "").trim();
+          let newId = oldId;
+          if(!/^PGM-\d+$/i.test(oldId)){
+            newId = generateNextProgramId(normalized);
+            if(oldId) idMigrationMap[oldId] = newId;
+          }
+          normalized.push(normalizeProgramme(p, i, newId));
+        });
+        g.programmes = normalized;
+      }
+
+      // Répercuter la migration d'ID sur les projets du portefeuille
+      g.portefeuille.projets.forEach(proj => {
+        const rawRef = String(proj.programme_id || proj.axe_strategique || "").trim();
+        if(rawRef && idMigrationMap[rawRef]){
+          proj.programme_id = idMigrationMap[rawRef];
+          proj.axe_strategique = idMigrationMap[rawRef];
+        } else if(proj.programme_id && !proj.axe_strategique){
+          proj.axe_strategique = proj.programme_id;
+        }
+      });
+
+      // Miroir de rétrocompatibilité pour Portefeuille V2.5 / Cockpit V2.5
+      g.politiques = g.programmes.map(p => ({
+        id: p.id,
+        icone: p.icone,
+        titre: p.titre,
+        description: p.description,
+        statut: p.statut === "cloture" ? "inactif" : "actif"
+      }));
+
+      return g;
+    }
+
+    function loadGov(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return normalizeGovernance(raw ? safeJsonParse(raw) : null);
+    }
+
+    function saveGov(g, silent=false){
+      g.meta.lastUpdatedAt = nowISO();
+      g.meta.dernier_enregistrement = g.meta.lastUpdatedAt;
+      g.politiques = (g.programmes || []).map(p => ({
+        id: p.id,
+        icone: p.icone,
+        titre: p.titre,
+        description: p.description,
+        statut: p.statut === "cloture" ? "inactif" : "actif"
+      }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(g));
+      notifyUpdate();
+      if(!silent) toast("Gouvernance enregistrée ✅");
+    }
+
+    function notifyUpdate(){
+      try{
+        const bc = new BroadcastChannel("dnsi-gouvernance");
+        bc.postMessage({ type: "GOUVERNANCE_UPDATED", source: "programmes" });
+        bc.close();
+      }catch(e){}
+    }
+
+    let GOV = loadGov();
+
+    /* =============================
+       Helpers Calcul & Formatage
+    ============================== */
+    function getProjectProgrammeId(proj, validIdsSet){
+      const direct = String(proj.programme_id || proj.axe_strategique || "").trim();
+      return (direct && validIdsSet.has(direct)) ? direct : "";
+    }
+
+    function getProjectCharge(p){
+      return safeNum(p?.charges?.total ?? p.charge_estimee_jours ?? p.charge ?? 0);
+    }
+
+    function getProjectBudgetK(p){
+      return safeNum(p?.budget?.investK ?? p?.budget?.amountK ?? p?.budget?.k ?? 0);
+    }
+
+    function isProjectLaunched(p){
+      return !!(p.has_pivot ?? p.hasPivot);
+    }
+
+    function getProjectProgress(p){
+      const raw = p?.avancement ?? p?.avancement_pct ?? p?.progress?.percent ?? 0;
+      return Math.max(0, Math.min(100, safeNum(raw)));
+    }
+
+    function computeProgrammeStats(prg, linkedProjects){
+      const launched = linkedProjects.filter(isProjectLaunched);
+      const idees = linkedProjects.filter(p => !isProjectLaunched(p));
+
+      const chargeFerme = launched.reduce((s, p) => s + getProjectCharge(p), 0);
+      const chargePrevi = idees.reduce((s, p) => s + getProjectCharge(p), 0);
+      const chargeTotal = chargeFerme + chargePrevi;
+
+      const budgetFerme = launched.reduce((s, p) => s + getProjectBudgetK(p), 0);
+      const budgetPrevi = idees.reduce((s, p) => s + getProjectBudgetK(p), 0);
+      const budgetTotal = budgetFerme + budgetPrevi;
+
+      // Avancement moyen pondéré sur les projets lancés
+      let avgProgress = 0;
+      if(launched.length > 0){
+        if(chargeFerme > 0){
+          const weighted = launched.reduce((s, p) => s + getProjectProgress(p) * getProjectCharge(p), 0);
+          avgProgress = Math.round(weighted / chargeFerme);
+        } else {
+          avgProgress = Math.round(launched.reduce((s, p) => s + getProjectProgress(p), 0) / launched.length);
+        }
+      }
+
+      return {
+        totalCount: linkedProjects.length,
+        nbLaunched: launched.length,
+        nbIdees: idees.length,
+        chargeFerme, chargePrevi, chargeTotal,
+        budgetFerme, budgetPrevi, budgetTotal,
+        avgProgress
+      };
+    }
+
+    // Formatage "Feuille blanche" pour Charge / Budget
+    function formatMetricDisplay(conso, cible, unit, ferme, previ){
+      const u = unit;
+      if(conso === 0 && cible === 0){
+        return {
+          mainText: "À estimer",
+          isEstimate: true,
+          subText: "En attente de chiffrage",
+          compactText: "À estimer",
+          state: "est",
+          pct: null
+        };
+      }
+      if(conso === 0 && cible > 0){
+        return {
+          mainText: `Est. ${cible.toLocaleString("fr-FR")} ${u}`,
+          isEstimate: false,
+          subText: "Enveloppe macro (en attente de projets)",
+          compactText: `Est. ${cible.toLocaleString("fr-FR")} ${u}`,
+          state: "ok",
+          pct: 0
+        };
+      }
+      if(conso > 0 && cible === 0){
+        return {
+          mainText: `${conso.toLocaleString("fr-FR")} ${u}`,
+          isEstimate: false,
+          subText: `Ferme : ${ferme.toLocaleString("fr-FR")} ${u} • Prévi : ${previ.toLocaleString("fr-FR")} ${u}`,
+          compactText: `${conso.toLocaleString("fr-FR")} ${u}`,
+          state: "ok",
+          pct: null
+        };
+      }
+      // Les deux > 0
+      const pct = Math.round((conso / cible) * 100);
+      const state = pct > 100 ? "over" : pct >= 85 ? "warn" : "ok";
+      return {
+        mainText: `${conso.toLocaleString("fr-FR")} ${u}`,
+        isEstimate: false,
+        subText: `Est. macro : ${cible.toLocaleString("fr-FR")} ${u} (${pct}%)`,
+        compactText: `${conso.toLocaleString("fr-FR")} / ${cible.toLocaleString("fr-FR")} ${u}`,
+        state,
+        pct
+      };
+    }
+
+    function formatHorizonLabel(prg){
+      if(prg.continu) return "Continu (Socle / MCO)";
+      if(prg.debut_y && prg.debut_q && prg.fin_y && prg.fin_q){
+        return `T${prg.debut_q} ${prg.debut_y} → T${prg.fin_q} ${prg.fin_y}`;
+      }
+      return "Horizon à planifier";
+    }
+
+    /* =============================
+       Bascule Vue Gantt / Cartes
+    ============================== */
+    function setViewMode(mode){
+      currentViewMode = mode;
+      el("btnViewGantt").classList.toggle("active", mode === "gantt");
+      el("btnViewCards").classList.toggle("active", mode === "cards");
+      el("viewGanttContainer").style.display = mode === "gantt" ? "block" : "none";
+      el("viewCardsContainer").style.display = mode === "cards" ? "grid" : "none";
+      render();
+    }
+
+    /* =============================
+       Rendu Principal
+    ============================== */
+    function render(){
+      const programmes = GOV.programmes || [];
+      const projets = GOV.portefeuille?.projets || [];
+      const validIds = new Set(programmes.map(p => p.id));
+
+      // Synchro horodatage
+      const last = GOV?.meta?.lastUpdatedAt ? new Date(GOV.meta.lastUpdatedAt) : null;
+      el("chipSync").textContent = last
+        ? `Dernière MAJ : ${last.toLocaleTimeString("fr-FR", {hour:"2-digit", minute:"2-digit"})}`
+        : "Synchronisation locale";
+
+      // Regroupement par programme + orphelins
+      const byProg = {};
+      programmes.forEach(p => { byProg[p.id] = []; });
+      const orphans = [];
+
+      for(const proj of projets){
+        const pid = getProjectProgrammeId(proj, validIds);
+        if(pid && byProg[pid]) byProg[pid].push(proj);
+        else orphans.push(proj);
+      }
+
+      // KPIs Globaux
+      const actifsCount = programmes.filter(p => p.statut === "actif").length;
+      const alignedProjs = projets.filter(p => !!getProjectProgrammeId(p, validIds));
+      const alignedLaunched = alignedProjs.filter(isProjectLaunched).length;
+      const alignedIdees = alignedProjs.length - alignedLaunched;
+
+      const totalChargeConso = alignedProjs.reduce((s, p) => s + getProjectCharge(p), 0);
+      const totalChargeEst = programmes.reduce((s, p) => s + safeNum(p.charge_cible_j), 0);
+      const totalBudgetConso = alignedProjs.reduce((s, p) => s + getProjectBudgetK(p), 0);
+      const totalBudgetEst = programmes.reduce((s, p) => s + safeNum(p.budget_cible_k), 0);
+
+      el("kpiActifs").textContent = actifsCount;
+      el("kpiTotalPrg").textContent = `sur ${programmes.length} programme(s)`;
+
+      if(projets.length === 0){
+        el("kpiCoverage").textContent = "—";
+        el("kpiCoverageSub").textContent = "Aucun projet dans le portefeuille";
+      } else {
+        const covPct = Math.round((alignedProjs.length / projets.length) * 100);
+        el("kpiCoverage").textContent = `${covPct} %`;
+        el("kpiCoverageSub").textContent = `${alignedProjs.length} / ${projets.length} (${alignedIdees} idée(s) • ${alignedLaunched} lancé(s))`;
+      }
+
+      const kpiChEl = el("kpiCharge");
+      if(totalChargeConso === 0 && totalChargeEst === 0){
+        kpiChEl.textContent = "À estimer";
+        kpiChEl.classList.add("to-estimate");
+        el("kpiChargeSub").textContent = "En attente de chiffrage des projets";
+      } else if(totalChargeConso === 0 && totalChargeEst > 0){
+        kpiChEl.textContent = `Est. ${totalChargeEst.toLocaleString("fr-FR")} j`;
+        kpiChEl.classList.remove("to-estimate");
+        el("kpiChargeSub").textContent = "Enveloppes macro programmes (hors projets)";
+      } else {
+        kpiChEl.textContent = `${totalChargeConso.toLocaleString("fr-FR")} j`;
+        kpiChEl.classList.remove("to-estimate");
+        el("kpiChargeSub").textContent = totalChargeEst > 0
+          ? `Somme projets (Est. macro : ${totalChargeEst.toLocaleString("fr-FR")} j)`
+          : "Somme des projets & pré-cadrages rattachés";
+      }
+
+      const kpiBudEl = el("kpiBudget");
+      if(totalBudgetConso === 0 && totalBudgetEst === 0){
+        kpiBudEl.textContent = "À estimer";
+        kpiBudEl.classList.add("to-estimate");
+        el("kpiBudgetSub").textContent = "En attente de chiffrage budgétaire";
+      } else if(totalBudgetConso === 0 && totalBudgetEst > 0){
+        kpiBudEl.textContent = `Est. ${totalBudgetEst.toLocaleString("fr-FR")} k€`;
+        kpiBudEl.classList.remove("to-estimate");
+        el("kpiBudgetSub").textContent = "Enveloppes macro programmes";
+      } else {
+        kpiBudEl.textContent = `${totalBudgetConso.toLocaleString("fr-FR")} k€`;
+        kpiBudEl.classList.remove("to-estimate");
+        el("kpiBudgetSub").textContent = totalBudgetEst > 0
+          ? `Somme projets (Est. macro : ${totalBudgetEst.toLocaleString("fr-FR")} k€)`
+          : "Investissement cumulé des projets rattachés";
+      }
+
+      // Radar Hors Programme
+      const banner = el("orphanBanner");
+      const btnOrph = el("btnShowOrphans");
+      if(orphans.length === 0){
+        banner.className = "orphan-banner ok";
+        el("orphanTitle").textContent = "✅ Couverture complète : 0 élément hors programme";
+        el("orphanSub").textContent = projets.length
+          ? "Toutes les idées et tous les projets du portefeuille sont rattachés à un programme identifié."
+          : "Aucun projet dans le portefeuille pour le moment.";
+        btnOrph.style.display = "none";
+      } else {
+        const orphLaunched = orphans.filter(isProjectLaunched).length;
+        const orphIdees = orphans.length - orphLaunched;
+        const orphCharge = orphans.reduce((s, p) => s + getProjectCharge(p), 0);
+        const orphBudget = orphans.reduce((s, p) => s + getProjectBudgetK(p), 0);
+
+        banner.className = "orphan-banner warn";
+        el("orphanTitle").textContent = `⚠️ Radar Hors Programme : ${orphans.length} élément(s) non rattaché(s)`;
+        el("orphanSub").textContent = `${orphIdees} idée(s) et ${orphLaunched} projet(s) lancé(s) — représentent ${orphCharge.toLocaleString("fr-FR")} jours et ${orphBudget.toLocaleString("fr-FR")} k€ hors cadre programme.`;
+        btnOrph.style.display = "inline-flex";
+      }
+
+      // Filtrage
+      const q = (el("fltSearch").value || "").toLowerCase().trim();
+      const st = el("fltStatut").value || "";
+      const visible = programmes.filter(p => {
+        if(st && p.statut !== st) return false;
+        if(q && !`${p.id} ${p.code} ${p.titre} ${p.description} ${p.direction_porteuse} ${p.sponsor_metier} ${p.pilote_dnsi}`.toLowerCase().includes(q)) return false;
+        return true;
+      });
+
+      el("chipVisibleCount").textContent = `${visible.length} / ${programmes.length} programme(s)`;
+
+      if(currentViewMode === "gantt"){
+        renderGantt(visible, byProg);
+      } else {
+        renderCards(visible, byProg);
+      }
+    }
+
+    /* =============================
+       Rendu Vue Gantt Pluri-Annuel
+    ============================== */
+    function renderGantt(visible, byProg){
+      const wrap = el("viewGanttContainer");
+      if(visible.length === 0){
+        wrap.innerHTML = `<div style="text-align:center; padding:40px; color:var(--muted);">Aucun programme ne correspond aux filtres actuels.</div>`;
+        return;
+      }
+
+      // Déterminer l'amplitude des années (au moins 3 ans, ex: année courante -> +2)
+      const currentY = new Date().getFullYear();
+      let minY = currentY;
+      let maxY = currentY + 2;
+
+      visible.forEach(p => {
+        if(!p.continu && p.debut_y && p.fin_y){
+          if(p.debut_y < minY) minY = p.debut_y;
+          if(p.fin_y > maxY) maxY = p.fin_y;
+        }
+      });
+
+      const years = [];
+      for(let y = minY; y <= maxY; y++) years.push(y);
+      const totalQ = years.length * 4;
+      const minQIdx = minY * 4; // T1 de minY
+
+      const yearsHeaderHtml = years.map(y => `<div class="gantt-year-cell">${y}</div>`).join("");
+      const quartersHeaderHtml = years.map(y =>
+        [1,2,3,4].map(q => `<div class="gantt-q-cell ${q===4 ? 'year-end' : ''}">T${q}</div>`).join("")
+      ).join("");
+      const bgColsHtml = years.map(() =>
+        [1,2,3,4].map(q => `<div class="gantt-bg-col ${q===4 ? 'year-end' : ''}"></div>`).join("")
+      ).join("");
+
+      const rowsHtml = visible.map(prg => {
+        const linked = byProg[prg.id] || [];
+        const st = computeProgrammeStats(prg, linked);
+        const chFmt = formatMetricDisplay(st.chargeTotal, prg.charge_cible_j, "j", st.chargeFerme, st.chargePrevi);
+        const buFmt = formatMetricDisplay(st.budgetTotal, prg.budget_cible_k, "k€", st.budgetFerme, st.budgetPrevi);
+
+        const stDot = prg.statut === "actif" ? "🟢" : prg.statut === "en_preparation" ? "🔵" : "⚪";
+        const codeTag = prg.code ? `${prg.id} · ${escapeHtml(prg.code)}` : prg.id;
+
+        // Calcul de la barre temporelle
+        let barHtml = "";
+        if(prg.continu){
+          barHtml = `
+            <div class="gantt-bar-continu"
+                 style="border-color:${escapeHtml(prg.couleur)}; background:${escapeHtml(prg.couleur)}14; color:${escapeHtml(prg.couleur)};"
+                 onclick="openProgrammeProjects('${escapeHtml(prg.id)}')"
+                 title="Cliquer pour voir les projets rattachés">
+              <span>🔄 Programme continu (Socle / MCO)</span>
+              <span>${st.totalCount} élément(s)${st.nbLaunched ? ` • Av. ${st.avgProgress}%` : ""}</span>
+            </div>
+          `;
+        } else if(prg.debut_y && prg.debut_q && prg.fin_y && prg.fin_q){
+          const startIdx = prg.debut_y * 4 + (prg.debut_q - 1);
+          const endIdx = prg.fin_y * 4 + (prg.fin_q - 1);
+          const leftPct = Math.max(0, ((startIdx - minQIdx) / totalQ) * 100);
+          const widthPct = Math.min(100 - leftPct, Math.max(4, ((endIdx - startIdx + 1) / totalQ) * 100));
+
+          barHtml = `
+            <div class="gantt-bar"
+                 style="left:${leftPct}%; width:${widthPct}%; background:${escapeHtml(prg.couleur)};"
+                 onclick="openProgrammeProjects('${escapeHtml(prg.id)}')"
+                 title="${escapeHtml(prg.titre)} (${formatHorizonLabel(prg)}) — Cliquer pour voir les projets">
+              ${st.avgProgress > 0 ? `<div class="gantt-bar-progress" style="width:${st.avgProgress}%;"></div>` : ""}
+              <div class="gantt-bar-label">
+                <span>${formatHorizonLabel(prg)}</span>
+                <span>${st.nbLaunched ? `${st.avgProgress}%` : `${st.totalCount} élém.`}</span>
+              </div>
+            </div>
+          `;
+        } else {
+          barHtml = `
+            <div class="gantt-bar-unplanned" onclick="editProgramme('${escapeHtml(prg.id)}')" title="Cliquer pour définir l'horizon">
+              📅 Horizon à planifier — cliquer pour définir les dates
+            </div>
+          `;
+        }
+
+        const chPillCls = chFmt.state === "est" ? "est" : chFmt.state === "over" ? "over" : chFmt.state === "warn" ? "warn" : "";
+        const buPillCls = buFmt.state === "est" ? "est" : buFmt.state === "over" ? "over" : buFmt.state === "warn" ? "warn" : "";
+
+        return `
+          <div class="gantt-row">
+            <div class="gantt-left">
+              <div class="gantt-left-top">
+                <div class="gantt-ident" onclick="openProgrammeProjects('${escapeHtml(prg.id)}')" title="Voir les projets du programme">
+                  <div class="gantt-ico" style="background:${escapeHtml(prg.couleur)}18;">${escapeHtml(prg.icone)}</div>
+                  <div style="min-width:0;">
+                    <div class="gantt-code-line">
+                      <span>${stDot}</span>
+                      <span class="mono">${codeTag}</span>
+                    </div>
+                    <div class="gantt-name">${escapeHtml(prg.titre)}</div>
+                  </div>
+                </div>
+                <div class="card-actions">
+                  <button class="iconbtn sm" onclick="editProgramme('${escapeHtml(prg.id)}')" title="Modifier">✏️</button>
+                  <button class="iconbtn sm danger" onclick="deleteProgramme('${escapeHtml(prg.id)}')" title="Supprimer">🗑</button>
+                </div>
+              </div>
+              <div class="gantt-counters">
+                <span class="g-pill" title="Idées / Projets lancés">💡 ${st.nbIdees} · ✅ ${st.nbLaunched}</span>
+                <span class="g-pill ${chPillCls}" title="Charge programme">⏱️ ${escapeHtml(chFmt.compactText)}</span>
+                <span class="g-pill ${buPillCls}" title="Budget programme">💶 ${escapeHtml(buFmt.compactText)}</span>
+              </div>
+            </div>
+            <div class="gantt-track">
+              <div class="gantt-grid-bg" style="grid-template-columns:repeat(${totalQ}, 1fr);">${bgColsHtml}</div>
+              ${barHtml}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      wrap.innerHTML = `
+        <div class="gantt-inner">
+          <div class="gantt-head">
+            <div class="gantt-head-left">
+              <span>Programme & Compteurs</span>
+              <span style="font-size:10px; opacity:.8;">💡 Idées · ✅ Lancés · ⏱️ j · 💶 k€</span>
+            </div>
+            <div class="gantt-timeline-head">
+              <div class="gantt-years-row" style="grid-template-columns:repeat(${years.length}, 1fr);">${yearsHeaderHtml}</div>
+              <div class="gantt-quarters-row" style="grid-template-columns:repeat(${totalQ}, 1fr);">${quartersHeaderHtml}</div>
+            </div>
+          </div>
+          ${rowsHtml}
+        </div>
+      `;
+    }
+
+    /* =============================
+       Rendu Vue Cartes
+    ============================== */
+    function renderCards(visible, byProg){
+      const grid = el("viewCardsContainer");
+      grid.innerHTML = "";
+
+      if(visible.length === 0){
+        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--muted); background:#fff; border-radius:16px; border:1px solid var(--border);">
+          Aucun programme ne correspond aux filtres actuels.
+        </div>`;
+        return;
+      }
+
+      visible.forEach(prg => {
+        const linked = byProg[prg.id] || [];
+        const st = computeProgrammeStats(prg, linked);
+        const chFmt = formatMetricDisplay(st.chargeTotal, prg.charge_cible_j, "j", st.chargeFerme, st.chargePrevi);
+        const buFmt = formatMetricDisplay(st.budgetTotal, prg.budget_cible_k, "k€", st.budgetFerme, st.budgetPrevi);
+
+        const stInfo = prg.statut === "actif"
+          ? { cls: "st-actif", lbl: "🟢 Actif" }
+          : prg.statut === "en_preparation"
+            ? { cls: "st-prep", lbl: "🔵 En préparation" }
+            : { cls: "st-cloture", lbl: "⚪ Clôturé" };
+
+        const metaTags = [];
+        if(prg.direction_porteuse) metaTags.push(`<span class="meta-tag">🏢 ${escapeHtml(prg.direction_porteuse)}</span>`);
+        if(prg.sponsor_metier) metaTags.push(`<span class="meta-tag">👤 ${escapeHtml(prg.sponsor_metier)}</span>`);
+        if(prg.pilote_dnsi) metaTags.push(`<span class="meta-tag">🧭 ${escapeHtml(prg.pilote_dnsi)}</span>`);
+        metaTags.push(`<span class="meta-tag">📅 ${escapeHtml(formatHorizonLabel(prg))}</span>`);
+
+        const chGauge = chFmt.pct !== null
+          ? `<div class="gauge-track"><div class="gauge-fill ${chFmt.state==='over'?'g-bad':chFmt.state==='warn'?'g-warn':'g-ok'}" style="width:${Math.min(100, chFmt.pct)}%"></div></div>`
+          : "";
+        const buGauge = buFmt.pct !== null
+          ? `<div class="gauge-track"><div class="gauge-fill ${buFmt.state==='over'?'g-bad':buFmt.state==='warn'?'g-warn':'g-ok'}" style="width:${Math.min(100, buFmt.pct)}%"></div></div>`
+          : "";
+
+        const codeLine = prg.code ? `${prg.id} · ${escapeHtml(prg.code)}` : prg.id;
+
+        const card = document.createElement("article");
+        card.className = "prg-card";
+        card.innerHTML = `
+          <div class="prg-accent" style="background:${escapeHtml(prg.couleur)};"></div>
+          <div class="prg-body">
+            <div class="prg-top">
+              <div class="prg-ident">
+                <div class="prg-icon" style="background:${escapeHtml(prg.couleur)}15;">${escapeHtml(prg.icone)}</div>
+                <div style="min-width:0;">
+                  <div class="prg-code">${codeLine}</div>
+                  <div class="prg-title">${escapeHtml(prg.titre)}</div>
+                </div>
+              </div>
+              <span class="status-pill ${stInfo.cls}">${stInfo.lbl}</span>
+            </div>
+
+            <div class="prg-meta">${metaTags.join("")}</div>
+            <div class="prg-desc">${escapeHtml(prg.description || "Aucun objectif renseigné.")}</div>
+
+            <div class="prg-counts">
+              <span>💡 ${st.nbIdees} idée(s) / pré-cadrage(s)</span>
+              <span>✅ ${st.nbLaunched} lancé(s)${st.nbLaunched ? ` (${st.avgProgress}%)` : ""}</span>
+            </div>
+
+            <div class="prg-stats">
+              <div class="stat-box">
+                <div class="stat-lbl">Charge programme</div>
+                <div class="stat-num mono ${chFmt.isEstimate ? 'to-estimate' : ''}">${escapeHtml(chFmt.mainText)}</div>
+                <div class="stat-sub">${escapeHtml(chFmt.subText)}</div>
+                ${chGauge}
+              </div>
+              <div class="stat-box">
+                <div class="stat-lbl">Budget programme</div>
+                <div class="stat-num mono ${buFmt.isEstimate ? 'to-estimate' : ''}">${escapeHtml(buFmt.mainText)}</div>
+                <div class="stat-sub">${escapeHtml(buFmt.subText)}</div>
+                ${buGauge}
+              </div>
+            </div>
+          </div>
+
+          <div class="prg-footer">
+            <button class="iconbtn primary" onclick="openProgrammeProjects('${escapeHtml(prg.id)}')">
+              📋 Voir les projets (${st.totalCount})
+            </button>
+            <div class="card-actions">
+              <button class="iconbtn" onclick="editProgramme('${escapeHtml(prg.id)}')">✏️ Éditer</button>
+              <button class="iconbtn danger" onclick="deleteProgramme('${escapeHtml(prg.id)}')">🗑</button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    /* =============================
+       Pickers Modale (Emoji / Couleur / Années / Aperçu)
+    ============================== */
+    function populateYearSelects(){
+      const yNow = new Date().getFullYear();
+      const opts = `<option value="">-- Année --</option>` +
+        Array.from({length: 8}, (_, i) => yNow - 1 + i)
+          .map(y => `<option value="${y}">${y}</option>`).join("");
+      el("fStartY").innerHTML = opts;
+      el("fEndY").innerHTML = opts;
+    }
+
+    function renderEmojiGrid(selected){
+      const grid = el("emojiGrid");
+      grid.innerHTML = EMOJIS.map(em => `
+        <button type="button" class="emoji-btn ${em === selected ? 'selected' : ''}" onclick="selectEmoji('${em}')">${em}</button>
+      `).join("");
+      el("fIcone").value = selected || "🎯";
+      updateBadgePreview();
+    }
+
+    function selectEmoji(em){
+      renderEmojiGrid(em);
+    }
+
+    function renderColorPalette(selectedColor){
+      const wrap = el("colorPalette");
+      const selLower = String(selectedColor || SWATCHES[2]).toLowerCase();
+      wrap.innerHTML = SWATCHES.map(c => `
+        <div class="color-swatch ${c.toLowerCase() === selLower ? 'selected' : ''}"
+             style="background:${c};"
+             onclick="selectColor('${c}')"
+             title="${c}"></div>
+      `).join("") + `
+        <label class="color-custom-btn" title="Couleur personnalisée">
+          🎨 Perso
+          <input type="color" id="fColorCustom" value="${escapeHtml(selectedColor || SWATCHES[2])}" oninput="selectColor(this.value)"/>
+        </label>
+      `;
+      el("fCouleur").value = selectedColor || SWATCHES[2];
+      updateBadgePreview();
+    }
+
+    function selectColor(c){
+      el("fCouleur").value = c;
+      const swatches = el("colorPalette").querySelectorAll(".color-swatch");
+      swatches.forEach(s => {
+        const bg = s.getAttribute("title") || "";
+        s.classList.toggle("selected", bg.toLowerCase() === String(c).toLowerCase());
+      });
+      const customInp = el("fColorCustom");
+      if(customInp && customInp.value.toLowerCase() !== String(c).toLowerCase()){
+        customInp.value = c;
+      }
+      updateBadgePreview();
+    }
+
+    function updateBadgePreview(){
+      const badge = el("previewBadge");
+      badge.style.background = el("fCouleur").value || SWATCHES[2];
+      el("prevIcon").textContent = el("fIcone").value || "🎯";
+      const code = el("fCode").value.trim().toUpperCase();
+      const id = el("fId").value.trim();
+      el("prevId").textContent = code ? `${id} · ${code}` : id;
+      el("prevTitle").textContent = el("fTitre").value.trim() || "Nouveau programme";
+    }
+
+    function toggleContinuFields(){
+      const isCont = el("fContinu").checked;
+      ["fStartQ", "fStartY", "fEndQ", "fEndY"].forEach(id => {
+        el(id).disabled = isCont;
+        el(id).style.opacity = isCont ? "0.45" : "1";
+      });
+    }
+
+    /* =============================
+       CRUD Programme
+    ============================== */
+    function openModalProgramme(){
+      editingExistingId = null;
+      const nextId = generateNextProgramId(GOV.programmes);
+      el("fId").value = nextId;
+      el("fCode").value = "";
+      el("fStatut").value = "actif";
+      el("fTitre").value = "";
+      el("fDescription").value = "";
+      el("fDirection").value = "";
+      el("fSponsor").value = "";
+      el("fPilote").value = "";
+      el("fContinu").checked = false;
+      el("fStartQ").value = "";
+      el("fStartY").value = "";
+      el("fEndQ").value = "";
+      el("fEndY").value = "";
+      el("fChargeCible").value = "";
+      el("fBudgetCible").value = "";
+
+      toggleContinuFields();
+      renderEmojiGrid("🎯");
+      renderColorPalette(SWATCHES[2]);
+      el("modalPrgTitle").textContent = `➕ Créer un Programme (${nextId})`;
+      el("modalProgramme").style.display = "flex";
+    }
+
+    function closeModalProgramme(){
+      el("modalProgramme").style.display = "none";
+    }
+
+    function editProgramme(id){
+      const prg = (GOV.programmes || []).find(p => p.id === id);
+      if(!prg) return;
+      editingExistingId = prg.id;
+
+      el("fId").value = prg.id;
+      el("fCode").value = prg.code || "";
+      el("fStatut").value = prg.statut || "actif";
+      el("fTitre").value = prg.titre || "";
+      el("fDescription").value = prg.description || "";
+      el("fDirection").value = prg.direction_porteuse || "";
+      el("fSponsor").value = prg.sponsor_metier || "";
+      el("fPilote").value = prg.pilote_dnsi || "";
+      el("fContinu").checked = !!prg.continu;
+      el("fStartQ").value = prg.debut_q || "";
+      el("fStartY").value = prg.debut_y || "";
+      el("fEndQ").value = prg.fin_q || "";
+      el("fEndY").value = prg.fin_y || "";
+      el("fChargeCible").value = prg.charge_cible_j > 0 ? prg.charge_cible_j : "";
+      el("fBudgetCible").value = prg.budget_cible_k > 0 ? prg.budget_cible_k : "";
+
+      toggleContinuFields();
+      renderEmojiGrid(prg.icone || "🎯");
+      renderColorPalette(prg.couleur || SWATCHES[2]);
+      el("modalPrgTitle").textContent = `✏️ Modifier : ${prg.id}`;
+      el("modalProgramme").style.display = "flex";
+    }
+
+    function saveProgramme(){
+      const id = el("fId").value.trim();
+      const code = el("fCode").value.trim().toUpperCase();
+      const titre = el("fTitre").value.trim();
+      const description = el("fDescription").value.trim();
+
+      if(!titre || !description){
+        alert("Le Nom du programme et son Objectif / Finalité sont obligatoires.");
+        return;
+      }
+
+      const continu = el("fContinu").checked;
+      let dq = null, dy = null, fq = null, fy = null;
+
+      if(!continu){
+        const sq = el("fStartQ").value, sy = el("fStartY").value;
+        const eq = el("fEndQ").value, ey = el("fEndY").value;
+        const anyDate = sq || sy || eq || ey;
+        if(anyDate){
+          if(!(sq && sy && eq && ey)){
+            alert("Pour planifier le programme sur le Gantt, renseignez le trimestre ET l'année de début et de fin (ou laissez les 4 champs vides).");
+            return;
+          }
+          dq = Number(sq); dy = Number(sy); fq = Number(eq); fy = Number(ey);
+          if((fy * 4 + fq) < (dy * 4 + dq)){
+            alert("La période de fin ne peut pas être antérieure à la période de début.");
+            return;
+          }
+        }
+      }
+
+      const payload = {
+        id,
+        code,
+        icone: el("fIcone").value || "🎯",
+        couleur: el("fCouleur").value || SWATCHES[2],
+        titre,
+        description,
+        statut: el("fStatut").value,
+        direction_porteuse: el("fDirection").value.trim(),
+        sponsor_metier: el("fSponsor").value.trim(),
+        pilote_dnsi: el("fPilote").value.trim(),
+        continu,
+        debut_q: dq,
+        debut_y: dy,
+        fin_q: fq,
+        fin_y: fy,
+        charge_cible_j: Math.max(0, safeNum(el("fChargeCible").value)),
+        budget_cible_k: Math.max(0, safeNum(el("fBudgetCible").value))
+      };
+
+      if(editingExistingId){
+        const idx = GOV.programmes.findIndex(p => p.id === editingExistingId);
+        if(idx >= 0) GOV.programmes[idx] = payload;
+      } else {
+        GOV.programmes.push(payload);
+      }
+
+      saveGov(GOV);
+      closeModalProgramme();
+      render();
+    }
+
+    function deleteProgramme(id){
+      const prg = (GOV.programmes || []).find(p => p.id === id);
+      if(!prg) return;
+      const validIds = new Set(GOV.programmes.map(p => p.id));
+      const linked = (GOV.portefeuille?.projets || []).filter(p => getProjectProgrammeId(p, validIds) === id);
+
+      const warnMsg = linked.length
+        ? `Attention : ${linked.length} projet(s)/idée(s) sont rattachés à "${prg.titre}". Ils passeront en "Hors Programme". Confirmer la suppression ?`
+        : `Supprimer définitivement le programme "${prg.titre}" (${prg.id}) ?`;
+
+      if(!confirm(warnMsg)) return;
+
+      GOV.programmes = GOV.programmes.filter(p => p.id !== id);
+      (GOV.portefeuille?.projets || []).forEach(proj => {
+        if(proj.programme_id === id) proj.programme_id = "";
+        if(proj.axe_strategique === id) proj.axe_strategique = "";
+      });
+
+      saveGov(GOV);
+      render();
+    }
+
+    /* =============================
+       Modale : Projets d'un Programme
+    ============================== */
+    function openProgrammeProjects(prgId){
+      const prg = (GOV.programmes || []).find(p => p.id === prgId);
+      if(!prg) return;
+      const validIds = new Set(GOV.programmes.map(p => p.id));
+      const linked = (GOV.portefeuille?.projets || []).filter(p => getProjectProgrammeId(p, validIds) === prgId);
+
+      el("modalProjTitle").textContent = `${prg.icone} ${prg.titre} (${prg.id})`;
+      const metaParts = [formatHorizonLabel(prg)];
+      if(prg.direction_porteuse) metaParts.push(`Dir. : ${prg.direction_porteuse}`);
+      if(prg.sponsor_metier) metaParts.push(`Sponsor : ${prg.sponsor_metier}`);
+      if(prg.pilote_dnsi) metaParts.push(`Pilote DNSI : ${prg.pilote_dnsi}`);
+      el("modalProjSub").textContent = `${linked.length} élément(s) rattaché(s) • ${metaParts.join(" · ")}`;
+
+      el("btnEditFromProjModal").onclick = () => {
+        el("modalProjects").style.display = "none";
+        editProgramme(prg.id);
+      };
+
+      const body = el("modalProjBody");
+      if(linked.length === 0){
+        body.innerHTML = `<div style="text-align:center; padding:24px; color:var(--muted);">Aucun projet ou idée n'est encore rattaché à ce programme.</div>`;
+      } else {
+        body.innerHTML = `
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Projet / Idée</th>
+                <th>Direction</th>
+                <th>Type</th>
+                <th>Prio</th>
+                <th style="text-align:right;">Avanc.</th>
+                <th style="text-align:right;">Budget</th>
+                <th style="text-align:right;">Charge</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${linked.map(p => `
+                <tr>
+                  <td class="mono" style="font-weight:800; color:var(--lille-red);">${escapeHtml(p.id)}</td>
+                  <td><b>${escapeHtml(p.nom || p.name || p.id)}</b></td>
+                  <td>${escapeHtml(p.direction || "—")}</td>
+                  <td>${isProjectLaunched(p)
+                    ? `<span class="mini-badge" style="background:#f0fdf4;color:#166534;border-color:#bbf7d0;">✅ Lancé</span>`
+                    : `<span class="mini-badge">💡 ${escapeHtml(p.status === "pre_cadrage" ? "Pré-cadrage" : "Idée")}</span>`}
+                  </td>
+                  <td><span class="mini-badge">${escapeHtml(p.priorite || "P2")}</span></td>
+                  <td class="mono" style="text-align:right;">${isProjectLaunched(p) ? getProjectProgress(p) + "%" : "—"}</td>
+                  <td class="mono" style="text-align:right;">${getProjectBudgetK(p) ? getProjectBudgetK(p).toLocaleString("fr-FR") + " k€" : "—"}</td>
+                  <td class="mono" style="text-align:right; font-weight:800;">${getProjectCharge(p) ? getProjectCharge(p).toLocaleString("fr-FR") + " j" : "—"}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        `;
+      }
+      el("modalProjects").style.display = "flex";
+    }
+
+    /* =============================
+       Modale : Radar Orphelins + Rattachement
+    ============================== */
+    function openOrphansModal(){
+      const programmes = (GOV.programmes || []).filter(p => p.statut !== "cloture");
+      const validIds = new Set((GOV.programmes || []).map(p => p.id));
+      const orphans = (GOV.portefeuille?.projets || []).filter(p => !getProjectProgrammeId(p, validIds));
+
+      const body = el("modalOrphansBody");
+      if(orphans.length === 0){
+        body.innerHTML = `<div style="text-align:center; padding:24px; color:#166534; font-weight:800;">✅ Aucun élément orphelin. Tout le portefeuille est couvert !</div>`;
+      } else {
+        const optionsHtml = `<option value="">-- Choisir un programme --</option>` +
+          programmes.map(pr => `<option value="${escapeHtml(pr.id)}">${escapeHtml(pr.icone)} ${escapeHtml(pr.id)} — ${escapeHtml(pr.titre)}</option>`).join("");
+
+        body.innerHTML = `
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Demande / Projet</th>
+                <th>Type</th>
+                <th style="text-align:right;">Charge</th>
+                <th style="width:290px;">Rattacher à un programme</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${orphans.map(p => `
+                <tr>
+                  <td class="mono" style="font-weight:800; color:var(--lille-red);">${escapeHtml(p.id)}</td>
+                  <td>
+                    <b>${escapeHtml(p.nom || p.name || p.id)}</b>
+                    <div style="font-size:11px; color:var(--muted);">${escapeHtml(p.direction || "Direction non renseignée")}</div>
+                  </td>
+                  <td>${isProjectLaunched(p)
+                    ? `<span class="mini-badge" style="background:#f0fdf4;color:#166534;">✅ Lancé</span>`
+                    : `<span class="mini-badge">💡 Idée</span>`}
+                  </td>
+                  <td class="mono" style="text-align:right; font-weight:800;">${getProjectCharge(p) ? getProjectCharge(p).toLocaleString("fr-FR") + " j" : "—"}</td>
+                  <td>
+                    <select onchange="assignOrphan('${escapeHtml(p.id)}', this.value)" style="width:100%; padding:6px 8px; border-radius:8px; border:1px solid var(--border); font-size:12px;">
+                      ${optionsHtml}
+                    </select>
+                  </td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        `;
+      }
+      el("modalOrphans").style.display = "flex";
+    }
+
+    function assignOrphan(projectId, progId){
+      if(!progId) return;
+      const proj = (GOV.portefeuille?.projets || []).find(p => String(p.id) === String(projectId));
+      if(!proj) return;
+
+      proj.programme_id = progId;
+      proj.axe_strategique = progId;
+      saveGov(GOV);
+      render();
+      openOrphansModal();
+    }
+
+    /* =============================
+       Export / Import JSON
+    ============================== */
+    function downloadGovJson(){
+      saveGov(GOV, true);
+      const blob = new Blob([JSON.stringify(GOV, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "Gouvernance.json";
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+      toast("Fichier Gouvernance.json téléchargé ✅");
+    }
+
+    async function importGovJson(file){
+      if(!file) return;
+      try{
+        const text = await file.text();
+        const parsed = safeJsonParse(text);
+        if(!parsed){ alert("Fichier JSON invalide."); return; }
+        GOV = normalizeGovernance(parsed);
+        saveGov(GOV);
+        render();
+      }catch(e){
+        alert("Erreur lors de la lecture du JSON.");
+      }
+    }
+
+    /* =============================
+       Câblage & Démarrage
+    ============================== */
+    populateYearSelects();
+
+    el("btnNewProgramme").onclick = openModalProgramme;
+    el("btnSaveProgramme").onclick = saveProgramme;
+    el("btnShowOrphans").onclick = openOrphansModal;
+    el("btnPdf").onclick = () => window.print();
+    el("btnSaveJson").onclick = downloadGovJson;
+    el("btnImport").onclick = () => { el("fileInput").value = ""; el("fileInput").click(); };
+    el("fileInput").onchange = e => importGovJson(e.target.files?.[0]);
+    el("btnRefresh").onclick = () => { GOV = loadGov(); render(); toast("Données réactualisées 🔄"); };
+
+    el("fltSearch").addEventListener("input", render);
+    el("fltStatut").addEventListener("change", render);
+    el("fTitre").addEventListener("input", updateBadgePreview);
+    el("fCode").addEventListener("input", updateBadgePreview);
+
+    ["modalProgramme", "modalProjects", "modalOrphans"].forEach(id => {
+      el(id).addEventListener("click", e => {
+        if(e.target === el(id)) el(id).style.display = "none";
+      });
+    });
+
+    window.addEventListener("storage", ev => {
+      if(ev.key === STORAGE_KEY){ GOV = loadGov(); render(); }
+    });
+    try{
+      const bc = new BroadcastChannel("dnsi-gouvernance");
+      bc.onmessage = ev => {
+        if(ev?.data?.type === "GOUVERNANCE_UPDATED" && ev?.data?.source !== "programmes"){
+          GOV = loadGov();
+          render();
+        }
+      };
+    }catch(e){}
+
+    // Boot
+    saveGov(GOV, true);
+    render();
+  </script>
+</body>
+</html>
