@@ -1,6 +1,6 @@
 {
   "version": "v6.9.0",
-  "date": "2026-11-19T18:44:05.839Z",
+  "date": "2026-11-19T18:44:35.603Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -454,7 +454,6 @@
         "g_e4_g_pos_1",
         "g_e4_g_pos_3",
         "g_e4_g_pos_4",
-        "g_e4_g_pos_5",
         "g_e3_d_pos_1",
         "g_e3_d_pos_2",
         "g_e3_d_pos_3",
@@ -571,6 +570,18 @@
     }
   ],
   "history": [
+    {
+      "id": "1793630189310",
+      "domaine": "Cocteaux parcelle 22",
+      "region": "Loire",
+      "millesime": "2026",
+      "couleur": "Rouge",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "idArchive": "1795113875601_lo1wj",
+      "dateSortie": "2026-11-19T18:44:35.601Z",
+      "note": 0
+    },
     {
       "id": "1791219587930",
       "domaine": "Terrassous Villare Juliani",
