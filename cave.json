@@ -1,6 +1,6 @@
 {
   "version": "v6.9.0",
-  "date": "2026-11-19T18:42:57.819Z",
+  "date": "2026-11-19T18:44:05.839Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -117,8 +117,7 @@
       "emplacements": [
         "g_e1_d_pos_2",
         "g_e1_d_pos_3",
-        "g_e1_d_pos_4",
-        "g_e1_d_pos_5"
+        "g_e1_d_pos_4"
       ]
     },
     {
@@ -572,6 +571,18 @@
     }
   ],
   "history": [
+    {
+      "id": "1791219587930",
+      "domaine": "Terrassous Villare Juliani",
+      "region": "Roussillon",
+      "millesime": "2024",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "idArchive": "1795113845835_tzc65",
+      "dateSortie": "2026-11-19T18:44:05.835Z",
+      "note": 0
+    },
     {
       "id": "1791218790646",
       "domaine": "Terrasous réserve ",
