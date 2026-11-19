@@ -1,6 +1,6 @@
 {
   "version": "v6.9.0",
-  "date": "2026-11-19T18:40:44.224Z",
+  "date": "2026-11-19T18:42:57.819Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -66,18 +66,6 @@
       "profil": "Fruité/Vif",
       "emplacements": [
         "g_e7_g_pos_1"
-      ]
-    },
-    {
-      "id": "1791218790646",
-      "domaine": "Terrasous réserve ",
-      "region": "Roussillon",
-      "millesime": "2025",
-      "couleur": "Rosé",
-      "envergure": "Dégustation",
-      "profil": "Puissant/Rond",
-      "emplacements": [
-        "g_e7_g_pos_2"
       ]
     },
     {
@@ -584,6 +572,18 @@
     }
   ],
   "history": [
+    {
+      "id": "1791218790646",
+      "domaine": "Terrasous réserve ",
+      "region": "Roussillon",
+      "millesime": "2025",
+      "couleur": "Rosé",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "idArchive": "1795113777805_offhy",
+      "dateSortie": "2026-11-19T18:42:57.806Z",
+      "note": 0
+    },
     {
       "id": "1791218633200",
       "domaine": "Cocteaux",
