@@ -1,6 +1,6 @@
 {
   "version": "v6.9.0",
-  "date": "2026-11-19T18:44:35.603Z",
+  "date": "2026-11-20T12:03:31.637Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -144,8 +144,7 @@
       "profil": "Fruité/Vif",
       "emplacements": [
         "g_e9_d_pos_2",
-        "g_e9_d_pos_3",
-        "g_e9_d_pos_4"
+        "g_e9_d_pos_3"
       ],
       "eff_color": "Rosé",
       "eff_type": "Brut"
@@ -570,6 +569,20 @@
     }
   ],
   "history": [
+    {
+      "id": "1791548935207",
+      "domaine": "Secret de chaix",
+      "region": "Loire",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "eff_color": "Rosé",
+      "eff_type": "Brut",
+      "idArchive": "1795176211633_7aidu",
+      "dateSortie": "2026-11-20T12:03:31.634Z",
+      "note": 0
+    },
     {
       "id": "1793630189310",
       "domaine": "Cocteaux parcelle 22",
