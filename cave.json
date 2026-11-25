@@ -1,6 +1,6 @@
 {
   "version": "v6.9.0",
-  "date": "2026-11-25T20:03:09.237Z",
+  "date": "2026-11-25T20:04:54.112Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -25,8 +25,7 @@
       "envergure": "Détente",
       "profil": "Fruité/Vif",
       "emplacements": [
-        "g_e10_g_pos_2",
-        "g_e10_g_pos_3"
+        "g_e10_g_pos_2"
       ],
       "eff_color": "Blanc",
       "eff_type": "Brut"
@@ -555,6 +554,20 @@
     }
   ],
   "history": [
+    {
+      "id": "1790788614307",
+      "domaine": "Gratin & Meyer",
+      "region": "Loire",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "eff_color": "Blanc",
+      "eff_type": "Brut",
+      "idArchive": "1795637094105_qny40",
+      "dateSortie": "2026-11-25T20:04:54.105Z",
+      "note": 0
+    },
     {
       "id": "1793630189310",
       "domaine": "Cocteaux parcelle 22",
