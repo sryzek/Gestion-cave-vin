@@ -1,6 +1,6 @@
 {
   "version": "v6.9.0",
-  "date": "2026-11-25T20:02:33.839Z",
+  "date": "2026-11-25T20:03:09.237Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -437,7 +437,6 @@
       "envergure": "Détente",
       "profil": "Fruité/Vif",
       "emplacements": [
-        "g_e4_g_pos_1",
         "g_e4_g_pos_3",
         "g_e4_g_pos_4",
         "g_e3_d_pos_1",
@@ -556,6 +555,18 @@
     }
   ],
   "history": [
+    {
+      "id": "1793630189310",
+      "domaine": "Cocteaux parcelle 22",
+      "region": "Loire",
+      "millesime": "2026",
+      "couleur": "Rouge",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "idArchive": "1795636989236_arhyd",
+      "dateSortie": "2026-11-25T20:03:09.236Z",
+      "note": 0
+    },
     {
       "id": "1791219176173",
       "domaine": "Cocteaux ",
