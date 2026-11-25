@@ -1,6 +1,6 @@
 {
   "version": "v6.9.0",
-  "date": "2026-11-22T12:52:05.797Z",
+  "date": "2026-11-25T20:02:33.839Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -92,18 +92,6 @@
         "g_e6_d_pos_1",
         "g_e6_d_pos_2",
         "g_e6_d_pos_3"
-      ]
-    },
-    {
-      "id": "1791219176173",
-      "domaine": "Cocteaux ",
-      "region": "Touraine ",
-      "millesime": "",
-      "couleur": "Rouge",
-      "envergure": "Détente",
-      "profil": "Fruité/Vif",
-      "emplacements": [
-        "g_e4_g_pos_2"
       ]
     },
     {
@@ -568,6 +556,18 @@
     }
   ],
   "history": [
+    {
+      "id": "1791219176173",
+      "domaine": "Cocteaux ",
+      "region": "Touraine ",
+      "millesime": "",
+      "couleur": "Rouge",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "idArchive": "1795636953834_bep0v",
+      "dateSortie": "2026-11-25T20:02:33.834Z",
+      "note": 0
+    },
     {
       "id": "1793629609586",
       "domaine": "Cocteaux",
