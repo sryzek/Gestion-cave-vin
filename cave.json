@@ -1,6 +1,6 @@
 {
   "version": "v6.9.0",
-  "date": "2026-11-25T20:04:54.112Z",
+  "date": "2026-11-26T17:43:41.024Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -117,8 +117,7 @@
       "profil": "Puissant/Rond",
       "emplacements": [
         "g_e1_g_pos_1",
-        "g_e1_g_pos_2",
-        "g_e1_g_pos_3"
+        "g_e1_g_pos_2"
       ]
     },
     {
@@ -554,6 +553,18 @@
     }
   ],
   "history": [
+    {
+      "id": "1791219698606",
+      "domaine": "L'éternel tardif",
+      "region": "Roussillon ",
+      "millesime": "2024",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "idArchive": "1795715021011_89s5y",
+      "dateSortie": "2026-11-26T17:43:41.012Z",
+      "note": 0
+    },
     {
       "id": "1790788614307",
       "domaine": "Gratin & Meyer",
