@@ -1,6 +1,6 @@
 {
   "version": "v6.9.0",
-  "date": "2026-11-26T17:43:41.024Z",
+  "date": "2026-11-26T17:45:59.506Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -103,8 +103,7 @@
       "profil": "Puissant/Rond",
       "emplacements": [
         "g_e1_d_pos_2",
-        "g_e1_d_pos_3",
-        "g_e1_d_pos_4"
+        "g_e1_d_pos_3"
       ]
     },
     {
@@ -553,6 +552,18 @@
     }
   ],
   "history": [
+    {
+      "id": "1791219587930",
+      "domaine": "Terrassous Villare Juliani",
+      "region": "Roussillon",
+      "millesime": "2024",
+      "couleur": "Rouge",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "idArchive": "1795715159500_3nbnt",
+      "dateSortie": "2026-11-26T17:45:59.500Z",
+      "note": 0
+    },
     {
       "id": "1791219698606",
       "domaine": "L'éternel tardif",
