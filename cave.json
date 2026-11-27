@@ -1,6 +1,6 @@
 {
   "version": "v6.9.0",
-  "date": "2026-11-26T17:45:59.506Z",
+  "date": "2026-11-27T11:03:51.440Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -309,7 +309,6 @@
       "envergure": "Détente",
       "profil": "Fruité/Vif",
       "emplacements": [
-        "esc_vrac_pos_39",
         "esc_vrac_pos_40",
         "esc_vrac_pos_41",
         "esc_vrac_pos_42",
@@ -552,6 +551,20 @@
     }
   ],
   "history": [
+    {
+      "id": "1792340497465",
+      "domaine": "Château Montaudon",
+      "region": "Champagne ",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "eff_color": "Blanc",
+      "eff_type": "Brut",
+      "idArchive": "1795777431434_vbua0",
+      "dateSortie": "2026-11-27T11:03:51.434Z",
+      "note": 0
+    },
     {
       "id": "1791219587930",
       "domaine": "Terrassous Villare Juliani",
