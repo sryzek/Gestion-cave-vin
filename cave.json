@@ -1,6 +1,6 @@
 {
   "version": "v6.9.0",
-  "date": "2026-11-27T11:03:51.440Z",
+  "date": "2026-11-27T15:57:42.375Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -401,8 +401,7 @@
         "g_e5_d_pos_1",
         "g_e5_d_pos_2",
         "g_e5_d_pos_3",
-        "g_e5_d_pos_4",
-        "g_e5_d_pos_5"
+        "g_e5_d_pos_4"
       ],
       "eff_color": "Blanc",
       "eff_type": "Brut"
@@ -551,6 +550,20 @@
     }
   ],
   "history": [
+    {
+      "id": "1793629916803",
+      "domaine": "Cocteaux Effervescent rouge",
+      "region": "Loire",
+      "millesime": "2026",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "eff_color": "Blanc",
+      "eff_type": "Brut",
+      "idArchive": "1795795062354_gypjh",
+      "dateSortie": "2026-11-27T15:57:42.355Z",
+      "note": 0
+    },
     {
       "id": "1792340497465",
       "domaine": "Château Montaudon",
