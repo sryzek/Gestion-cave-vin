@@ -1,6 +1,6 @@
 {
   "version": "v6.9.0",
-  "date": "2026-11-27T15:57:42.375Z",
+  "date": "2026-11-28T13:36:07.892Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -12,20 +12,6 @@
       "profil": "Fruité/Vif",
       "emplacements": [
         "g_e10_g_pos_1"
-      ],
-      "eff_color": "Blanc",
-      "eff_type": "Brut"
-    },
-    {
-      "id": "1790788614307",
-      "domaine": "Gratin & Meyer",
-      "region": "Loire",
-      "millesime": "",
-      "couleur": "Effervescent",
-      "envergure": "Détente",
-      "profil": "Fruité/Vif",
-      "emplacements": [
-        "g_e10_g_pos_2"
       ],
       "eff_color": "Blanc",
       "eff_type": "Brut"
@@ -550,6 +536,20 @@
     }
   ],
   "history": [
+    {
+      "id": "1790788614307",
+      "domaine": "Gratin & Meyer",
+      "region": "Loire",
+      "millesime": "",
+      "couleur": "Effervescent",
+      "envergure": "Détente",
+      "profil": "Fruité/Vif",
+      "eff_color": "Blanc",
+      "eff_type": "Brut",
+      "idArchive": "1795872967878_scm3a",
+      "dateSortie": "2026-11-28T13:36:07.878Z",
+      "note": 0
+    },
     {
       "id": "1793629916803",
       "domaine": "Cocteaux Effervescent rouge",
