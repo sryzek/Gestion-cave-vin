@@ -1,6 +1,6 @@
 {
   "version": "v6.9.0",
-  "date": "2026-11-28T13:36:07.892Z",
+  "date": "2026-11-28T13:36:43.924Z",
   "inventory": [
     {
       "id": "1790788372664",
@@ -27,18 +27,6 @@
       "emplacements": [
         "g_e8_d_pos_1",
         "g_e8_d_pos_2"
-      ]
-    },
-    {
-      "id": "1791218537072",
-      "domaine": "Closerie les alisiers petit chablis",
-      "region": "Bourgogne ",
-      "millesime": "2025",
-      "couleur": "Blanc",
-      "envergure": "Dégustation",
-      "profil": "Puissant/Rond",
-      "emplacements": [
-        "g_e8_d_pos_4"
       ]
     },
     {
@@ -536,6 +524,18 @@
     }
   ],
   "history": [
+    {
+      "id": "1791218537072",
+      "domaine": "Closerie les alisiers petit chablis",
+      "region": "Bourgogne ",
+      "millesime": "2025",
+      "couleur": "Blanc",
+      "envergure": "Dégustation",
+      "profil": "Puissant/Rond",
+      "idArchive": "1795873003922_liip7",
+      "dateSortie": "2026-11-28T13:36:43.922Z",
+      "note": 0
+    },
     {
       "id": "1790788614307",
       "domaine": "Gratin & Meyer",
